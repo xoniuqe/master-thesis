@@ -26,7 +26,7 @@ build:
   # before_script:
   #   - apt update && apt -y install make autoconf
   script:
-    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake --build build
+    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake --build .
    # - g++ helloworld.cpp -o mybinary
   #artifacts:
   #  paths:
