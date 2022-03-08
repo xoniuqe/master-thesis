@@ -26,11 +26,11 @@ build:
   # before_script:
   #   - apt update && apt -y install make autoconf
   script:
-    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake --build .
+    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake --build . --target install
    # - g++ helloworld.cpp -o mybinary
   artifacts:
     paths:
-      - SteepestDescent
+      - .
       # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
       # cache:
       #   paths:
