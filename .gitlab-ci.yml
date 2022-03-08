@@ -11,8 +11,8 @@ image: gcc
 before_script:
  - apt-get update --yes
  - apt-get install --yes cmake build-essential gdb pkg-config
- - cd vcpkg && bash bootstrap-vcpkg.sh
- - cd vcpkg && vcpkg install gsl 
+ - bash ./vcpkg/bootstrap-vcpkg.sh
+ - ./vcpkg/vcpkg install gsl 
 
 build:
   stage: build
@@ -21,7 +21,7 @@ build:
   # before_script:
   #   - apt update && apt -y install make autoconf
   script:
-    - cmake -DCMAKE_TOOLCHAIN_FILE=vcpkg\\scripts\\buildsystems\\vcpkg.cmake --build build
+    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake --build build
    # - g++ helloworld.cpp -o mybinary
   artifacts:
     paths:
