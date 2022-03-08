@@ -2,7 +2,7 @@
 # projektspezifische Logik hier.
 #
 cmake_minimum_required (VERSION 3.8)
-
+add_compile_definitions(HAVE_INLINE)
 # Fügen Sie der ausführbaren Datei dieses Projekts eine Quelle hinzu.
 add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h")
 
