@@ -4,7 +4,7 @@
 ## Setting up my project:
 
 * clone the repo
-* cd vckpkg
+* cd vcpkg
 * bootstrap-vcpkg.bat
 * vcpkg install gsl gsl:x64-windows
 (todo: vcpkg install @ResponseFile)
@@ -43,6 +43,19 @@ implementation.
 https://stackoverflow.com/questions/34647154/gitlab-ci-with-matlab
 
 
+## Risks
+
+Precesision of GSL seems to be 2*10^-16, but we need 10^-16
+Boost OdeInt seems to be more precise
+
+Boost multiprecision
+https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/index.html
+
+Gauﬂ-laguerre Quadrature with Boost.Multiprecision
+https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/fp_eg/gauss_lagerre_quadrature.html
+
+https://stackoverflow.com/questions/37296481/integration-with-quadrature-and-multiprecision-boost-libraries-in-c
+
 
 ## Useful links 
 
@@ -57,3 +70,8 @@ https://solarianprogrammer.com/2020/01/26/getting-started-gsl-gnu-scientific-lib
 
 https://vcpkg.readthedocs.io/en/latest/examples/installing-and-using-packages/
 
+### CMake
+https://cliutils.gitlab.io/modern-cmake/chapters/intro/running.html
+
+### Google results
+https://www.google.com/search?channel=trow5&client=firefox-b-d&q=c%2B%2B+library+gauss+laguerre
