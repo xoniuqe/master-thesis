@@ -11,7 +11,7 @@ image: gcc
 before_script:
  - apt-get update --yes
  - apt-get install --yes cmake build-essential gdb pkg-config
- - bash ./vcpkg/bootstrap-vcpkg.sh
+ - ./vcpkg/bootstrap-vcpkg.sh
  - ./vcpkg/vcpkg install gsl 
 
 build:
