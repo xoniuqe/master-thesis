@@ -17,7 +17,7 @@ before_script:
  - echo "calling vcpkg"
  - sh ./vcpkg/bootstrap-vcpkg.sh
  - ./vcpkg/vcpkg install gsl 
- - ./vcpkg integrate install
+ - ./vcpkg/vcpkg integrate install
 
 build:
   stage: build
@@ -28,9 +28,9 @@ build:
   script:
     - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake --build build
    # - g++ helloworld.cpp -o mybinary
-  artifacts:
-    paths:
-      - mybinary
+  #artifacts:
+  #  paths:
+  #    - mybinary
       # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
       # cache:
       #   paths:
