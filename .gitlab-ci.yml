@@ -28,9 +28,9 @@ build:
   script:
     - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake --build .
    # - g++ helloworld.cpp -o mybinary
-  #artifacts:
-  #  paths:
-  #    - mybinary
+  artifacts:
+    paths:
+      - SteepestDescent
       # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
       # cache:
       #   paths:
