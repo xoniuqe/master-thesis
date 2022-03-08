@@ -18,7 +18,6 @@ before_script:
  - sh ./vcpkg/bootstrap-vcpkg.sh
  - ./vcpkg/vcpkg install gsl 
  - ./vcpkg/vcpkg integrate install
- - mkdir install
 
 build:
   stage: build
@@ -27,11 +26,13 @@ build:
   # before_script:
   #   - apt update && apt -y install make autoconf
   script:
-    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake --build . --target install
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake ..
    # - g++ helloworld.cpp -o mybinary
   artifacts:
     paths:
-      - SteepestDescend
+      - build
       # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
       # cache:
       #   paths:
