@@ -12,7 +12,7 @@ before_script:
  - git submodule sync --recursive
  - git submodule update --init --recursive
  - apt-get update --yes
- - apt-get install --yes cmake build-essential gdb pkg-config
+ - apt-get install --yes cmake build-essential gdb pkg-config curl zip unzip tar
  - ls vcpkg
  - echo "calling vcpkg"
  - sh ./vcpkg/bootstrap-vcpkg.sh
