@@ -10,6 +10,40 @@
 (todo: vcpkg install @ResponseFile)
 * vcpkg integrate install
 
+## Implementation details
+
+### Used technologies
+
+Programming language: C++
+
+Mathlibrary: Gnu Scientifc Library
+
+Testing: do be decided
+
+Speedup: Intel-Threading-Building-Blocks, OpenCl, Cuda(?)
+
+### Requirements
+
+1. The code should run faster than the Matlab implementation
+2. API:
+    1. Python
+    2. Matlab
+    3. Commandline interface
+3. 
+
+## Considerations for perfomance 
+
+### Running Matlab on Gitlab
+
+Rough idea:
+
+Execute the Matlab implementation and measure the runtime (and maybe space) of it and compare it with the c++
+implementation.
+
+https://stackoverflow.com/questions/34647154/gitlab-ci-with-matlab
+
+
+
 ## Useful links 
 
 Gnu Scientific library (GSL)
