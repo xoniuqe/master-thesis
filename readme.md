@@ -59,6 +59,11 @@ https://stackoverflow.com/questions/37296481/integration-with-quadrature-and-mul
 
 ## Useful links 
 
+
+Comparison of linear algebrar libraries:
+https://en.wikipedia.org/wiki/Comparison_of_linear_algebra_libraries
+
+
 Gnu Scientific library (GSL)
 
 https://www.gnu.org/software/gsl/
