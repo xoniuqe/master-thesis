@@ -7,13 +7,12 @@
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "variables": [
         {
           "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "${projectDir}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+          "value": "${projectDir}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake",
+          "type": "STRING"
         }
       ]
     }
