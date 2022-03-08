@@ -18,6 +18,7 @@ before_script:
  - sh ./vcpkg/bootstrap-vcpkg.sh
  - ./vcpkg/vcpkg install gsl 
  - ./vcpkg/vcpkg integrate install
+ - mkdir install
 
 build:
   stage: build
