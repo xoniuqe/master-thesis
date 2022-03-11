@@ -20,8 +20,8 @@ build-latex:
     script:
      - cd latex
      - pdflatex thesis.tex
-     - biber literatur.bib
-     - pdflatex thesis.tex
+     #- biber literatur.bib
+    # - pdflatex thesis.tex
     #after_script:
     # - cat latex/thesis.log
     artifacts:
