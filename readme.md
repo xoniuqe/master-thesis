@@ -57,8 +57,12 @@ https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/boost_multipr
 https://stackoverflow.com/questions/37296481/integration-with-quadrature-and-multiprecision-boost-libraries-in-c
 
 
+
+
 ## Useful links 
 
+Running GNU Octave on Gitlab:
+https://gitlab.com/mtmiller/octave-snapshot
 
 Comparison of linear algebrar libraries:
 https://en.wikipedia.org/wiki/Comparison_of_linear_algebra_libraries
@@ -80,3 +84,10 @@ https://cliutils.gitlab.io/modern-cmake/chapters/intro/running.html
 
 ### Google results
 https://www.google.com/search?channel=trow5&client=firefox-b-d&q=c%2B%2B+library+gauss+laguerre
+
+### Gauﬂ-laguerre implementations
+
+http://www.mymathlib.com/quadrature/gauss_laguerre.html
+
+Gauﬂ-laguerre Quadrature with Boost.Multiprecision
+https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/fp_eg/gauss_lagerre_quadrature.html
