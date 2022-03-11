@@ -16,18 +16,16 @@
 build-latex:
     stage: build
     image: registry.gitlab.com/islandoftex/images/texlive:latest
-    before_script:
-     - cd latex
 
     script:
-     - pdflatex thesis.tex
-     - biber thesis
-     - pdflatex thesis.tex
+     - pdflatex latex/thesis.tex
+     - biber latex/literatur.bib
+     - pdflatex latex/thesis.tex
     after_script:
-     - cat thesis.log
+     - cat latex/thesis.log
     artifacts:
      paths:
-      - thesis.pdf
+      - latex/thesis.pdf
 
 
 build:
