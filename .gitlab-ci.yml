@@ -18,9 +18,10 @@ build-latex:
     image: registry.gitlab.com/islandoftex/images/texlive:latest
 
     script:
-     - pdflatex latex/thesis.tex
-     - biber latex/literatur.bib
-     - pdflatex latex/thesis.tex
+     - cd latex
+     - pdflatex thesis.tex
+     - biber literatur.bib
+     - pdflatex thesis.tex
     after_script:
      - cat latex/thesis.log
     artifacts:
