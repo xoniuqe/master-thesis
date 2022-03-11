@@ -22,8 +22,8 @@ build-latex:
      - pdflatex thesis.tex
      - biber literatur.bib
      - pdflatex thesis.tex
-    after_script:
-     - cat latex/thesis.log
+    #after_script:
+    # - cat latex/thesis.log
     artifacts:
      paths:
       - latex/thesis.pdf
