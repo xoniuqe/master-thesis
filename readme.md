@@ -10,6 +10,14 @@
 (todo: vcpkg install @ResponseFile)
 * vcpkg integrate install
 
+## Thoughts
+
+The nature of the problem allows it to be splitted in many sub calculations.
+This should make it easier to run parts of this in threads or even in separate calls to the provided API with muliple machines (e.g. when scaling on a cluster)
+This has still to be verified, but each integration runs over a small triangular area, so the splitting could be achieved by an external call.
+We should provide each function in the planned APIs (Python / Matlab)
+
+
 ## Implementation details
 
 ### Used technologies
@@ -28,7 +36,7 @@ Speedup: Intel-Threading-Building-Blocks, OpenCl, Cuda(?)
 2. API:
     1. Python
     2. Matlab
-    3. Commandline interface
+    (3. Commandline interface)
 3. 
 
 ## Considerations for perfomance 
@@ -72,6 +80,10 @@ Gnu Scientific library (GSL)
 
 https://www.gnu.org/software/gsl/
 
+
+Python API:
+https://pybind11.readthedocs.io/en/latest/basics.html
+https://www.boost.org/doc/libs/1_78_0/libs/python/doc/html/index.html
 
 vcpkg and GSL:
 
