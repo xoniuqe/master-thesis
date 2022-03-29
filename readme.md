@@ -41,6 +41,8 @@ Speedup: Intel-Threading-Building-Blocks, OpenCl, Cuda(?)
 
 ## Considerations for perfomance 
 
+Compile-time evaluation of Gauﬂ-Laguerre stuff.
+
 ### Running Matlab on Gitlab
 
 Rough idea:
@@ -58,6 +60,9 @@ Boost OdeInt seems to be more precise
 
 Boost multiprecision
 https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/index.html
+
+About constexpr
+https://www.boost.org/doc/libs/1_78_0/libs/multiprecision/doc/html/boost_multiprecision/tut/lits.html
 
 Gauﬂ-laguerre Quadrature with Boost.Multiprecision
 https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/fp_eg/gauss_lagerre_quadrature.html
@@ -80,9 +85,13 @@ Gnu Scientific library (GSL)
 
 https://www.gnu.org/software/gsl/
 
+Seemingly no constexpr support.
 
 Python API:
 https://pybind11.readthedocs.io/en/latest/basics.html
+https://github.com/pybind/cmake_example
+
+
 https://www.boost.org/doc/libs/1_78_0/libs/python/doc/html/index.html
 
 vcpkg and GSL:
