@@ -3,6 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.8)
 add_compile_definitions(HAVE_INLINE)
+add_compile_definitions(GSL_DISABLE_DEPRECATED)
 # Fügen Sie der ausführbaren Datei dieses Projekts eine Quelle hinzu.
 add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h")
 
