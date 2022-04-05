@@ -2,7 +2,8 @@
 //
 
 #include "SteepestDescent.h"
-#include  <complex> //include complex to replace the gsl complex numbers
+#include <complex> //include complex to replace the gsl complex numbers
+#include <tuple>
 
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_math.h>
@@ -20,6 +21,12 @@ auto createI(const function f, const function g) {
 	//	gsl_sf_laguerre_n(160, )
 	};
 }*/
+
+auto dot_product(const gsl_vector_view* a, const gsl_vector* b) -> double;
+auto dot_product(const gsl_vector_view a, const gsl_vector_view b) -> double;
+auto dot_product(const gsl_vector_view* a, const gsl_vector_view* b) -> double;
+auto dot_product(const gsl_vector* a, const gsl_vector* b) -> double;
+
 
 
 /// <summary>
@@ -42,9 +49,25 @@ auto partial_derivative_P_x(const double x, const double y, const gsl_matrix* A,
 	return calculate_row(0) + calculate_row(1) + calculate_row(2);
 }
 
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="x"></param>
+/// <param name="A"></param>
+/// <param name="b"></param>
+/// <param name="r"></param>
+/// <returns></returns>
 auto calculate_P_x(const gsl_vector* x, const gsl_matrix* A, const gsl_vector* b, const gsl_vector* r) {
-	//gsl_matrix_mul
-	//todo: implement this with matrix-vector-multiplication => the papers implementation seems to make things more complicated than needed
+	auto tmp = gsl_vector_alloc(3);
+	gsl_vector_memcpy(tmp, b);
+	gsl_vector_sub(tmp, r);
+
+	gsl_blas_dgemv(CblasNoTrans, 1.0, A, x, 1.0, tmp);
+	auto result = dot_product(tmp, tmp);
+	
+	gsl_vector_free(tmp);
+	return result;
 }
 
 auto calculate_P_x(const double x, const double y, const gsl_matrix* A, const gsl_vector* b, const gsl_vector* r) {
@@ -59,10 +82,6 @@ auto calculate_P_x(const double x, const double y, const gsl_matrix* A, const gs
 	return calculate_row(0) + calculate_row(1) + calculate_row(2);
 }
 
-auto dot_product(const gsl_vector_view* a, const gsl_vector* b) -> double;
-auto dot_product(const gsl_vector_view a, const gsl_vector_view b) -> double;
-auto dot_product(const gsl_vector_view * a, const gsl_vector_view * b) -> double;
-auto dot_product(const gsl_vector * a, const gsl_vector * b) -> double;
 
 
 auto dot_product(const gsl_vector_view* a, const gsl_vector* b) -> double {
@@ -96,11 +115,20 @@ auto get_complex_roots(const double y, gsl_matrix* A, const gsl_vector* b, const
 	gsl_vector_add(A_2_copy, b);
 	gsl_vector_sub(A_2_copy, r);
 	auto real_c = - dot_product(&A_1, A_2_copy) / dot_product(A_1, A_1);
+
+	gsl_vector_free(A_2_copy);
+
 	auto P_rc = calculate_P_x(real_c, y, A, b, r);
 
 	double c_0;
-	if (abs(real_c) > 0.000000001)
-		c_0 = (calculate_P_x(0, y, A, b, r) - P_rc) / gsl_pow_2(real_c);
+	if (abs(real_c) > 0.000000001) {
+		auto x = calculate_P_x(0, y, A, b, r);
+		auto tmp = gsl_vector_alloc(2);
+		gsl_vector_set(tmp, 0, 0);
+		gsl_vector_set(tmp, 1, y);
+		//auto yx = calculate_P_x(tmp, A, b, r);
+		c_0 = (x - P_rc) / gsl_pow_2(real_c);
+	}
 	else {
 		auto x = calculate_P_x(1, y, A, b, r);
 		c_0 = 1.0 / 2.0 * x;
@@ -114,6 +142,20 @@ auto get_complex_roots(const double y, gsl_matrix* A, const gsl_vector* b, const
 
 auto stub_integrate_1d() {
 
+}
+
+constexpr auto calculate_laguerre_point(const int k, const int a, const double x) {
+	if (k == 0) {
+		return 1.;
+	}
+	if (k == 1) {
+		return 1. + a - x;
+	}
+	auto l_k_prev = calculate_laguerre_point(k - 1, a, x);
+	auto l_k_prev_prev = calculate_laguerre_point(k - 2, a, x);
+	auto left_factor = 2. * k + 1. - x;
+	auto k_plus_one_inv = 1.0 / ((double)k - 1.0);
+	return left_factor * l_k_prev - (double)k * l_k_prev_prev * k_plus_one_inv;
 }
 
 void setup_1d_test()
