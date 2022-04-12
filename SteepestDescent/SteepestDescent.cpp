@@ -13,6 +13,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_sf_laguerre.h>
+#include <gsl/gsl_eigen.h>
+#include <gsl/gsl_complex_math.h>
 
 using namespace std;
 /*
@@ -161,13 +163,30 @@ constexpr auto calculate_laguerre_point(const int k, const int a, const double x
 	auto left_factor = 2. * n_k + 1. + a - x;
 	auto left = left_factor * l_k_prev;
 
-	auto right_factor =  n_k + a;
+	auto right_factor = n_k + a;
 	auto right = right_factor * l_k_prev_prev;
 	auto k_plus_one_inv = 1. / (n_k + 1.);
 	return (left - right) * k_plus_one_inv;
 }
 
-constexpr auto lagpts(int n) {
+gsl_matrix* my_diag_alloc(gsl_vector* X)
+{
+	gsl_matrix* mat = gsl_matrix_alloc(X->size, X->size);
+	gsl_vector_view diag = gsl_matrix_diagonal(mat);
+	gsl_matrix_set_all(mat, 0.0); //or whatever number you like
+	gsl_vector_memcpy(&diag.vector, X);
+	return mat;
+}
+
+gsl_vector* vector_from_std(std::vector<double> vector, int size) {
+	auto _vector = gsl_vector_alloc(size);
+	for (auto i = 0; i < size; i++) {
+		gsl_vector_set(_vector, i, vector[i]);
+	}
+	return _vector;
+}
+
+auto lagpts(int n) {
 	/*alpha = 2 * (1:n) - 1;  beta = 1:n - 1; % 3 - term recurrence coeffs
 		T = diag(beta, 1) + diag(alpha) + diag(beta, -1);% Jacobi matrix
 		[V, D] = eig(T);% eigenvalue decomposition
@@ -175,12 +194,29 @@ constexpr auto lagpts(int n) {
 		w = V(1, indx). ^ 2;% Quadrature weights
 		v = sqrt(x).*abs(V(1, indx)).';        % Barycentric weights
 		v = v. / max(v); v(2:2 : n) = -v(2:2 : n);*/
-	/*std::vector<double> alpha(n);
+	std::vector<double> alpha(n);
 	std::iota(std::begin(alpha), std::end(alpha), 1);
-	std::for_each(std::begin(alpha), std::end(alpha), [](auto const &x) { x =  2. * x - 1.});
+	std::for_each(std::begin(alpha), std::end(alpha), [](auto& x) { x = 2. * x - 1.;  });
 	std::vector<double> beta(n);
-	std::iota(std::begin(beta), std::end(beta), 0);*/
+	std::iota(std::begin(beta), std::end(beta), 0);
+	auto workspace = gsl_eigen_nonsymmv_alloc(n);
+	//auto alpha_gsl_vec = vector_from_std(alpha);
+	//auto beta_alpha_gsl_vec = vector_from_std(beta);
+	auto T = gsl_matrix_alloc(n, n);//my_diag_alloc(alpha_gsl_vec);
+	for (auto i = 0; i < n; i++) {
+		gsl_matrix_set(T, i, i, alpha[i]);
+		if (i + 1 < n) {
+			gsl_matrix_set(T, i, i + 1, beta[i]);
+		}
+		if (i - 1 > 0) {
+			gsl_matrix_set(T, i, i - 1, beta[i]);
+		}
+	}
+	auto eigenvalues= gsl_matrix_complex_alloc(n,n);
+	auto eigenvector = gsl_vector_complex_alloc(n);
 
+	auto result = gsl_eigen_nonsymmv(T, eigenvector, eigenvalues, workspace);
+	return 1;
 }
 
 void setup_1d_test()
