@@ -29,13 +29,6 @@ namespace math_utils {
 		std::vector<double> beta(n-1);
 		
 		std::iota(std::begin(beta), std::end(beta), 0);
-		arma::mat T = arma::diagmat(arma::vec(beta), 1) + arma::diagmat(arma::vec(alpha)) + arma::diagmat(arma::vec(beta), -1);
-		arma::cx_vec eigval;
-		arma::cx_mat eigvec;
-		auto eigen = arma::eig_gen(eigval, eigvec, T);
-		//auto diag = arma::diagvec(eigvec);
-
-
 	}
 
 
