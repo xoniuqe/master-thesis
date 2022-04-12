@@ -7,11 +7,8 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
-#include <variant>
 
 #include "math_utils.h"
-#include "print_utils.h"
-
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
@@ -159,24 +156,13 @@ constexpr auto calculate_laguerre_point(const int k, const int a, const double x
 	auto left_factor = 2. * n_k + 1. + a - x;
 	auto left = left_factor * l_k_prev;
 
-	auto right_factor = n_k + a;
+	auto right_factor =  n_k + a;
 	auto right = right_factor * l_k_prev_prev;
 	auto k_plus_one_inv = 1. / (n_k + 1.);
 	return (left - right) * k_plus_one_inv;
 }
 
-gsl_matrix* my_diag_alloc(gsl_vector* X)
-{
-	gsl_matrix* mat = gsl_matrix_alloc(X->size, X->size);
-	gsl_vector_view diag = gsl_matrix_diagonal(mat);
-	gsl_matrix_set_all(mat, 0.0); //or whatever number you like
-	gsl_vector_memcpy(&diag.vector, X);
-	return mat;
-}
-
-
-
-auto calculate_laguerre_points_and_weights(int n) {
+constexpr auto lagpts(int n) {
 	/*alpha = 2 * (1:n) - 1;  beta = 1:n - 1; % 3 - term recurrence coeffs
 		T = diag(beta, 1) + diag(alpha) + diag(beta, -1);% Jacobi matrix
 		[V, D] = eig(T);% eigenvalue decomposition
@@ -184,162 +170,12 @@ auto calculate_laguerre_points_and_weights(int n) {
 		w = V(1, indx). ^ 2;% Quadrature weights
 		v = sqrt(x).*abs(V(1, indx)).';        % Barycentric weights
 		v = v. / max(v); v(2:2 : n) = -v(2:2 : n);*/
-	std::vector<double> alpha(n);
+	/*std::vector<double> alpha(n);
 	std::iota(std::begin(alpha), std::end(alpha), 1);
-	std::for_each(std::begin(alpha), std::end(alpha), [](auto& x) { x = 2. * x - 1.;  });
+	std::for_each(std::begin(alpha), std::end(alpha), [](auto const &x) { x =  2. * x - 1.});
 	std::vector<double> beta(n);
-	std::iota(std::begin(beta), std::end(beta), 1);
-	auto workspace = gsl_eigen_symmv_alloc(n);
-	//auto alpha_gsl_vec = vector_from_std(alpha);
-	//auto beta_alpha_gsl_vec = vector_from_std(beta);
-	auto T = gsl_matrix_alloc(n, n);//my_diag_alloc(alpha_gsl_vec);
-	gsl_matrix_set_zero(T);
-	for (auto i = 0; i < n; i++) {
-		gsl_matrix_set(T, i, i, alpha[i]);
-		if (i + 1 < n) {
-			gsl_matrix_set(T, i, i + 1, beta[i]);
-			gsl_matrix_set(T, i + 1, i, beta[i]);
-		}
-	}
-	print_utils::print_matrix_pretty(T, n, n);
-	auto evec= gsl_matrix_alloc(n,n);
-	auto laguerrePoints = gsl_vector_alloc(n);
-	gsl_matrix_set_zero(evec);
-	gsl_vector_set_zero(laguerrePoints);
-	auto result = gsl_eigen_symmv(T, laguerrePoints, evec, workspace);
-	std::cout << "result: " << result << std::endl;
-	auto diag = gsl_matrix_diagonal(evec);
-	std::cout << "results: " << std::endl;
-	gsl_vector_fprintf(stdout, laguerrePoints, "%g");
+	std::iota(std::begin(beta), std::end(beta), 0);*/
 
-	std::cout << "diag:" << std::endl;
-	gsl_vector_fprintf(stdout, &diag.vector, "%g");
-
-	auto quadratureWeights = gsl_vector_alloc(n);
-	gsl_vector_set_zero(quadratureWeights);
-	for (auto i = 0; i < n; i++) {
-		auto value = abs(gsl_matrix_get(evec, 0, i));
-		value *= value;
-		gsl_vector_set(quadratureWeights, i, value);
-	}
-	/*v = sqrt(x).*abs(V(1, indx)).';        % Barycentric weights
-		v = v. / max(v); v(2:2 : n) = -v(2:2 : n);*/
-
-	auto barycentricWeights = gsl_vector_alloc(n);
-	gsl_vector_set_zero(barycentricWeights);
-	auto sqrt_of_laguerre_points = gsl_vector_alloc(n);
-	gsl_vector_set_zero(sqrt_of_laguerre_points);
-
-	auto tmp = gsl_vector_alloc(n);
-	gsl_vector_set_zero(tmp);
-	auto max_value = -1.;
-	for (auto i = 0; i < n; i++) {
-		gsl_vector_set(tmp, i, abs(gsl_matrix_get(evec, 0, i)));
-		gsl_vector_set(sqrt_of_laguerre_points, i, sqrt(gsl_vector_get(laguerrePoints, i)));
-		gsl_vector_set(barycentricWeights, i, abs(gsl_matrix_get(evec, 0, i)) * sqrt(gsl_vector_get(laguerrePoints, i)));
-		auto value = abs(gsl_matrix_get(evec, 0, i)) * sqrt(gsl_vector_get(laguerrePoints, i));
-
-		//auto value = abs(gsl_matrix_get(evec, 0, i));
-		//value *= sqrt(gsl_vector_get(laguerrePoints, i));
-		if (value > max_value) {
-			max_value = value;
-		}
-		//gsl_vector_set(barycentricWeights, i, value * value);
-	}
-	std::cout << "sqrt(x):" << std::endl;
-	gsl_vector_fprintf(stdout, sqrt_of_laguerre_points, "%g");
-
-	std::cout << "tmp:" << std::endl;
-	gsl_vector_fprintf(stdout, tmp, "%g");
-
-	std::cout << "barycentric before weighting:" << std::endl;
-	gsl_vector_fprintf(stdout, barycentricWeights, "%g");
-
-	gsl_vector_scale(barycentricWeights, 1. / max_value);
-	for (auto i = 1; i < n; i += 2) {
-		auto value = gsl_vector_get(barycentricWeights, i);
-		gsl_vector_set(barycentricWeights, i, -value);
-	}
-
-	std::cout << "laguerre points:" << std::endl;
-	gsl_vector_fprintf(stdout, laguerrePoints, "%g");
-	std::cout << "quadrature weights:" << std::endl;
-	gsl_vector_fprintf(stdout, quadratureWeights, "%g");
-	std::cout << "barycentric weights:" << std::endl;
-	gsl_vector_fprintf(stdout, barycentricWeights, "%g");
-
-	std::cout << std::endl;
-	gsl_eigen_symmv_free(workspace);
-
-
-	return std::make_tuple(laguerrePoints, quadratureWeights, barycentricWeights);
-}
-
-
-auto calculate_splitting_points(const gsl_complex c, const double c_0, const double q) -> std::tuple<splitting_point, splitting_point> {
-	if (gsl_isinf(q) != 0) {
-		// c_s is bi-valued 
-		auto c_s = std::make_tuple(c, gsl_complex_conjugate(c));
-		auto c_r = GSL_REAL(c);
-		return std::make_tuple(c_s, c_r);
-		//auto c_s = std::make_tuple(c, gsl_complex_conjugate(gsl_complex(c)));
-
-	}
-
-	if (std::abs(q) < std::numeric_limits<double>::min()) {
-		auto c_s = GSL_REAL(c);
-		auto c_r = std::make_tuple(c, gsl_complex_conjugate(c));
-		return std::make_tuple(c_s, c_r);
-	}
-
-	if (std::abs(q) - sqrt(c_0) < std::numeric_limits<double>::min()) {
-		return std::make_tuple(GSL_POSINF, GSL_POSINF);
-	}
-	auto c_real_cube = GSL_REAL(c) * GSL_REAL(c);
-	auto c_cube_abs = gsl_complex_abs(c) * gsl_complex_abs(c);
-	auto q_cubed = q * q;
-	auto K_c_s = sqrt(c_real_cube + (c_0 * c_real_cube - c_cube_abs * q_cubed) / (c_0 - q_cubed));
-	auto K_c_r = sqrt(c_real_cube + (q_cubed * c_real_cube - c_0 * c_cube_abs) / (c_0 - q_cubed));
-	// here there seems to be no difference between the cases |q| < sqrt(c_0) and |q| > sqrt(c_0)
-	//if (std::abs(q) < sqrt(c_0)) {
-	if (q < 0) {
-		auto c_s = GSL_REAL(c) + K_c_s;
-		auto c_r = GSL_REAL(c) + K_c_r;
-		return std::make_tuple(c_s, c_r);
-	}
-	auto c_s = GSL_REAL(c) - K_c_s;
-	auto c_r = GSL_REAL(c) - K_c_r;
-	return std::make_tuple(c_s, c_r);
-	/* }
-	else {
-
-	}*/
-}
-
-
-
-auto generate_K_x(const double x, const gsl_complex c, const double c_0,const double q) {
-	return[&](const double t) -> auto {
-		auto P_x = c_0 * x * x + c_0 * gsl_complex_abs(c) * gsl_complex_abs(c) - 2. * c_0 * x * GSL_REAL(c);
-		return std::sqrt(P_x) +  q * x + t * 1i;
-	};
-}
-
-auto integrate_1d(const double y, gsl_matrix* A, gsl_vector* b, gsl_vector* r, gsl_vector* mu, const double k, const double left_split_point, const double right_split_point, std::tuple<std::vector<double>, std::vector<double>> laguerre_points)
-{
-	auto a_1 = gsl_matrix_column(A, 0);
-	auto a_2 = gsl_matrix_column(A, 1);
-	auto q = dot_product(a_1.vector, mu);
-	auto s = dot_product(a_2.vector, mu) * y + dot_product(mu, b);
-
-	auto [c, c_0] = get_complex_roots(y, A, b, r);
-	auto sing_point = math_utils::get_singularity_for_ODE(q, datatypes::complex_root{ c, c_0 });
-	auto spec_poitn = math_utils::get_spec_point(q, datatypes::complex_root{ c, c_0 });
-
-	if (std::abs(std::imag(sing_point)) < std::abs(std::imag(c))) 
-	{
-		sing_point = std::real(sing_point);
-	}
 }
 
 void setup_1d_test()
@@ -425,21 +261,18 @@ int main()
 #ifdef HAVE_INLINE
 	std::cout << " HAVE INLINE " << std::endl;
 #endif
-	std::cout << "Hello CMake." << std::endl;
-	/*
+	cout << "Hello CMake." << endl;
+
 	for (int i = 0; i < 40; i++) {
 
 		cout << "lag point " << i << ": " << gsl_sf_laguerre_n(i, 1.0, 5.0) << "\n";
-	}*/
-	/*
+	}
+
 	cout << "own impl" << endl;
 	for (int i = 0; i < 40; i++) {
 		cout << "lag point " << i << ": " << calculate_laguerre_point(i, 1.0, 5.0) << "\n";
 
-	}*/
-
-	calculate_laguerre_points_and_weights(10);
-
+	}
 
 /*	double A_data[] = {
 		  0.57092943, 0.00313503, 0.88069151, 0.39626474,
