@@ -4,7 +4,11 @@
 #include "SteepestDescent.h"
 #include <complex> //include complex to replace the gsl complex numbers
 #include <tuple>
+#include <vector>
+#include <numeric>
+#include <algorithm>
 
+#include "math_utils.h"
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
@@ -153,9 +157,30 @@ constexpr auto calculate_laguerre_point(const int k, const int a, const double x
 	}
 	auto l_k_prev = calculate_laguerre_point(k - 1, a, x);
 	auto l_k_prev_prev = calculate_laguerre_point(k - 2, a, x);
-	auto left_factor = 2. * k + 1. - x;
-	auto k_plus_one_inv = 1.0 / ((double)k - 1.0);
-	return left_factor * l_k_prev - (double)k * l_k_prev_prev * k_plus_one_inv;
+	auto n_k = (double)k - 1.;
+	auto left_factor = 2. * n_k + 1. + a - x;
+	auto left = left_factor * l_k_prev;
+
+	auto right_factor =  n_k + a;
+	auto right = right_factor * l_k_prev_prev;
+	auto k_plus_one_inv = 1. / (n_k + 1.);
+	return (left - right) * k_plus_one_inv;
+}
+
+constexpr auto lagpts(int n) {
+	/*alpha = 2 * (1:n) - 1;  beta = 1:n - 1; % 3 - term recurrence coeffs
+		T = diag(beta, 1) + diag(alpha) + diag(beta, -1);% Jacobi matrix
+		[V, D] = eig(T);% eigenvalue decomposition
+		[x, indx] = sort(diag(D));% Laguerre points
+		w = V(1, indx). ^ 2;% Quadrature weights
+		v = sqrt(x).*abs(V(1, indx)).';        % Barycentric weights
+		v = v. / max(v); v(2:2 : n) = -v(2:2 : n);*/
+	/*std::vector<double> alpha(n);
+	std::iota(std::begin(alpha), std::end(alpha), 1);
+	std::for_each(std::begin(alpha), std::end(alpha), [](auto const &x) { x =  2. * x - 1.});
+	std::vector<double> beta(n);
+	std::iota(std::begin(beta), std::end(beta), 0);*/
+
 }
 
 void setup_1d_test()
@@ -239,6 +264,18 @@ int main()
 	cout << " HAVE INLINE " << endl;
 #endif
 	cout << "Hello CMake." << endl;
+
+	for (int i = 0; i < 40; i++) {
+
+		cout << "lag point " << i << ": " << gsl_sf_laguerre_n(i, 1.0, 5.0) << "\n";
+	}
+
+	cout << "own impl" << endl;
+	for (int i = 0; i < 40; i++) {
+		cout << "lag point " << i << ": " << calculate_laguerre_point(i, 1.0, 5.0) << "\n";
+
+	}
+
 /*	double A_data[] = {
 		  0.57092943, 0.00313503, 0.88069151, 0.39626474,
 		 0.33336008, 0.01876333, 0.12228647, 0.40085702,
