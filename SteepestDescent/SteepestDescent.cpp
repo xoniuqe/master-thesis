@@ -178,12 +178,33 @@ gsl_matrix* my_diag_alloc(gsl_vector* X)
 	return mat;
 }
 
+
 gsl_vector* vector_from_std(std::vector<double> vector, int size) {
 	auto _vector = gsl_vector_alloc(size);
 	for (auto i = 0; i < size; i++) {
 		gsl_vector_set(_vector, i, vector[i]);
 	}
 	return _vector;
+}
+
+void print_matrix_pretty(gsl_matrix_complex* matrix, int size1, int size2) {
+	for (int i = 0; i < size1; i++) {
+		for (int j = 0; j < size2; j++) {
+			auto value = gsl_matrix_complex_get(matrix, i, j);
+			std::cout << GSL_REAL(value) << " ";// +" << GSL_IMAG(value) << "i ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+void print_matrix_pretty(gsl_matrix* matrix, int size1, int size2) {
+	for (int i = 0; i < size1; i++) {
+		for (int j = 0; j < size2; j++) {
+			auto value = gsl_matrix_get(matrix, i, j);
+			std::cout << value << " ";
+		}
+		std::cout << std::endl;
+	}
 }
 
 auto lagpts(int n) {
@@ -198,25 +219,91 @@ auto lagpts(int n) {
 	std::iota(std::begin(alpha), std::end(alpha), 1);
 	std::for_each(std::begin(alpha), std::end(alpha), [](auto& x) { x = 2. * x - 1.;  });
 	std::vector<double> beta(n);
-	std::iota(std::begin(beta), std::end(beta), 0);
-	auto workspace = gsl_eigen_nonsymmv_alloc(n);
+	std::iota(std::begin(beta), std::end(beta), 1);
+	auto workspace = gsl_eigen_symmv_alloc(n);
 	//auto alpha_gsl_vec = vector_from_std(alpha);
 	//auto beta_alpha_gsl_vec = vector_from_std(beta);
 	auto T = gsl_matrix_alloc(n, n);//my_diag_alloc(alpha_gsl_vec);
+	gsl_matrix_set_zero(T);
 	for (auto i = 0; i < n; i++) {
 		gsl_matrix_set(T, i, i, alpha[i]);
 		if (i + 1 < n) {
 			gsl_matrix_set(T, i, i + 1, beta[i]);
-		}
-		if (i - 1 > 0) {
-			gsl_matrix_set(T, i, i - 1, beta[i]);
+			gsl_matrix_set(T, i + 1, i, beta[i]);
 		}
 	}
-	auto eigenvalues= gsl_matrix_complex_alloc(n,n);
-	auto eigenvector = gsl_vector_complex_alloc(n);
+	print_matrix_pretty(T, n, n);
+	auto evec= gsl_matrix_alloc(n,n);
+	auto laguerrePoints = gsl_vector_alloc(n);
+	gsl_matrix_set_zero(evec);
+	gsl_vector_set_zero(laguerrePoints);
+	auto result = gsl_eigen_symmv(T, laguerrePoints, evec, workspace);
+	std::cout << "result: " << result << std::endl;
+	auto diag = gsl_matrix_diagonal(evec);
+	std::cout << "results: " << std::endl;
+	gsl_vector_fprintf(stdout, laguerrePoints, "%g");
 
-	auto result = gsl_eigen_nonsymmv(T, eigenvector, eigenvalues, workspace);
-	return 1;
+	std::cout << "diag:" << std::endl;
+	gsl_vector_fprintf(stdout, &diag.vector, "%g");
+
+	auto quadratureWeights = gsl_vector_alloc(n);
+	gsl_vector_set_zero(quadratureWeights);
+	for (auto i = 0; i < n; i++) {
+		auto value = abs(gsl_matrix_get(evec, 0, i));
+		value *= value;
+		gsl_vector_set(quadratureWeights, i, value);
+	}
+	/*v = sqrt(x).*abs(V(1, indx)).';        % Barycentric weights
+		v = v. / max(v); v(2:2 : n) = -v(2:2 : n);*/
+
+	auto barycentricWeights = gsl_vector_alloc(n);
+	gsl_vector_set_zero(barycentricWeights);
+	auto sqrt_of_laguerre_points = gsl_vector_alloc(n);
+	gsl_vector_set_zero(sqrt_of_laguerre_points);
+
+	auto tmp = gsl_vector_alloc(n);
+	gsl_vector_set_zero(tmp);
+	auto max_value = -1.;
+	for (auto i = 0; i < n; i++) {
+		gsl_vector_set(tmp, i, abs(gsl_matrix_get(evec, 0, i)));
+		gsl_vector_set(sqrt_of_laguerre_points, i, sqrt(gsl_vector_get(laguerrePoints, i)));
+		gsl_vector_set(barycentricWeights, i, abs(gsl_matrix_get(evec, 0, i)) * sqrt(gsl_vector_get(laguerrePoints, i)));
+		auto value = abs(gsl_matrix_get(evec, 0, i)) * sqrt(gsl_vector_get(laguerrePoints, i));
+
+		//auto value = abs(gsl_matrix_get(evec, 0, i));
+		//value *= sqrt(gsl_vector_get(laguerrePoints, i));
+		if (value > max_value) {
+			max_value = value;
+		}
+		//gsl_vector_set(barycentricWeights, i, value * value);
+	}
+	std::cout << "sqrt(x):" << std::endl;
+	gsl_vector_fprintf(stdout, sqrt_of_laguerre_points, "%g");
+
+	std::cout << "tmp:" << std::endl;
+	gsl_vector_fprintf(stdout, tmp, "%g");
+
+	std::cout << "barycentric before weighting:" << std::endl;
+	gsl_vector_fprintf(stdout, barycentricWeights, "%g");
+
+	gsl_vector_scale(barycentricWeights, 1. / max_value);
+	for (auto i = 1; i < n; i += 2) {
+		auto value = gsl_vector_get(barycentricWeights, i);
+		gsl_vector_set(barycentricWeights, i, -value);
+	}
+
+	std::cout << "laguerre points:" << std::endl;
+	gsl_vector_fprintf(stdout, laguerrePoints, "%g");
+	std::cout << "quadrature weights:" << std::endl;
+	gsl_vector_fprintf(stdout, quadratureWeights, "%g");
+	std::cout << "barycentric weights:" << std::endl;
+	gsl_vector_fprintf(stdout, barycentricWeights, "%g");
+
+	std::cout << std::endl;
+	gsl_eigen_symmv_free(workspace);
+
+
+	return std::make_tuple(laguerrePoints, quadratureWeights, barycentricWeights);
 }
 
 void setup_1d_test()
@@ -240,12 +327,15 @@ void setup_1d_test()
 	}
 	auto DPx = partial_derivative_P_x(0, 0, A, &b.vector, &r.vector);
 
+
 	std::cout << "\nDPx = \n" << DPx;
 
 	auto [c, c_0] = get_complex_roots(0, A, &b.vector, &r.vector);
 
 	std::cout << "\nc = \n" << c;
 	std::cout << "\nc0 = \n" << c_0;
+	std::cout << std::endl;
+
 
 
 
@@ -300,17 +390,20 @@ int main()
 	cout << " HAVE INLINE " << endl;
 #endif
 	cout << "Hello CMake." << endl;
-
+	/*
 	for (int i = 0; i < 40; i++) {
 
 		cout << "lag point " << i << ": " << gsl_sf_laguerre_n(i, 1.0, 5.0) << "\n";
-	}
-
+	}*/
+	/*
 	cout << "own impl" << endl;
 	for (int i = 0; i < 40; i++) {
 		cout << "lag point " << i << ": " << calculate_laguerre_point(i, 1.0, 5.0) << "\n";
 
-	}
+	}*/
+
+	lagpts(10);
+
 
 /*	double A_data[] = {
 		  0.57092943, 0.00313503, 0.88069151, 0.39626474,
@@ -354,7 +447,7 @@ int main()
 	gsl_permutation_free(perm);
 	*/
 
-	setup_1d_test();
+	//setup_1d_test();
 
 
 	return 0;
