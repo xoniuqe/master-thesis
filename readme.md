@@ -74,6 +74,13 @@ https://stackoverflow.com/questions/37296481/integration-with-quadrature-and-mul
 
 ## Useful links 
 
+
+About the performanace:
+https://stackoverflow.com/questions/18009056/why-does-matlab-octave-wipe-the-floor-with-c-in-eigenvalue-problems
+
+About eigenvalue decomposition (german):
+http://www.peter-junglas.de/fh/vorlesungen/numa/html/kap6.html
+
 Running GNU Octave on Gitlab:
 https://gitlab.com/mtmiller/octave-snapshot
 
