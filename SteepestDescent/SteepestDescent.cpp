@@ -7,8 +7,11 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
+#include <variant>
 
 #include "math_utils.h"
+#include "print_utils.h"
+
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
@@ -16,17 +19,9 @@
 #include <gsl/gsl_eigen.h>
 #include <gsl/gsl_complex_math.h>
 
-using namespace std;
-/*
-typedef int inputType;
-typedef int ouputType;
-typedef ouputType (*function)(const inputType);
-/*
-auto createI(const function f, const function g) {
-	return[](const inputType k const inputType a, const inputType b) -> {
-	//	gsl_sf_laguerre_n(160, )
-	};
-}*/
+#include <type_traits>
+using namespace std::complex_literals;
+typedef std::variant<std::tuple<gsl_complex, gsl_complex>, double> splitting_point;
 
 auto dot_product(const gsl_vector_view* a, const gsl_vector* b) -> double;
 auto dot_product(const gsl_vector_view a, const gsl_vector_view b) -> double;
@@ -142,13 +137,10 @@ auto get_complex_roots(const double y, gsl_matrix* A, const gsl_vector* b, const
 	}
 	
 
-	auto c = real_c + 1i * sqrt(P_rc / c_0);
+	auto c = real_c + 1i * std::sqrt(P_rc / c_0);
 	return std::make_tuple(c, c_0);
 }
 
-auto stub_integrate_1d() {
-
-}
 
 constexpr auto calculate_laguerre_point(const int k, const int a, const double x) {
 	if (k == 0) {
@@ -179,35 +171,8 @@ gsl_matrix* my_diag_alloc(gsl_vector* X)
 }
 
 
-gsl_vector* vector_from_std(std::vector<double> vector, int size) {
-	auto _vector = gsl_vector_alloc(size);
-	for (auto i = 0; i < size; i++) {
-		gsl_vector_set(_vector, i, vector[i]);
-	}
-	return _vector;
-}
 
-void print_matrix_pretty(gsl_matrix_complex* matrix, int size1, int size2) {
-	for (int i = 0; i < size1; i++) {
-		for (int j = 0; j < size2; j++) {
-			auto value = gsl_matrix_complex_get(matrix, i, j);
-			std::cout << GSL_REAL(value) << " ";// +" << GSL_IMAG(value) << "i ";
-		}
-		std::cout << std::endl;
-	}
-}
-
-void print_matrix_pretty(gsl_matrix* matrix, int size1, int size2) {
-	for (int i = 0; i < size1; i++) {
-		for (int j = 0; j < size2; j++) {
-			auto value = gsl_matrix_get(matrix, i, j);
-			std::cout << value << " ";
-		}
-		std::cout << std::endl;
-	}
-}
-
-auto lagpts(int n) {
+auto calculate_laguerre_points_and_weights(int n) {
 	/*alpha = 2 * (1:n) - 1;  beta = 1:n - 1; % 3 - term recurrence coeffs
 		T = diag(beta, 1) + diag(alpha) + diag(beta, -1);% Jacobi matrix
 		[V, D] = eig(T);% eigenvalue decomposition
@@ -232,7 +197,7 @@ auto lagpts(int n) {
 			gsl_matrix_set(T, i + 1, i, beta[i]);
 		}
 	}
-	print_matrix_pretty(T, n, n);
+	print_utils::print_matrix_pretty(T, n, n);
 	auto evec= gsl_matrix_alloc(n,n);
 	auto laguerrePoints = gsl_vector_alloc(n);
 	gsl_matrix_set_zero(evec);
@@ -304,6 +269,73 @@ auto lagpts(int n) {
 
 
 	return std::make_tuple(laguerrePoints, quadratureWeights, barycentricWeights);
+}
+
+
+auto calculate_splitting_points(const gsl_complex c, const double c_0, const double q) -> std::tuple<splitting_point, splitting_point> {
+	if (gsl_isinf(q) != 0) {
+		// c_s is bi-valued 
+		auto c_s = std::make_tuple(c, gsl_complex_conjugate(c));
+		gsl_complex x = 1. + 10i;
+		auto c_r = GSL_REAL(c);
+		return std::make_tuple(c_s, c_r);
+		//auto c_s = std::make_tuple(c, gsl_complex_conjugate(gsl_complex(c)));
+
+	}
+
+	if (std::abs(q) < std::numeric_limits<double>::min()) {
+		auto c_s = GSL_REAL(c);
+		auto c_r = std::make_tuple(c, gsl_complex_conjugate(c));
+		return std::make_tuple(c_s, c_r);
+	}
+
+	if (std::abs(q) - sqrt(c_0) < std::numeric_limits<double>::min()) {
+		return std::make_tuple(GSL_POSINF, GSL_POSINF);
+	}
+	auto c_real_cube = GSL_REAL(c) * GSL_REAL(c);
+	auto c_cube_abs = gsl_complex_abs(c) * gsl_complex_abs(c);
+	auto q_cubed = q * q;
+	auto K_c_s = sqrt(c_real_cube + (c_0 * c_real_cube - c_cube_abs * q_cubed) / (c_0 - q_cubed));
+	auto K_c_r = sqrt(c_real_cube + (q_cubed * c_real_cube - c_0 * c_cube_abs) / (c_0 - q_cubed));
+	// here there seems to be no difference between the cases |q| < sqrt(c_0) and |q| > sqrt(c_0)
+	//if (std::abs(q) < sqrt(c_0)) {
+	if (q < 0) {
+		auto c_s = GSL_REAL(c) + K_c_s;
+		auto c_r = GSL_REAL(c) + K_c_r;
+		return std::make_tuple(c_s, c_r);
+	}
+	auto c_s = GSL_REAL(c) - K_c_s;
+	auto c_r = GSL_REAL(c) - K_c_r;
+	return std::make_tuple(c_s, c_r);
+	/* }
+	else {
+
+	}*/
+}
+
+
+
+auto generate_K_x(const double x, const gsl_complex c, const double c_0,const double q) {
+	return[&](const double t) -> auto {
+		auto P_x = c_0 * x * x + c_0 * gsl_complex_abs(c) * gsl_complex_abs(c) - 2. * c_0 * x * GSL_REAL(c);
+		return std::sqrt(P_x) +  q * x + t * 1i;
+	};
+}
+
+auto integrate_1d(const double y, gsl_matrix* A, gsl_vector* b, gsl_vector* r, gsl_vector* mu, const double k, const double left_split_point, const double right_split_point, std::tuple<std::vector<double>, std::vector<double>> laguerre_points)
+{
+	
+	auto q = dot_product(&gsl_matrix_column(A, 0).vector, mu);
+	auto s = dot_product(&gsl_matrix_column(A, 1).vector, mu) * y + dot_product(mu, b);
+
+	auto [c, c_0] = get_complex_roots(y, A, b, r);
+	auto sing_point = math_utils::get_singularity_for_ODE(q, datatypes::complex_root{ c, c_0 });
+	auto spec_poitn = math_utils::get_spec_point(q, datatypes::complex_root{ c, c_0 });
+
+	if (std::abs(std::imag(sing_point)) < std::abs(std::imag(c))) 
+	{
+		sing_point = std::real(sing_point);
+	}
 }
 
 void setup_1d_test()
@@ -387,9 +419,9 @@ constexpr int test()
 int main()
 {
 #ifdef HAVE_INLINE
-	cout << " HAVE INLINE " << endl;
+	std::cout << " HAVE INLINE " << std::endl;
 #endif
-	cout << "Hello CMake." << endl;
+	std::cout << "Hello CMake." << std::endl;
 	/*
 	for (int i = 0; i < 40; i++) {
 
@@ -402,7 +434,7 @@ int main()
 
 	}*/
 
-	lagpts(10);
+	calculate_laguerre_points_and_weights(10);
 
 
 /*	double A_data[] = {
