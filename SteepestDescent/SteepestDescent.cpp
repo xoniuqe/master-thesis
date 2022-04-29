@@ -97,6 +97,10 @@ auto dot_product(const gsl_vector_view* a, const gsl_vector_view* b) -> double {
 	return dot_product(&a->vector, &b->vector);
 }
 
+auto dot_product(const gsl_vector a, const gsl_vector* b) -> double {
+	return dot_product(&a, b);
+}
+
 auto dot_product(const gsl_vector* a, const gsl_vector* b) -> double {
 	double result = 0;
 	gsl_blas_ddot(a, b, &result);
@@ -323,9 +327,10 @@ auto generate_K_x(const double x, const gsl_complex c, const double c_0,const do
 
 auto integrate_1d(const double y, gsl_matrix* A, gsl_vector* b, gsl_vector* r, gsl_vector* mu, const double k, const double left_split_point, const double right_split_point, std::tuple<std::vector<double>, std::vector<double>> laguerre_points)
 {
-	
-	auto q = dot_product(&gsl_matrix_column(A, 0).vector, mu);
-	auto s = dot_product(&gsl_matrix_column(A, 1).vector, mu) * y + dot_product(mu, b);
+	auto a_1 = gsl_matrix_column(A, 0);
+	auto a_2 = gsl_matrix_column(A, 1);
+	auto q = dot_product(a_1.vector, mu);
+	auto s = dot_product(a_2.vector, mu) * y + dot_product(mu, b);
 
 	auto [c, c_0] = get_complex_roots(y, A, b, r);
 	auto sing_point = math_utils::get_singularity_for_ODE(q, datatypes::complex_root{ c, c_0 });
