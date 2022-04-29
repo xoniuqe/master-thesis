@@ -6,7 +6,7 @@ add_compile_definitions(HAVE_INLINE)
 add_compile_definitions(GSL_DISABLE_DEPRECATED)
 
 # Fügen Sie der ausführbaren Datei dieses Projekts eine Quelle hinzu.
-add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h" "math_utils.h")
+add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h" "math_utils.h" "gauss_laguerre.h" "datatypes.h" "gsl_vector_utils.h" "math_lib_wrapper.h")
 
 # TODO: Fügen Sie bei Bedarf Tests hinzu, und installieren Sie Ziele.
 target_link_libraries(SteepestDescent PRIVATE GSL::gsl ${ARMADILLO_LIBRARIES})# Boost::Multiprecision)

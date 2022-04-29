@@ -3,6 +3,27 @@
 
 #include "SteepestDescent.h"
 #include <complex> //include complex to replace the gsl complex numbers
+#include <gsl/gsl_complex.h>
+#  define GSL_COMPLEX_DEFINE(R, C) typedef std::complex<R> C ;
+
+#  define GSL_REAL(z)              (std::real(z))
+#  define GSL_IMAG(z)              (std::imag(z))
+#  define GSL_COMPLEX_P(zp)        (*z)
+#  define GSL_COMPLEX_P_REAL(zp)   (std::real(zp))
+#  define GSL_COMPLEX_P_IMAG(zp)   (std::imag(zp))
+#  define GSL_COMPLEX_EQ(z1,z2)    (z1 == z2)
+
+#  define GSL_SET_COMPLEX(zp,x,y)  {zp->real(x); zp->imag(y);}
+#  define GSL_SET_REAL(zp,x)       zp->real(x);
+#  define GSL_SET_IMAG(zp,y)       zp->imag(y);
+
+
+GSL_COMPLEX_DEFINE(double, gsl_complex)
+GSL_COMPLEX_DEFINE(long double, gsl_complex_long_double)
+GSL_COMPLEX_DEFINE(float, gsl_complex_float)
+
+#define GSL_SET_COMPLEX_PACKED(zp,n,x,y) do {*((zp)+2*(n))=(x); *((zp)+(2*(n)+1))=(y);} while(0)
+
 #include <tuple>
 #include <vector>
 #include <numeric>
@@ -260,6 +281,13 @@ constexpr int test()
 
 int main()
 {
+
+#if !defined(GSL_COMPLEX_LEGACY) &&          \
+     defined(complex) 
+
+	std::cout << "why" << std
+#endif
+	std::cout << "Using std::complex<double> in gsl: " << std::is_same<gsl_complex, std::complex<double>>::value << std::endl;
 #ifdef HAVE_INLINE
 	cout << " HAVE INLINE " << endl;
 #endif
