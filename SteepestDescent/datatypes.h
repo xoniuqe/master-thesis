@@ -13,7 +13,7 @@ namespace datatypes {
 	};
 
 	struct complex_root {
-		gsl_complex c;// std::complex<double> c;
+		std::complex<double> c;
 		double c_0;
 	};
 
