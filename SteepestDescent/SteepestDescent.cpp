@@ -276,7 +276,6 @@ auto calculate_splitting_points(const gsl_complex c, const double c_0, const dou
 	if (gsl_isinf(q) != 0) {
 		// c_s is bi-valued 
 		auto c_s = std::make_tuple(c, gsl_complex_conjugate(c));
-		gsl_complex x = 1. + 10i;
 		auto c_r = GSL_REAL(c);
 		return std::make_tuple(c_s, c_r);
 		//auto c_s = std::make_tuple(c, gsl_complex_conjugate(gsl_complex(c)));
