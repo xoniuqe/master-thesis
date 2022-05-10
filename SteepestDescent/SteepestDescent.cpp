@@ -180,7 +180,7 @@ void setup_1d_test()
 	
 	arma::vec mu { 1,4,0 };
 
-	auto DPx = partial_derivative_P_x(0, 0, A, b, r);
+	auto DPx = math_utils::partial_derivative_P_x(0, 0, A, b, r);
 
 
 	std::cout << "\nDPx = \n" << DPx;
