@@ -23,4 +23,4 @@ target_link_libraries(math_lib_tests PRIVATE  ${ARMADILLO_LIBRARIES} Catch2::Cat
 
 # If you register a test, then ctest and make test will run it.
 # You can also run examples and check the output, as well.
-add_test(NAME test_math_lib_tests COMMAND math_lib_tests -o result.xml) # Command can be a target
+add_test(NAME test_math_lib_tests COMMAND math_lib_tests -r junit -o result.xml) # Command can be a target
