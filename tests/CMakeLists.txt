@@ -6,7 +6,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(catch)
 # Adds Catch2::Catch2
 
-
+find_package(Catch2 REQUIRED)
 find_package(Armadillo REQUIRED)
 
 include_directories(${ARMADILLO_INCLUDE_DIRS})
