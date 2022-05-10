@@ -12,13 +12,15 @@
 #include <math.h>
 #include <type_traits>
 
-//#include <complex>
-//#include <armadillo>
-
-
-
-
 namespace math_utils {
+	using namespace std::complex_literals
+	
+	template<class T> struct is_complex : std::false_type {};
+	template<class T> struct is_complex<std::complex<T>> : std::true_type {};
+
+
+
+	
 
 	
 
