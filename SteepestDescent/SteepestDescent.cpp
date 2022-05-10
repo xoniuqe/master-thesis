@@ -1,4 +1,4 @@
-﻿// SteepestDescent.cpp: Definiert den Einstiegspunkt für die Anwendung.
+// SteepestDescent.cpp: Definiert den Einstiegspunkt für die Anwendung.
 //
 
 #include "SteepestDescent.h"
@@ -79,9 +79,6 @@ auto calculate_P_x(const double x, const double y, const datatypes::matrix& A, c
 	return calculate_row(0) + calculate_row(1) + calculate_row(2);
 }
 
-
-
-
 constexpr auto calculate_laguerre_point(const int k, const int a, const double x) {
 	if (k == 0) {
 		return 1.;
@@ -158,6 +155,11 @@ auto calculate_splitting_points(const std::complex<double> c, const double c_0, 
 
 	}
 
+	if (std::abs(q) < std::numeric_limits<double>::min()) {
+		auto c_s = std::real(c) + 0i;
+		auto c_r = std::make_tuple(c, std::conj(c));
+		return std::make_tuple(c_s, c_r);
+	}
 
 	if (std::abs(q) - sqrt(c_0) < std::numeric_limits<double>::min()) {
 		//return std::make_tuple(arma::max_, GSL_POSINF);

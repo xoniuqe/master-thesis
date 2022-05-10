@@ -1,5 +1,3 @@
-#pragma once
-
 #include <catch2/catch.hpp>
 #include <complex>
 
@@ -11,7 +9,7 @@ TEST_CASE("calculate spec and sing points", "[math_lib]") {
 	arma::vec b{ 0,0,0 };
 	arma::vec r{ 0, 1, 2 };
 	arma::vec mu{ 1,4,0 };
-	auto [c, c_0] = get_complex_roots(0, A, b, r);
+	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
 	auto q = -8;
 
 	SECTION("calculate the spec point") {
