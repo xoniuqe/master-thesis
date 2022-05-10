@@ -38,12 +38,6 @@ build:
      - git submodule sync --recursive
      - git submodule update --init --recursive
      - apt-get update --yes
-     - apt-get install --yes cmake build-essential gdb pkg-config curl zip unzip tar
-     - ls vcpkg
-     - echo "calling vcpkg"
-     - sh ./vcpkg/bootstrap-vcpkg.sh
-     - ./vcpkg/vcpkg install gsl 
-     - ./vcpkg/vcpkg integrate install
 
     script:
      - mkdir build
