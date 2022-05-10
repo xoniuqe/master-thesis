@@ -73,4 +73,4 @@ test:
 
     artifacts:
       paths:
-       - build_test\tests\
+       - build_test/tests/result.xml
