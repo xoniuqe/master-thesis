@@ -15,6 +15,7 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 # Tests need to be added as executables first
 add_executable(math_lib_tests math_lib_tests.cpp)
 
+add_compile_definitions(USE_ARMADILLO)
 # I'm using C++17 in the test
 #target_compile_features(math_lib_tests PRIVATE cxx_std_17)
 
