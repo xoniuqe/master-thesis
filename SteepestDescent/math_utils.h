@@ -6,11 +6,15 @@
 #include <complex>
 #include <armadillo>
 #include "datatypes.h"
+#ifdef _WIN32
 #include <corecrt_math_defines.h>
+#endif
 #include <math.h>
 #include <type_traits>
 
 namespace math_utils {
+	using namespace std::complex_literals;
+	
 	template<class T> struct is_complex : std::false_type {};
 	template<class T> struct is_complex<std::complex<T>> : std::true_type {};
 
@@ -50,7 +54,7 @@ namespace math_utils {
 	}
 
 	/// <summary>
-	/// singularity := definitionslücke
+	/// singularity := definitionslï¿½cke
 	/// </summary>
 	/// <param name="complex_root"></param>
 	/// <param name="q"></param>

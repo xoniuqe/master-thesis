@@ -1,13 +1,13 @@
-﻿# CMakeList.txt: CMake-Projekt für "SteepestDescent". Schließen Sie die Quelle ein, und definieren Sie
+# CMakeList.txt: CMake-Projekt für "SteepestDescent". Schließen Sie die Quelle ein, und definieren Sie
 # projektspezifische Logik hier.
 #
 cmake_minimum_required (VERSION 3.12)
 
 find_package(Armadillo REQUIRED)
-find_package(MKL REQUIRED)
+#find_package(MKL REQUIRED)
 
 include_directories(${ARMADILLO_INCLUDE_DIRS})
-include_directories(${MKL_INCLUDE_DIRS})
+#include_directories(${MKL_INCLUDE_DIRS})
 add_compile_definitions(ARMADILLO)
 
 # Fügen Sie der ausführbaren Datei dieses Projekts eine Quelle hinzu.
