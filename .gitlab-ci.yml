@@ -59,7 +59,6 @@ test:
      - apt-get update --yes
      - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
     script:
-     - mkdir build_test
-     - cd build_test
-     - cmake --build .. --target test
-     - make
+    - cmake -S tests -B build_test
+    - cmake --build build_test -v
+    - cmake --build build_test -t test
