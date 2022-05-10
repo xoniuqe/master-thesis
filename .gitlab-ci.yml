@@ -52,6 +52,12 @@ build:
 
 test:
     stage: test
+    image: gcc
+    before_script:
+     - git submodule sync --recursive
+     - git submodule update --init --recursive
+     - apt-get update --yes
+     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
     script:
      - mkdir build_test
      - cd build_test
