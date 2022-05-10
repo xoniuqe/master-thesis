@@ -64,6 +64,6 @@ test:
      - export PATH=$HOME/.local/bin:$PATH
 
     script:
-    - cmake -S tests -B build_test
+    - cmake -S . -B build_test
     - cmake --build build_test -v
     - cmake --build build_test -t test
