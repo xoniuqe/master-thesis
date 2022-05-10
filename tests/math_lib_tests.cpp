@@ -1,5 +1,6 @@
 #include <catch2/catch.hpp>
 #include <complex>
+#include <armadillo>
 
 #include "../SteepestDescent/datatypes.h"
 #include "../SteepestDescent/math_utils.h"
