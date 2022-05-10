@@ -38,6 +38,7 @@ build:
      - git submodule sync --recursive
      - git submodule update --init --recursive
      - apt-get update --yes
+     - apt-get install --yes cmake
 
     script:
      - mkdir build
