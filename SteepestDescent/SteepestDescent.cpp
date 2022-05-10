@@ -87,7 +87,7 @@ auto get_complex_roots(const double y, const datatypes::matrix& A, const datatyp
 
 
 	auto A_2copy = arma::vec(A_2);
-	A_2copy *= 2.;
+	A_2copy *= y;
 	A_2copy += b - r;
 
 	auto real_c = - arma::dot(A_1, A_2copy) / arma::dot(A_1, A_1);
@@ -97,15 +97,15 @@ auto get_complex_roots(const double y, const datatypes::matrix& A, const datatyp
 	double c_0;
 	if (abs(real_c) > 0.000000001) {
 		auto x = calculate_P_x(0, y, A, b, r); 
-		c_0 = (x - P_rc) / real_c * real_c;
+		c_0 = (x - P_rc) / (real_c * real_c);
 	}
 	else {
-		auto x = calculate_P_x(1, y, A, b, r);
+		auto x = partial_derivative_P_x(1, y, A, b, r);
 		c_0 = 1.0 / 2.0 * x;
 
 	}
 	
-	auto c = real_c + std::sqrt(std::complex<double>(P_rc / c_0));
+	auto c = real_c + std::sqrt((P_rc / c_0)) * 1i;
 	return std::make_tuple(c, c_0);
 }
 
@@ -245,8 +245,8 @@ auto integrate_1d(const double y, const datatypes::matrix& A, const datatypes::v
 
 void setup_1d_test()
 {
-	arma::mat  A{ -5, 1, -1, 1, -1 ,0 };
-
+	arma::mat  A{ {-5, 1}, {-1, 1,} , {- 1 ,0 }};
+	
 	arma::vec b { 0,1,0 };
 
 	arma::vec r { 0, 12, 1 };
@@ -263,6 +263,33 @@ void setup_1d_test()
 	std::cout << "\nc = \n" << c;
 	std::cout << "\nc0 = \n" << c_0;
 	std::cout << std::endl;
+}
+
+void test_split() {
+	arma::mat  A{ {1, 1}, {1, 1,} , {0 ,0 } };
+
+	arma::vec b{ 0,0,0 };
+
+	arma::vec r{ 0, 1, 2 };
+
+	arma::vec mu{ 1,4,0 };
+
+	std::cout << "A:\n";
+	A.print();
+
+	auto [c, c_0] = get_complex_roots(0, A, b, r);
+
+	auto q = -8;
+	auto k = 10;
+	auto s = 3;
+
+	auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
+	auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
+
+	std::cout << "c: " << c << std::endl;
+	std::cout << "c_0: " << c_0 << std::endl;
+	std::cout << "spec_point: " << spec_point << std::endl;
+	std::cout << "sing_point: " << sing_point << std::endl;
 
 }
 
@@ -270,7 +297,8 @@ void setup_1d_test()
 int main()
 {
 
-	setup_1d_test();
+	//setup_1d_test();
+	test_split();
 
 	return 0;
 }
