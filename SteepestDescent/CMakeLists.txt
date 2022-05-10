@@ -8,6 +8,7 @@ find_package(MKL REQUIRED)
 
 include_directories(${ARMADILLO_INCLUDE_DIRS})
 include_directories(${MKL_INCLUDE_DIRS})
+add_compile_definitions(ARMADILLO)
 
 # Fügen Sie der ausführbaren Datei dieses Projekts eine Quelle hinzu.
 add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h" "math_utils.h" "gauss_laguerre.h" "datatypes.h" "gsl_vector_utils.h")
