@@ -1,4 +1,4 @@
-﻿// SteepestDescent.cpp: Definiert den Einstiegspunkt für die Anwendung.
+// SteepestDescent.cpp: Definiert den Einstiegspunkt für die Anwendung.
 //
 
 #include "SteepestDescent.h"
@@ -77,38 +77,6 @@ auto calculate_P_x(const double x, const double y, const datatypes::matrix& A, c
 	};
 	return calculate_row(0) + calculate_row(1) + calculate_row(2);
 }
-
-
-
-auto get_complex_roots(const double y, const datatypes::matrix& A, const datatypes::vector& b, const datatypes::vector& r) -> auto{
-
-	auto A_1 = A.col(0);
-	auto A_2 = A.col(1);
-
-
-	auto A_2copy = arma::vec(A_2);
-	A_2copy *= y;
-	A_2copy += b - r;
-
-	auto real_c = - arma::dot(A_1, A_2copy) / arma::dot(A_1, A_1);
-
-	auto P_rc = calculate_P_x(real_c, y, A, b, r);
-
-	double c_0;
-	if (abs(real_c) > 0.000000001) {
-		auto x = calculate_P_x(0, y, A, b, r); 
-		c_0 = (x - P_rc) / (real_c * real_c);
-	}
-	else {
-		auto x = partial_derivative_P_x(1, y, A, b, r);
-		c_0 = 1.0 / 2.0 * x;
-
-	}
-	
-	auto c = real_c + std::sqrt((P_rc / c_0)) * 1i;
-	return std::make_tuple(c, c_0);
-}
-
 
 constexpr auto calculate_laguerre_point(const int k, const int a, const double x) {
 	if (k == 0) {
@@ -233,7 +201,7 @@ auto integrate_1d(const double y, const datatypes::matrix& A, const datatypes::v
 	auto q = arma::dot(a_1, mu);
 	auto s = arma::dot(a_2, mu) * y + arma::dot(mu, b);
 
-	auto [c, c_0] = get_complex_roots(y, A, b, r);
+	auto [c, c_0] = math_utils::get_complex_roots(y, A, b, r);
 	auto sing_point = math_utils::get_singularity_for_ODE(q, datatypes::complex_root{ c, c_0 });
 	auto spec_poitn = math_utils::get_spec_point(q, datatypes::complex_root{ c, c_0 });
 
@@ -258,7 +226,7 @@ void setup_1d_test()
 
 	std::cout << "\nDPx = \n" << DPx;
 
-	auto [c, c_0] = get_complex_roots(0, A, b, r);
+	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
 
 	std::cout << "\nc = \n" << c;
 	std::cout << "\nc0 = \n" << c_0;
@@ -277,7 +245,7 @@ void test_split() {
 	std::cout << "A:\n";
 	A.print();
 
-	auto [c, c_0] = get_complex_roots(0, A, b, r);
+	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
 
 	auto q = -8;
 	auto k = 10;
