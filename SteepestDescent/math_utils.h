@@ -1,15 +1,33 @@
 #pragma once
+
 #include <vector>
 #include <algorithm>
 #include <numeric>
-
 #include <complex>
 #include <armadillo>
-
-
-
+#include "datatypes.h"
+#include <corecrt_math_defines.h>
+#include <math.h>
+#include <type_traits>
 
 namespace math_utils {
+	template<class T> struct is_complex : std::false_type {};
+	template<class T> struct is_complex<std::complex<T>> : std::true_type {};
+
+	template<class T>
+	auto floor(T value) -> T {
+		return std::floor(value);
+	}
+
+	template<class T, std::is_base_of<std::true_type, is_complex<T>> = true>
+	auto floor(T value) -> T {
+		return  floor(std::real(value)) + floor(std::imag(value)) * 1i;
+	}
+
+	
+
+	
+
 
 	auto get_laguerre_points(const int n) {
 
@@ -29,15 +47,123 @@ namespace math_utils {
 		std::vector<double> beta(n-1);
 		
 		std::iota(std::begin(beta), std::end(beta), 0);
-		arma::mat T = arma::diagmat(arma::vec(beta), 1) + arma::diagmat(arma::vec(alpha)) + arma::diagmat(arma::vec(beta), -1);
-		arma::cx_vec eigval;
-		arma::cx_mat eigvec;
-		auto eigen = arma::eig_gen(eigval, eigvec, T);
-		//auto diag = arma::diagvec(eigvec);
+	}
+
+	/// <summary>
+	/// singularity := definitionslücke
+	/// </summary>
+	/// <param name="complex_root"></param>
+	/// <param name="q"></param>
+	/// <param name="k"></param>
+	/// <param name="s"></param>
+	/// <returns></returns>
+	auto calculate_singularities_ODE(const datatypes::complex_root complex_root, const double q, const double k, const double s) 
+	{  
+		auto C = complex_root.c_0 - q * q;
+		auto rc = std::real(complex_root.c);
+		auto ic = std::imag(complex_root.c);
+		auto sqc = std::sqrt(complex_root.c_0);
+		auto cTimesCconj = rc * rc + ic * ic;
+		auto tmp = (rc * rc * q * q + cTimesCconj * C);
+		auto tmp2 = complex_root.c_0 * rc * rc;
+		auto tmp3 = std::sqrt(tmp - tmp2);
+		auto tmp4 = rc * q + s;
+		auto n_sing = (M_PI / k) * (floor((k / M_PI) * (tmp3 + tmp4)) + 1) - s;
+		auto e_sing = ((complex_root.c_0 * rc) - (q * n_sing)) / C;
+		auto r_sing = std::sqrt((n_sing * n_sing - complex_root.c_0 * cTimesCconj) / C + e_sing * e_sing);
+		return std::make_tuple(n_sing, e_sing, r_sing);
+	}
+	constexpr auto decide_split_points(const double left_split_zero, const double right_split_zero, const double left_split_point, const double right_split_point)
+	{
+		double first_split_point;
+		double second_split_point;
+
+		if (left_split_zero <= left_split_point) {
+			first_split_point = left_split_point;
+		}
+		if (left_split_zero >= right_split_point) {
+			first_split_point = right_split_point;
+		}
+		if (left_split_point < left_split_zero && left_split_zero < right_split_point) {
+			first_split_point = left_split_zero;
+		}
+
+		if (right_split_zero >= right_split_point) {
+			second_split_point = right_split_point;
+		}
+		if (right_split_zero <= left_split_point) {
+			second_split_point = left_split_point;
+		}
+
+		if (left_split_point < right_split_zero && right_split_zero < right_split_point) {
+			second_split_point = right_split_zero;
+		}
+
+		return std::make_tuple(first_split_point, second_split_point);
+	}
+
+	auto get_split_points_sing(const double q, const double k, const double s, const datatypes::complex_root complex_root, const double left_split_point, const double right_split_point)
+	{
+		auto [n_sing, e_sing, r_sing] = calculate_singularities_ODE(complex_root, q, k, s);
+
+		auto left_split_zero = e_sing - r_sing;
+		auto right_split_zero = e_sing + r_sing;
 
 
+		return decide_split_points(left_split_zero, right_split_zero, left_split_point, right_split_point);
 	}
 
 
 
+	auto get_split_points_spec(const double q, const double k, const double s, const datatypes::complex_root complex_root, const double left_split_point, const double right_split_point)
+	{
+		auto C = complex_root.c_0 - q * q;
+		auto rc = std::real(complex_root.c);		
+		auto ic = std::imag(complex_root.c);
+
+		auto cTimesCconj = rc * rc + ic * ic;
+
+
+		auto n0_spec = M_PI / k * (std::floor(k / M_PI * (rc * q * q / q + s))) - s;
+		auto n1_spec = M_PI / k * (std::floor(k / M_PI * (rc * q * q / q + s)) + 1) - s;
+		auto e0_spec = (complex_root.c_0 * rc - q * n0_spec) / C;
+		auto e1_spec = (complex_root.c_0 * rc - q * n1_spec) / C;
+
+		double left_zero_split, right_zero_split;
+		double first_split_point, second_split_point;
+		if (q < 0) {
+			left_zero_split = e1_spec + std::sqrt((n1_spec * n1_spec - complex_root.c_0 * cTimesCconj) / C + e1_spec * e1_spec);
+			right_zero_split = e0_spec + std::sqrt((n0_spec * n0_spec - complex_root.c_0 * cTimesCconj) / C + e0_spec * e0_spec);
+		}
+		else {
+			left_zero_split = e0_spec - std::sqrt((n0_spec * n0_spec - complex_root.c_0 * cTimesCconj) / C + e0_spec * e0_spec);
+			right_zero_split = e1_spec - std::sqrt((n1_spec * n1_spec - complex_root.c_0 * cTimesCconj) / C + e1_spec * e1_spec);
+		}
+
+		return decide_split_points(left_zero_split, right_zero_split, left_split_point, right_split_point);
+	}
+	
+	auto get_singularity_for_ODE(const double q, const datatypes::complex_root complex_root) -> std::complex<double> {
+		auto C = complex_root.c_0 - q * q;
+		auto rc = std::real(complex_root.c);
+		auto ic = std::imag(complex_root.c);
+
+		auto cTimesCconj = rc * rc + ic * ic;
+
+		auto F = std::sqrt(std::complex<double>(C * C - (q * q / complex_root.c_0 * cTimesCconj - C * C) / (q * q / complex_root.c_0 - 1)));
+
+		return q < 0 ? C + F : C - F;
+	}
+
+	auto get_spec_point(const double q, const datatypes::complex_root complex_root) {
+		auto C = std::real(complex_root.c);
+		auto c_real_squared = std::pow(C, 2);
+		auto rc = std::real(complex_root.c);
+		auto ic = std::imag(complex_root.c);
+
+		auto cTimesCconj = rc * rc + ic * ic;
+		auto K = std::sqrt(std::complex<double>(1. / (complex_root.c_0 - q * q) * (q * q * C * C - complex_root.c_0 * cTimesCconj) + C * C));
+
+		return q < 0 ? C + K : C - K;
+	}
 }

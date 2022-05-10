@@ -3,12 +3,19 @@
 
 ## Setting up my project:
 
+(gsl )
 * clone the repo
 * cd vcpkg
 * bootstrap-vcpkg.bat
 * vcpkg install gsl gsl:x64-windows
 (todo: vcpkg install @ResponseFile)
 * vcpkg integrate install
+
+(armadillo)
+* clone the repo
+on windows:
+ * install intel mkl
+ *
 
 ## Thoughts
 
@@ -94,11 +101,6 @@ https://stackoverflow.com/questions/37296481/integration-with-quadrature-and-mul
 
 ## Useful links 
 
-<<<<<<< Updated upstream
-=======
-Gaussian quardarature explained:
-https://www.youtube.com/watch?v=w2xjlPwYock
-
 
 About the performanace:
 https://stackoverflow.com/questions/18009056/why-does-matlab-octave-wipe-the-floor-with-c-in-eigenvalue-problems
@@ -106,7 +108,6 @@ https://stackoverflow.com/questions/18009056/why-does-matlab-octave-wipe-the-flo
 About eigenvalue decomposition (german):
 http://www.peter-junglas.de/fh/vorlesungen/numa/html/kap6.html
 
->>>>>>> Stashed changes
 Running GNU Octave on Gitlab:
 https://gitlab.com/mtmiller/octave-snapshot
 
