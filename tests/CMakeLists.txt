@@ -6,6 +6,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(catch)
 # Adds Catch2::Catch2
 
+
+find_package(Armadillo REQUIRED)
+
+include_directories(${ARMADILLO_INCLUDE_DIRS})
+
+
 # Tests need to be added as executables first
 add_executable(math_lib_tests math_lib_tests.cpp)
 
