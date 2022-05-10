@@ -18,12 +18,12 @@ TEST_CASE("calculate spec and sing points", "[math_lib]") {
 
 	SECTION("calculate the spec point") {
 		auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
-		REQUIRE(std::real(spec_point) == 0.7694);
+		REQUIRE(std::real(spec_point) == Approx(0.7694));
 	}
 
 	SECTION("calculate the sing point") {
 		auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
-		REQUIRE(std::real(sing_point) == 0.5);
-		REQUIRE(std::imag(sing_point) == 1.524);
+		REQUIRE(std::real(sing_point) == Approx(0.5));
+		REQUIRE(std::imag(sing_point) == Approx(1.524));
 	}
 }
