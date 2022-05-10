@@ -3,7 +3,7 @@
 #include <catch2/catch.hpp>
 #include <complex>
 
-#include "SteepestDescent/math_utils.h"
+#include "../SteepestDescent/math_utils.h"
 
 
 TEST_CASE("calculate spec and sing points", "[math_lib]") {
