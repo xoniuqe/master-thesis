@@ -39,12 +39,15 @@ build:
      - git submodule update --init --recursive
      - apt-get update --yes
      - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
+     # We will install latest CMake, even though Ubuntu has a recent one
+     - mkdir -p $HOME/.local
+     - curl -s "https://cmake.org/files/v3.23/cmake-3.23.1-linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C $HOME/.local
+     - export PATH=$HOME/.local/bin:$PATH
 
     script:
-     - mkdir build
-     - cd build
-     - cmake ..
-     - make
+     - cmake -S . -B build
+     - cmake --build build -v
+
     artifacts:
       paths:
        - build
@@ -52,16 +55,8 @@ build:
 
 test:
     stage: test
-    image: gcc
-    before_script:
-     - git submodule sync --recursive
-     - git submodule update --init --recursive
-     - apt-get update --yes
-     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
-     # We will install latest CMake, even though Ubuntu has a recent one
-     - mkdir -p $HOME/.local
-     - curl -s "https://cmake.org/files/v3.23/cmake-3.23.1-linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C $HOME/.local
-     - export PATH=$HOME/.local/bin:$PATH
+    dependencies:
+        build
 
     script:
     - cmake -S . -B build_test
