@@ -79,8 +79,8 @@ namespace math_utils {
 	}
 	constexpr auto decide_split_points(const double left_split_zero, const double right_split_zero, const double left_split_point, const double right_split_point)
 	{
-		double first_split_point;
-		double second_split_point;
+		double first_split_point = 0.;
+		double second_split_point = 0.;
 
 		if (left_split_zero <= left_split_point) {
 			first_split_point = left_split_point;
@@ -148,15 +148,13 @@ namespace math_utils {
 	}
 	
 	auto get_singularity_for_ODE(const double q, const datatypes::complex_root complex_root) -> std::complex<double> {
-		auto C = complex_root.c_0 - q * q;
 		auto rc = std::real(complex_root.c);
 		auto ic = std::imag(complex_root.c);
 
 		auto cTimesCconj = rc * rc + ic * ic;
+		auto F = std::sqrt(std::complex<double>(rc * rc - (q * q / complex_root.c_0 * cTimesCconj - rc * rc) / (q * q / complex_root.c_0 - 1)));
 
-		auto F = std::sqrt(std::complex<double>(C * C - (q * q / complex_root.c_0 * cTimesCconj - C * C) / (q * q / complex_root.c_0 - 1)));
-
-		return q < 0 ? C + F : C - F;
+		return q < 0 ? rc + F :rc - F;
 	}
 
 	auto get_spec_point(const double q, const datatypes::complex_root complex_root) {
