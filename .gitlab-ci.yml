@@ -55,8 +55,7 @@ build:
 
 test:
     stage: test
-    dependencies:
-        build
+    dependencies: [build]
 
     script:
     - cmake -S . -B build_test
