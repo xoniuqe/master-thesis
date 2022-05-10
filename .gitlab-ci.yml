@@ -72,5 +72,6 @@ test:
     - cmake --build build_test -t test
 
     artifacts:
-      paths:
-       - build_test/tests/result.xml
+      when: always
+      reports:
+        junit: build_test/tests/result.xml
