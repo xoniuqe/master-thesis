@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -164,7 +165,51 @@ namespace math_utils {
 		return q < 0 ? C + K : C - K;
 	}
 
-	auto get_complex_roots(const double y, const datatypes::matrix& A, const datatypes::vector& b, const datatypes::vector& r) -> auto {
+
+	/// <summary>
+	/// Takes only positive real values
+	/// </summary>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="A"></param>
+	/// <param name="b"></param>
+	/// <param name="r"></param>
+	/// <returns></returns>
+	auto calculate_P_x(const double x, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r) {
+		//fx = ((A(1, 1) * x + A(1, 2) * y + b(1) - r(1)). ^ 2 + (A(2, 1) * x + A(2, 2) * y + b(2) - r(2)). ^ 2 + (A(3, 1) * x + A(3, 2) * y + b(3) - r(3)). ^ 2);
+		auto calculate_row = [&](const int i) {
+			auto first_val = MATRIX_GET(A, i, 0);
+			auto second_val = MATRIX_GET(A, i, 1);
+			auto b_element = VECTOR_GET(b, i);
+			auto r_element = VECTOR_GET(r, i);
+			auto tmp = ((first_val * x + second_val * y + b_element - r_element));
+			return tmp * tmp;
+		};
+		return calculate_row(0) + calculate_row(1) + calculate_row(2);
+	}
+
+	/// <summary>
+	/// Calculates the partial derivative in x direction.
+	/// </summary>
+	/// <param name="x">Barycentrical parameter x of the triangle </param>
+	/// <param name="y">Barycentrical parameter y of the triangle </param>
+	/// <param name="A">Jacobian matrix of the triangle </param>
+	/// <param name="b">Affine transformation Ax + b </param>
+	/// <param name="r">View vector </param>
+	/// <returns>The partial derivative in x direction </returns>
+	auto partial_derivative_P_x(const double x, const double y, const datatypes::matrix& A, const datatypes::vector& b, const datatypes::vector& r) {
+		auto calculate_row = [&](const int i) {
+			auto first_val = MATRIX_GET(A, i, 0);
+			auto second_val = MATRIX_GET(A, i,1);
+			auto b_element = VECTOR_GET(b, i);
+			auto r_element = VECTOR_GET(r, i);
+			return first_val * 2 * (first_val * x + second_val * y + b_element - r_element);
+		};
+		return calculate_row(0) + calculate_row(1) + calculate_row(2);
+	}
+
+
+	auto get_complex_roots(const double y, const datatypes::matrix& A, const datatypes::vector& b, const datatypes::vector& r) -> auto{
 		auto A_1 = A.col(0);
 		auto A_2 = A.col(1);
 		auto A_2copy = arma::vec(A_2);
