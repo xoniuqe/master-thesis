@@ -6,7 +6,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(catch)
 # Adds Catch2::Catch2
 
-find_package(Catch2 REQUIRED)
 find_package(Armadillo REQUIRED)
 
 include_directories(${ARMADILLO_INCLUDE_DIRS})
@@ -24,7 +23,4 @@ target_link_libraries(math_lib_tests PRIVATE  ${ARMADILLO_LIBRARIES} Catch2::Cat
 
 # If you register a test, then ctest and make test will run it.
 # You can also run examples and check the output, as well.
-#add_test(NAME test_math_lib_tests COMMAND math_lib_tests) # Command can be a target
-include(CTest)
-include(Catch)
-catch_discover_tests(math_lib_tests REPORTER xml EXTRA_ARGS -o report.xml)
+add_test(NAME test_math_lib_tests COMMAND math_lib_tests CONFIG -r xml -o result.xml) # Command can be a target
