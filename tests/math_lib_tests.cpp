@@ -27,3 +27,18 @@ TEST_CASE("calculate spec and sing points", "[math_lib]") {
 		REQUIRE(std::imag(sing_point) == Approx(1.524));
 	}
 }
+
+
+TEST_CASE("get complex roots", "[math_lib]") {
+	arma::mat  A{ {1, 1}, {1, 1,} , {0 ,0 } };
+
+	arma::vec b{ 0,0,0 };
+
+	arma::vec r{ 0, 1, 2 };
+
+	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
+
+	REQUIRE(std::real(c) == Approx(1));
+	REQUIRE(std::imag(c) == Approx(1));
+	REQUIRE(c_0  == Approx(1));
+}
