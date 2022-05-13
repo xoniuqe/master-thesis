@@ -9,10 +9,8 @@
 #include <algorithm>
 
 namespace gauss_laguerre {
-	//alternative to try: 
-	//typedef std::function <const double(const std::complex<double> x)> path_function;
 
-	typedef std::function <const double(const gsl_complex x)> path_function;
+	typedef std::function <const double(const std::complex<double> x)> path_function;
 
 	auto calculate_laguerre_points_and_weights(int n) {
 		std::vector<double> alpha(n);
@@ -23,10 +21,10 @@ namespace gauss_laguerre {
 
 		arma::mat T(n, n);
 		for (auto i = 0; i < n; i++) {
-			T[i, i] = alpha[i];
+			T(i, i) = alpha[i];
 			if (i + 1 < n) {
-				T[i, i + 1] = beta[i];
-				T[i + 1, i] = beta[i];
+				T(i, i + 1) = beta[i];
+				T(i + 1, i) = beta[i];
 			}
 		}
 
@@ -40,7 +38,7 @@ namespace gauss_laguerre {
 
 		arma::vec quadrature_weights(n);
 		for (auto i = 0; i < n; i++) {
-			auto value = abs(evec[0,i]);
+			auto value = std::abs(evec[0,i]);
 			quadrature_weights[i] = value * value;
 		}
 	
