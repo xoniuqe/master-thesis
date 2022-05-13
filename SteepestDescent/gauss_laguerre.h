@@ -56,11 +56,11 @@ namespace gauss_laguerre {
 		barycentric_weights *= -(1. / max_value);
 		return std::make_tuple(laguerre_points, quadrature_weights, barycentric_weights);
 	}
-	
+	/*
 	auto calculate_integral(const path_function, std::vector<double> nodes, std::vector<double> weights) {
 		//std::vector<double> calculation_result;
 		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), [](auto left, auto right) -> auto {
 			return left * path_function(right);
 		}, std::plus<>());
-	}
+	}*/
 }
