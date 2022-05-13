@@ -1,4 +1,4 @@
-﻿// SteepestDescent.cpp: Definiert den Einstiegspunkt für die Anwendung.
+// SteepestDescent.cpp: Definiert den Einstiegspunkt für die Anwendung.
 //
 
 #include "SteepestDescent.h"
@@ -6,7 +6,6 @@
 #include <variant>
 #include <tuple>
 
-//#undef ARMA_USE_SUPERLU
 #include <armadillo>
 
 #include "math_utils.h"
@@ -17,27 +16,6 @@
 #include <type_traits>
 using namespace std::complex_literals;
 typedef std::variant<std::tuple<std::complex<double>, std::complex<double>>, std::complex<double>> splitting_point;
-
-
-/// <summary>
-/// Calculates the partial derivative in x direction.
-/// </summary>
-/// <param name="x">Barycentrical parameter x of the triangle </param>
-/// <param name="y">Barycentrical parameter y of the triangle </param>
-/// <param name="A">Jacobian matrix of the triangle </param>
-/// <param name="b">Affine transformation Ax + b </param>
-/// <param name="r">View vector </param>
-/// <returns>The partial derivative in x direction </returns>
-auto partial_derivative_P_x(const double x, const double y, const datatypes::matrix& A, const datatypes::vector& b, const datatypes::vector& r) {
-	auto calculate_row = [&](const int i) {
-		auto first_val = MATRIX_GET(A, i, 0);
-		auto second_val = MATRIX_GET(A, i,1);
-		auto b_element = VECTOR_GET(b, i);
-		auto r_element = VECTOR_GET(r, i);
-		return first_val * 2 * (first_val * x + second_val * y + b_element - r_element);
-	};
-	return calculate_row(0) + calculate_row(1) + calculate_row(2);
-}
 
 
 /// <summary>
@@ -56,30 +34,6 @@ auto calculate_P_x(const datatypes::vector& x, const datatypes::matrix& A, const
 	
 	return result;
 }
-
-/// <summary>
-/// Takes only positive real values
-/// </summary>
-/// <param name="x"></param>
-/// <param name="y"></param>
-/// <param name="A"></param>
-/// <param name="b"></param>
-/// <param name="r"></param>
-/// <returns></returns>
-auto calculate_P_x(const double x, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r) {
-	//fx = ((A(1, 1) * x + A(1, 2) * y + b(1) - r(1)). ^ 2 + (A(2, 1) * x + A(2, 2) * y + b(2) - r(2)). ^ 2 + (A(3, 1) * x + A(3, 2) * y + b(3) - r(3)). ^ 2);
-	auto calculate_row = [&](const int i) {
-		auto first_val = MATRIX_GET(A, i, 0);
-		auto second_val = MATRIX_GET(A, i, 1);
-		auto b_element = VECTOR_GET(b, i);
-		auto r_element = VECTOR_GET(r, i);
-		auto tmp = ((first_val * x + second_val * y + b_element - r_element));
-		return tmp * tmp;
-	};
-	return calculate_row(0) + calculate_row(1) + calculate_row(2);
-}
-
-
 
 
 constexpr auto calculate_laguerre_point(const int k, const int a, const double x) {
@@ -225,7 +179,7 @@ void setup_1d_test()
 	
 	arma::vec mu { 1,4,0 };
 
-	auto DPx = partial_derivative_P_x(0, 0, A, b, r);
+	auto DPx = math_utils::partial_derivative_P_x(0, 0, A, b, r);
 
 
 	std::cout << "\nDPx = \n" << DPx;
