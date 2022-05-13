@@ -38,7 +38,7 @@ TEST_CASE("get complex roots", "[math_lib]") {
 
 	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
 
-	REQUIRE(std::real(c) == Approx(1));
-	REQUIRE(std::imag(c) == Approx(1));
-	REQUIRE(c_0  == Approx(1));
+	REQUIRE(std::real(c) == Approx(0.5));
+	REQUIRE(std::imag(c) == Approx(1.5));
+	REQUIRE(c_0  == Approx(2));
 }
