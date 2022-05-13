@@ -22,8 +22,6 @@ namespace gauss_laguerre {
 		std::iota(std::begin(beta), std::end(beta), 1);
 
 		arma::mat T(n, n);
-		auto workspace = gsl_eigen_symmv_alloc(n);
-		auto T = gsl_matrix_alloc(n, n);
 		for (auto i = 0; i < n; i++) {
 			T[i, i] = alpha[i];
 			if (i + 1 < n) {
@@ -57,7 +55,7 @@ namespace gauss_laguerre {
 			}
 		}
 
-		barycentric_weights *= -/1. / max_value);
+		barycentric_weights *= -(1. / max_value);
 		return std::make_tuple(laguerre_points, quadrature_weights, barycentric_weights);
 	}
 	
