@@ -38,7 +38,7 @@ namespace gauss_laguerre {
 
 		arma::vec quadrature_weights(n);
 		for (auto i = 0; i < n; i++) {
-			auto value = std::abs(evec[0,i]);
+			auto value = std::abs(evec(0,i));
 			quadrature_weights[i] = value * value;
 		}
 	
@@ -47,7 +47,7 @@ namespace gauss_laguerre {
 
 		auto max_value = -1.;
 		for (auto i = 0; i < n; i++) {
-			barycentric_weights[i] = std::abs(evec[0, i] * sqrt(laguerre_points[i]));
+			barycentric_weights[i] = std::abs(evec(0, i) * std::sqrt(laguerre_points[i]));
 			if (barycentric_weights[i] > max_value) {
 				max_value = barycentric_weights[i];
 			}
