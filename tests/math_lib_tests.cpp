@@ -2,8 +2,8 @@
 #include <complex>
 #include <armadillo>
 
-#include "../SteepestDescent/datatypes.h"
-#include "../SteepestDescent/math_utils.h"
+#include <steepest_descent/datatypes.h>
+#include <steepest_descent/math_utils.h>
 
 
 TEST_CASE("calculate spec and sing points", "[math_lib]") {

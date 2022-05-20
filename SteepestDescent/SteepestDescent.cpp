@@ -8,17 +8,17 @@
 
 //#undef ARMA_USE_SUPERLU
 #include <armadillo>
-
-#include "math_utils.h"
-#include "print_utils.h"
-#include "datatypes.h"
+#include "steepest_descent/gauss_laguerre.h"
+#include <steepest_descent/gauss_laguerre.h>
+#include "steepest_descent/math_utils.h"
+#include "steepest_descent/datatypes.h"
 
 
 #include <type_traits>
 using namespace std::complex_literals;
 typedef std::variant<std::tuple<std::complex<double>, std::complex<double>>, std::complex<double>> splitting_point;
 
-
+/*
 /// <summary>
 /// 
 /// </summary>
@@ -35,7 +35,7 @@ auto calculate_P_x(const datatypes::vector& x, const datatypes::matrix& A, const
 	
 	return result;
 }
-
+*/
 
 constexpr auto calculate_laguerre_point(const int k, const int a, const double x) {
 	if (k == 0) {
@@ -146,12 +146,6 @@ auto calculate_splitting_points(const std::complex<double> c, const double c_0, 
 
 
 
-auto generate_K_x(const double x, const std::complex<double> c, const double c_0,const double q) {
-	return[&](const double t) -> auto {
-		auto P_x = c_0 * x * x + c_0 * std::abs(c) * std::abs(c) - 2. * c_0 * x * std::real(c);
-		return std::sqrt(P_x) +  q * x + t * 1i;
-	};
-}
 
 auto integrate_1d(const double y, const datatypes::matrix& A, const datatypes::vector& b, const datatypes::vector& r, const datatypes::vector& mu, const double k, const double left_split_point, const double right_split_point, std::tuple<std::vector<double>, std::vector<double>> laguerre_points)
 {
@@ -223,7 +217,24 @@ void test_split() {
 
 int main()
 {
+	arma::mat  A{ {1, 1}, {1, 1,} , {0 ,0 } };
 
+	arma::vec b{ 0,0,0 };
+
+	arma::vec r{ 0, 1, 2 };
+
+	arma::vec mu{ 1,4,0 };
+
+	auto k = 10;
+	auto s = 3;
+
+	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
+
+	auto q = -std::sqrt(c_0);
+
+	auto result = gauss_laguerre::calculate_laguerre_points_and_weights(10);
+	auto [path, derivative] = 	path_utils::get_complex_path(0, 0, A, b, r, q, {c, c_0});
+	//gauss_laguerre::calculate_integral()
 	//setup_1d_test();
 	test_split();
 

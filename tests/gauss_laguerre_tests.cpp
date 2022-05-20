@@ -2,10 +2,19 @@
 #include <complex>
 #include <armadillo>
 
-#include "../SteepestDescent/gauss_laguerre.h"
+#include <steepest_descent/gauss_laguerre.h>
+
 
 
 TEST_CASE("laguerre points", "[gauss_laguerre]") {
-	auto [laguerre_points, x, y] = gauss_laguerre::calculate_laguerre_points_and_weights(10);
+	std::vector<double> expected_laguerre_points = { 0.1378,0.7295,1.8083,3.4014,5.5525,8.3302,11.8438,16.2793,21.9966,29.9207};
+	std::vector<double> expected_weights = {0.30844,0.40112,0.21807,0.062087,0.0095015,0.00075301,2.8259e-05,4.2493e-07,1.8396e-09,9.9118e-13};
+	auto [laguerre_points, weights]/*, y] */= gauss_laguerre::calculate_laguerre_points_and_weights(10);
+
+	for (auto i = 0; i < 10; i++) {
+		REQUIRE(laguerre_points[i] == Approx(expected_laguerre_points[i]));
+		REQUIRE(weights[i] == Approx(expected_weights[i]));
+	}
+	
 
 }

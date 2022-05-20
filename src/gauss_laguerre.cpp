@@ -1,18 +1,17 @@
-#pragma once
+#include <steepest_descent/gauss_laguerre.h>
 
-#include <vector>
 #include <functional>
 #include <complex> //include complex to replace the gsl complex numbers
 #include <armadillo>
-#include <tuple>
 #include <numeric>
-#include <algorithm>
+#include <algorithm> 
+
+using namespace std::literals::complex_literals;
 
 namespace gauss_laguerre {
 
-	typedef std::function <const double(const std::complex<double> x)> path_function;
-
-	auto calculate_laguerre_points_and_weights(int n) {
+	auto calculate_laguerre_points_and_weights(int n) ->std::tuple<std::vector<double>, std::vector<double>>
+	{
 		std::vector<double> alpha(n);
 		std::iota(std::begin(alpha), std::end(alpha), 1);
 		std::for_each(std::begin(alpha), std::end(alpha), [](auto& x) { x = 2. * x - 1.;  });
@@ -38,13 +37,11 @@ namespace gauss_laguerre {
 
 		arma::vec quadrature_weights(n);
 		for (auto i = 0; i < n; i++) {
-			auto value = std::abs(evec(0,i));
+			auto value = std::abs(evec(0, i));
 			quadrature_weights[i] = value * value;
 		}
-	
 
-		arma::vec barycentric_weights (n);
-
+		arma::vec barycentric_weights(n);
 		auto max_value = -1.;
 		for (auto i = 0; i < n; i++) {
 			barycentric_weights[i] = std::abs(evec(0, i) * std::sqrt(laguerre_points[i]));
@@ -54,13 +51,17 @@ namespace gauss_laguerre {
 		}
 
 		barycentric_weights *= -(1. / max_value);
-		return std::make_tuple(laguerre_points, quadrature_weights, barycentric_weights);
+
+		return std::make_tuple(arma::conv_to<std::vector<double>>::from(laguerre_points), arma::conv_to<std::vector<double>>::from(quadrature_weights));
 	}
-	/*
-	auto calculate_integral(const path_function, std::vector<double> nodes, std::vector<double> weights) {
+
+	auto calculate_integral(const path_utils::path_function path, std::vector<double> nodes, std::vector<double> weights) -> std::complex<double> {
 		//std::vector<double> calculation_result;
-		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), [](auto left, auto right) -> auto {
-			return left * path_function(right);
-		}, std::plus<>());
-	}*/
+		auto result = 0. + 0.i;
+		auto reduce_function = [&](auto left, auto right) -> auto {
+			return left * path(right);
+		};
+
+		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), result, reduce_function, std::plus<>());
+	}
 }
