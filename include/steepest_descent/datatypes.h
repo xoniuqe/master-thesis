@@ -1,11 +1,8 @@
 #pragma once
-#ifdef USE_ARMADILLO
 #include <armadillo>
-#endif
 #include <complex>
 
 namespace datatypes {
-#ifdef USE_ARMADILLO
 	typedef  arma::mat matrix;
 	typedef  arma::vec vector;
 
@@ -14,12 +11,11 @@ namespace datatypes {
 #define VECTOR_GET(v,x) v.at(x);
 
 #define DOT_PRODUCT(v1, v2) arma::dot(v1,v2);
-#endif
 
 
 	struct triangle {
 		matrix* A;
-		vector* b;
+		vector* b;	
 	};
 
 	struct complex_root {
