@@ -19,6 +19,7 @@ namespace gauss_laguerre {
 		std::iota(std::begin(beta), std::end(beta), 1);
 
 		arma::mat T(n, n);
+		T.zeros();
 		for (auto i = 0; i < n; i++) {
 			T(i, i) = alpha[i];
 			if (i + 1 < n) {
