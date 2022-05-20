@@ -12,7 +12,7 @@ TEST_CASE("laguerre points", "[gauss_laguerre]") {
 	auto [nodes, weights] = gauss_laguerre::calculate_laguerre_points_and_weights(10);
 
 	for (auto i = 0; i < 10; i++) {
-		REQUIRE(nodes[i] == Approx(expected_laguerre_points[i]).margin(0.0001);
+		REQUIRE(nodes[i] == Approx(expected_laguerre_points[i]).margin(0.0001));
 		REQUIRE(weights[i] == Approx(expected_weights[i]).margin(0.0001));
 	}
 	
