@@ -24,7 +24,7 @@ namespace math_utils {
 	/// <param name="k"></param>
 	/// <param name="s"></param>
 	/// <returns></returns>
-	auto calculate_singularities_ODE(const datatypes::complex_root complex_root, const double q, const double k, const double s) -> std::tuple<double, double, double>
+	auto calculate_singularities_ODE(const datatypes::complex_root complex_root, const double q, const double k, const double s) -> std::tuple<std::complex<double>, std::complex<double>, std::complex<double>>
 	{
 		auto C = complex_root.c_0 - q * q;
 		auto rc = std::real(complex_root.c);
@@ -40,10 +40,10 @@ namespace math_utils {
 		auto r_sing = std::sqrt((n_sing * n_sing - complex_root.c_0 * cTimesCconj) / C + e_sing * e_sing);
 		return std::make_tuple(n_sing, e_sing, r_sing);
 	}
-	constexpr auto decide_split_points(const double left_split_zero, const double right_split_zero, const double left_split_point, const double right_split_point) -> std::tuple<double, double>
+	constexpr auto decide_split_points(const std::complex<double> left_split_zero, const std::complex<double> right_split_zero, const std::complex<double> left_split_point, const std::complex<double> right_split_point) -> std::tuple<std::complex<double>, std::complex<double>>
 	{
-		double first_split_point = 0.;
-		double second_split_point = 0.;
+		std::complex<double> first_split_point;
+		std::complex<double> second_split_point;
 
 		if (left_split_zero <= left_split_point) {
 			first_split_point = left_split_point;
@@ -69,7 +69,7 @@ namespace math_utils {
 		return std::make_tuple(first_split_point, second_split_point);
 	}
 
-	auto get_split_points_sing(const double q, const double k, const double s, const datatypes::complex_root complex_root, const double left_split_point, const double right_split_point) -> std::tuple<double, double>
+	auto get_split_points_sing(const double q, const double k, const double s, const datatypes::complex_root complex_root, const std::complex<double> left_split_point, const std::complex<double> right_split_point) -> std::tuple<std::complex<double>, std::complex<double>>
 	{
 		auto [n_sing, e_sing, r_sing] = calculate_singularities_ODE(complex_root, q, k, s);
 
@@ -82,7 +82,7 @@ namespace math_utils {
 
 
 
-	auto get_split_points_spec(const double q, const double k, const double s, const datatypes::complex_root complex_root, const double left_split_point, const double right_split_point) -> std::tuple<double, double>
+	auto get_split_points_spec(const double q, const double k, const double s, const datatypes::complex_root complex_root, const std::complex<double> left_split_point, const std::complex<double> right_split_point) -> std::tuple<std::complex<double>, std::complex<double>>
 	{
 		auto C = complex_root.c_0 - q * q;
 		auto rc = std::real(complex_root.c);
@@ -96,8 +96,8 @@ namespace math_utils {
 		auto e0_spec = (complex_root.c_0 * rc - q * n0_spec) / C;
 		auto e1_spec = (complex_root.c_0 * rc - q * n1_spec) / C;
 
-		double left_zero_split, right_zero_split;
-		double first_split_point, second_split_point;
+		std::complex<double> left_zero_split, right_zero_split;
+		std::complex<double> first_split_point, second_split_point;
 		if (q < 0) {
 			left_zero_split = e1_spec + std::sqrt((n1_spec * n1_spec - complex_root.c_0 * cTimesCconj) / C + e1_spec * e1_spec);
 			right_zero_split = e0_spec + std::sqrt((n0_spec * n0_spec - complex_root.c_0 * cTimesCconj) / C + e0_spec * e0_spec);
@@ -143,6 +143,19 @@ namespace math_utils {
 	/// <param name="r"></param>
 	/// <returns></returns>
 	auto calculate_P_x(const double x, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r) -> double {
+		//fx = ((A(1, 1) * x + A(1, 2) * y + b(1) - r(1)). ^ 2 + (A(2, 1) * x + A(2, 2) * y + b(2) - r(2)). ^ 2 + (A(3, 1) * x + A(3, 2) * y + b(3) - r(3)). ^ 2);
+		auto calculate_row = [&](const int i) {
+			auto first_val = MATRIX_GET(A, i, 0);
+			auto second_val = MATRIX_GET(A, i, 1);
+			auto b_element = VECTOR_GET(b, i);
+			auto r_element = VECTOR_GET(r, i);
+			auto tmp = ((first_val * x + second_val * y + b_element - r_element));
+			return tmp * tmp;
+		};
+		return calculate_row(0) + calculate_row(1) + calculate_row(2);
+	}
+
+	auto calculate_P_x(const std::complex<double> x, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r) -> std::complex<double> {
 		//fx = ((A(1, 1) * x + A(1, 2) * y + b(1) - r(1)). ^ 2 + (A(2, 1) * x + A(2, 2) * y + b(2) - r(2)). ^ 2 + (A(3, 1) * x + A(3, 2) * y + b(3) - r(3)). ^ 2);
 		auto calculate_row = [&](const int i) {
 			auto first_val = MATRIX_GET(A, i, 0);

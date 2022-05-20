@@ -7,11 +7,10 @@
 #include <tuple>
 
 #include <armadillo>
-#include "steepest_descent/gauss_laguerre.h"
 #include <steepest_descent/gauss_laguerre.h>
-#include "steepest_descent/math_utils.h"
-#include "steepest_descent/datatypes.h"
-
+#include <steepest_descent/math_utils.h>
+#include <steepest_descent/datatypes.h>
+#include <steepest_descent/path_utils.h>
 
 #include <type_traits>
 using namespace std::complex_literals;
@@ -214,6 +213,71 @@ void test_split() {
 }
 
 
+auto integral_test()
+{
+	arma::mat  A{ {0, 0}, {1, 0}, {1, 1 } };
+
+	arma::vec b{ 0,0,0 };
+
+	arma::vec r{ 1, -0.5, -0.5 };
+
+	arma::vec mu{ 1,-0.5, -0.5 };
+	auto y = 0.;
+	auto k = 100;
+	auto left_split = 0.; 
+	auto right_split = 1.;
+
+	auto [nodes, weights] = gauss_laguerre::calculate_laguerre_points_and_weights(30);
+
+	auto q = arma::dot(A.col(0), mu);
+	auto s = arma::dot(A.col(1), mu) * y + arma::dot(mu, b);
+	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
+
+	auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
+	auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
+
+	if (std::abs(std::imag(sing_point)) < std::abs(std::imag(c))) {
+		sing_point = std::real(sing_point);
+	}
+
+	if (std::abs(std::imag(spec_point) < std::abs(std::imag(c)))) {
+		spec_point = std::real(spec_point);
+	}
+	auto tol = 0.1;
+	if (std::real(spec_point) >= (left_split - tol) && std::real(spec_point) <= (right_split + tol) && std::abs(std::imag(spec_point)) <= std::numeric_limits<double>::epsilon()) {
+		std::cout << "spec point" << std::endl;
+	}
+
+	if (std::real(sing_point) >= (left_split - tol) && std::real(sing_point) <= (right_split + tol) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon()) {
+		std::cout << "sing point" << std::endl;
+		auto [sp1, sp2] = math_utils::get_split_points_sing(q, k, s, { c, c_0 }, left_split, right_split);
+		auto path1 = path_utils::get_weighted_path(sp1, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
+		auto path2 = path_utils::get_weighted_path(sp2, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
+
+		auto I1 = gauss_laguerre::calculate_integral(path1, nodes, weights);
+		auto I2 = gauss_laguerre::calculate_integral(path2, nodes, weights);
+
+		std::cout << "I1: " << I1 << std::endl;
+		std::cout << "I2: " << I2 << std::endl;
+		return;
+	}
+
+	std::cout << "no singularity: exit; did not implement 'integral' yet" << std::endl;
+	return;
+
+
+
+		/*   
+    if specPoint >= lSp-tol && specPoint <= rSp+tol && imag(specPoint) == 0    %specPoint lies in the integration segment.
+        string = 'Spec';
+    end
+
+
+    if singPoint >= lSp-tol && singPoint <= rSp+tol && imag(singPoint) == 0    %singPoint lies in the integration segment.
+        string = 'Sing';
+    end*/
+}
+
 int main()
 {
 	arma::mat  A{ {1, 1}, {1, 1,} , {0 ,0 } };
@@ -227,15 +291,17 @@ int main()
 	auto k = 10;
 	auto s = 3;
 
+	integral_test();
+	/*
 	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
 
 	auto q = -std::sqrt(c_0);
 
-	auto result = gauss_laguerre::calculate_laguerre_points_and_weights(10);
-	auto [path, derivative] = 	path_utils::get_complex_path(0, 0, A, b, r, q, {c, c_0});
+	auto [nodes, weights] = gauss_laguerre::calculate_laguerre_points_and_weights(10);
+	auto [path, derivative] = 	path_utils::get_complex_path(0, 0, A, b, r, q, {c, c_0}, 0);
 	//gauss_laguerre::calculate_integral()
 	//setup_1d_test();
-	test_split();
+	test_split();*/
 
 	return 0;
 }
