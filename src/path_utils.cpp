@@ -17,8 +17,8 @@ namespace path_utils {
     using namespace std::literals::complex_literals;
 
 
-    auto generate_K_x(const double x, const double P_x, const double q) -> std::function<const std::complex<double>(const double t)> {
-        return[&](const double t) -> auto {
+    auto generate_K_x(const std::complex<double> x, const std::complex<double> P_x, const double q) -> std::function<const std::complex<double>(const double t)> {
+        return[=](const double t) -> auto {
             //auto P_x = c_0 * x * x + c_0 * std::abs(c) * std::abs(c) - 2. * c_0 * x * std::real(c);
             return std::sqrt(P_x) + q * x + t * 1i;
         };
@@ -26,7 +26,7 @@ namespace path_utils {
 
     //function[cPath,ddtcPath] = GetComplexPath(sP,y,A,b,r,q,c,c_0,singPoint)
 
-    auto get_complex_path(const double split_point, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r, const double q, const datatypes::complex_root complex_root) -> std::tuple< path_function, path_function>{
+    auto get_complex_path(const std::complex<double> split_point, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r, const double q, const datatypes::complex_root complex_root, const std::complex<double> sing_point) -> std::tuple< path_function, path_function>{
         /*
 
     Cb = conj(c);
@@ -51,69 +51,83 @@ namespace path_utils {
         auto S = 1.0 / (complex_root.c_0 - q * q);
         auto Psp = math_utils::calculate_P_x(split_point, y, A, b, r);
         auto K = generate_K_x(split_point, Psp, q);
-        auto T = [&](const auto t) -> auto {
+        auto T = [=](const auto t) -> auto {
             return (q * K(t) - complex_root.c_0 * C) * S;
         };
 
         path_function path;
         if (std::abs(q - sqc) <= std::numeric_limits<double>::epsilon()) {
-            auto U = [&](const std::complex<double> t) -> auto {
+            auto U = [=](const double t) -> auto {
                 return std::sqrt(Psp) + sqc * split_point + 1i * t;
             };
-            path = [&](const std::complex<double> t) -> auto {
+            path = [=](const double t) -> auto {
                 return (U(t) * U(t) - cTimesCconj * complex_root.c_0) / (2. * (U(t) * sqc - complex_root.c_0 * C));
             };
         }
         if (std::abs(q + sqc) <= std::numeric_limits<double>::epsilon()) {
-            auto U = [&Psp, &sqc, &split_point](const std::complex<double> t) -> auto {
+            auto U = [&Psp, &sqc, &split_point](const double t) -> auto {
                 return std::sqrt(Psp) - sqc * split_point + 1i * t;
             };
-            path = [&](const std::complex<double> t) -> auto {
+            path = [=](const double t) -> auto {
                 return (U(t) * U(t) - cTimesCconj * complex_root.c_0) / (2. * (-1. * U(t) * sqc - complex_root.c_0 * C));
             };
         }
-        /*
-     if q == 0;
-    cPath = @(t) ((PsP+2*1i*PsP^(1/2).*t-t.^2)*1/c_0-imag(c)^2).^(1/2)+C;
-    if sP < C;
-        cPath = @(t) -cPath(t)+2*C;
-    end
-end
 
-if q == sqc;
-    U = @(t) sqrt(PsP)+sqc*sP+1i.*t;
-    cPath = @(t) ((U(t)).^2-c_0*c*Cb)/2.*(U(t)*sqc-c_0*C).^(-1);
-end
+        if (std::abs(q) > sqc) {
+            auto sign = q > 0 ? 1. : -1.;
+            path = [=](const double t) -> auto {
+                return std::sqrt(sign * ((K(t) * K(t) - cTimesCconj * complex_root.c_0) * S * T(t) * T(t))) - T(t);
+            };
+        }
 
-if q == -sqc;
-    U = @(t) sqrt(PsP)-sqc*sP+1i.*t;
-    cPath = @(t) ((U(t)).^2-c_0*c*Cb)/2.*(-U(t)*sqc-c_0*C).^(-1);
-end
+        if (std::abs(q) < sqc) {
+            auto sign = std::real(split_point) >= std::real(sing_point) ? 1. : -1.;
+            path = [=](const double t) -> auto {
+                return std::sqrt(sign * ((K(t) * K(t) - cTimesCconj * complex_root.c_0) * S * T(t) * T(t))) - T(t);
+            };
+        }
 
-if q > 0 && abs(q) > sqc;
-    cPath = @(t) -((K(t).^2-c_0*c*Cb)*S+T(t).^2).^(1/2)-T(t);
-end
+        if (std::abs(q) <= std::numeric_limits<double>::epsilon()) {
+            auto path_fun = [=](const double t) -> auto {
+                return std::sqrt((Psp + 2. * 1.i * std::sqrt(Psp) * t - t * t) * 1. / complex_root.c_0 - (std::imag(complex_root.c) * std::imag(complex_root.c))) + C;
+            };
+            if (std::real(split_point) < C) {
+                path = [=](const double t) -> auto {
+                    return -path_fun(t) + 2 * C;
+                };
+            }
+            else
+            {
+                path = path_fun;
+            }
+        }
 
-if q < 0 && abs(q) > sqc;
-    cPath = @(t) ((K(t).^2-c_0*c*Cb)*S+T(t).^2).^(1/2)-T(t);
-end
+        path_function path_derivative;
+        auto Pp = [=](const double t) -> auto {
+            return  math_utils::calculate_P_x(path(t), y, A, b, r);
+        };
 
-if abs(q) < sqc;
-    if sP >= singPoint;
-        cPath = @(t) ((K(t).^2-c_0*c*Cb)*S+T(t).^2).^(1/2)-T(t);
-    else
-        cPath = @(t) -((K(t).^2-c_0*c*Cb)*S+T(t).^2).^(1/2)-T(t);
-    end
-end
-
+        path_derivative = [=](const double t) -> auto {
+            return std::sqrt(Pp(t)) * 1.i /std::sqrt(complex_root.c_0 * (path(t) - C) + q * (Pp(t)));
+        };
+   /*
 
 %Derivative of the path obtained by injecting the explicit formulas
 %into the ODE.
 
 Pp = @(t) Px(cPath(t),y,A,b,r);
-ddtcPath = @(t) (Pp(t)).^(1/2)*1i./(c_0*(cPath(t)-C)+q*(Pp(t)).^(1/2));*/
+ddtcPath = @(t) (Pp(t)).^(1/2)*1i./(c_0*(cPath(t)-  C)+q*(Pp(t)).^(1/2));*/
 
-        return std::make_tuple(path, [](const auto t) -> auto { return t; });
+        return std::make_tuple(path, path_derivative);
     }
 
+    auto get_weighted_path(const std::complex<double> split_point, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r, const double q, const double k, const double s, const datatypes::complex_root complex_root, const std::complex<double> sing_point)->path_function {
+        auto [path, derivative] = get_complex_path(split_point, y, A, b, r, q, complex_root, sing_point);
+        //
+        //
+        //@(t) ddtcPath(t/k).*exp(1i*k*(Px(sP,y,A,b,r).^(1/2)+q*sP+s)).*k^(-1).*Px(cPath(t/k),y,A,b,r).^(-1/2);
+        return [=](const double t) -> auto {
+            return derivative(t / k) * std::exp(1i * k * std::sqrt(math_utils::calculate_P_x(split_point, y, A, b, r)) + q * sing_point + s) * (1. / k) * std::sqrt(math_utils::calculate_P_x(path(t / k), y, A, b, r));
+        };
+    }
 }

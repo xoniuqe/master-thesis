@@ -59,10 +59,10 @@ namespace gauss_laguerre {
 	auto calculate_integral(const path_utils::path_function path, std::vector<double> nodes, std::vector<double> weights) -> std::complex<double> {
 		//std::vector<double> calculation_result;
 		auto result = 0. + 0.i;
-		auto reduce_function = [&](auto left, auto right) -> auto {
+		auto transform = [&](double left, double right) -> std::complex<double> {
 			return left * path(right);
 		};
 
-		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), result, reduce_function, std::plus<>());
+		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), result, std::plus<>(), transform);
 	}
 }

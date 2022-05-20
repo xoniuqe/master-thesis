@@ -2,6 +2,7 @@
 
 #include <complex>
 #include "datatypes.h"
+#include "complex_comparison.h"
 #ifdef _WIN32
 #include <corecrt_math_defines.h>
 #endif
@@ -9,6 +10,9 @@
 
 namespace math_utils {
 	using namespace std::complex_literals;
+
+	using namespace complex_comparison;
+
 	
 	template<class T> struct is_complex : std::false_type {};
 	template<class T> struct is_complex<std::complex<T>> : std::true_type {};
@@ -32,13 +36,13 @@ namespace math_utils {
 	/// <param name="k"></param>
 	/// <param name="s"></param>
 	/// <returns></returns>
-	auto calculate_singularities_ODE(const datatypes::complex_root complex_root, const double q, const double k, const double s)->std::tuple<double, double, double>;
-	constexpr auto decide_split_points(const double left_split_zero, const double right_split_zero, const double left_split_point, const double right_split_point)->std::tuple<double, double>;
-	auto get_split_points_sing(const double q, const double k, const double s, const datatypes::complex_root complex_root, const double left_split_point, const double right_split_point)->std::tuple<double, double>;
+	auto calculate_singularities_ODE(const datatypes::complex_root complex_root, const double q, const double k, const double s)->std::tuple<std::complex<double>, std::complex<double>, std::complex<double>>;
+	constexpr auto decide_split_points(const std::complex<double> left_split_zero, const std::complex<double> right_split_zero, const std::complex<double> left_split_point, const std::complex<double> right_split_point)->std::tuple<std::complex<double>, std::complex<double>>;
+	auto get_split_points_sing(const double q, const double k, const double s, const datatypes::complex_root complex_root, const std::complex<double> left_split_point, const std::complex<double> right_split_point)->std::tuple<std::complex<double>, std::complex<double>>;
 
 
 
-	auto get_split_points_spec(const double q, const double k, const double s, const datatypes::complex_root complex_root, const double left_split_point, const double right_split_point)->std::tuple<double, double>;
+	auto get_split_points_spec(const double q, const double k, const double s, const datatypes::complex_root complex_root, const std::complex<double> left_split_point, const std::complex<double> right_split_point)->std::tuple<std::complex<double>, std::complex<double>>;
 	
 	auto get_singularity_for_ODE(const double q, const datatypes::complex_root complex_root)->std::complex<double>;
 
@@ -55,6 +59,10 @@ namespace math_utils {
 	/// <param name="r"></param>
 	/// <returns></returns>
 	auto calculate_P_x(const double x, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r) -> double; 
+
+
+	auto calculate_P_x(const std::complex<double> x, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r)->std::complex<double>;
+
 
 	/// <summary>
 	/// Calculates the partial derivative in x direction.
