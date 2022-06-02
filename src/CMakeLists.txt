@@ -21,4 +21,4 @@ target_include_directories(SteepestDescentLib PUBLIC ../include)
 target_link_libraries(SteepestDescentLib PRIVATE ${ARMADILLO_LIBRARIES})
 
 # All users of this library will need at least C++11
-target_compile_features(SteepestDescentLib PUBLIC cxx_std_17)
+#target_compile_features(SteepestDescentLib PUBLIC cxx_std_20)
