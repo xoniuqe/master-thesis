@@ -16,7 +16,7 @@ add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h")
 
 
 
-target_compile_features(SteepestDescent PRIVATE cxx_std_17)
+#target_compile_features(SteepestDescent PRIVATE cxx_std_17)
 
 
 add_compile_definitions(SteepestDescent PUBLIC USE_ARMADILLO)
