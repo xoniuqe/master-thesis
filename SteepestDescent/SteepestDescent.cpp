@@ -228,6 +228,9 @@ auto integral_test()
 	auto left_split = 0.; 
 	auto right_split = 1.;
 
+	std::cout << "Px: " << math_utils::calculate_P_x(left_split, y, A, b, r) << std::endl;
+	std::cout << "Px: " << math_utils::calculate_P_x(right_split, y, A, b, r) << std::endl;
+
 	auto [nodes, weights] = gauss_laguerre::calculate_laguerre_points_and_weights(30);
 
 	auto q = arma::dot(A.col(0), mu);
@@ -246,20 +249,42 @@ auto integral_test()
 	}
 	auto tol = 0.1;
 	if (std::real(spec_point) >= (left_split - tol) && std::real(spec_point) <= (right_split + tol) && std::abs(std::imag(spec_point)) <= std::numeric_limits<double>::epsilon()) {
-		std::cout << "spec point" << std::endl;
+		std::cout << "spec point" << spec_point <<  std::endl;
 	}
 
 	if (std::real(sing_point) >= (left_split - tol) && std::real(sing_point) <= (right_split + tol) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon()) {
-		std::cout << "sing point" << std::endl;
+		std::cout << "sing point" << sing_point << std::endl;
 		auto [sp1, sp2] = math_utils::get_split_points_sing(q, k, s, { c, c_0 }, left_split, right_split);
-		auto path1 = path_utils::get_weighted_path(sp1, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
-		auto path2 = path_utils::get_weighted_path(sp2, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
 
-		auto I1 = gauss_laguerre::calculate_integral(path1, nodes, weights);
-		auto I2 = gauss_laguerre::calculate_integral(path2, nodes, weights);
+		std::cout << "left: " << left_split << std::endl;
+		std::cout << "right: " << right_split << std::endl;
+
+		std::cout << "sp1: " << sp1 << std::endl;
+		std::cout << "sp2: " << sp2 << std::endl;
+
+		auto path1 = path_utils::get_weighted_path(left_split, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
+		auto path2 = path_utils::get_weighted_path(sp1, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
+
+		auto I1 = gauss_laguerre::calculate_integral(path1, path2, nodes, weights);
+
+	
+		auto path3 = path_utils::get_weighted_path(sp2, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
+		std::cout << "weighted path: " << path3(1) << std::endl;
+		auto path4 = path_utils::get_weighted_path(right_split, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
+		std::cout << "weighted path: " << path4(1) << std::endl;
+
+	
+		auto I2 = gauss_laguerre::calculate_integral(path3, path4, nodes, weights);
+
 
 		std::cout << "I1: " << I1 << std::endl;
 		std::cout << "I2: " << I2 << std::endl;
+
+		//just the "normal" integrate is missing
+		//    greenFun1D = @(x) exp(1i*k*(Px(x,y,A,b,r).^(1/2)+q*x+s)).*Px(x,y,A,b,r).^(-1/2); 
+		//matlab:  integral(greenFun1D,splitPt1,splitPt2, "ArrayValued", "True") 
+		auto x = -0.090716 + 0.259133i;
+		std::cout << "result: " << I1 + x + I2 << std::endl;
 		return;
 	}
 
