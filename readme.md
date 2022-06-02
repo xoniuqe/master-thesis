@@ -46,7 +46,9 @@ Programming language: C++
 
 Mathlibrary: Gnu Scientifc Library
 
-Testing: do be decided
+Testing: Catch2
+
+Benchmarking: to be decided
 
 Speedup: Intel-Threading-Building-Blocks, OpenCl, Cuda(?)
 
