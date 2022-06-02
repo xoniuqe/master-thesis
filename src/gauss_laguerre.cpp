@@ -31,15 +31,16 @@ namespace gauss_laguerre {
 
 		arma::mat evec(n, n);
 		arma::vec laguerre_points(n);
-
-		auto result = arma::eig_sym(laguerre_points, evec, T);
+		laguerre_points.zeros();
+		evec.zeros();
+		auto result = arma::eig_sym(laguerre_points, evec, T, "std");
 		auto diag = evec.diag();
 
 
 		arma::vec quadrature_weights(n);
 		for (auto i = 0; i < n; i++) {
-			auto value = std::abs(evec(0, i));
-			quadrature_weights[i] = value * value;
+			auto value = evec(0, i);
+			quadrature_weights[i] = std::pow(value, 2.);// *value;
 		}
 
 		arma::vec barycentric_weights(n);
@@ -59,10 +60,21 @@ namespace gauss_laguerre {
 	auto calculate_integral(const path_utils::path_function path, std::vector<double> nodes, std::vector<double> weights) -> std::complex<double> {
 		//std::vector<double> calculation_result;
 		auto result = 0. + 0.i;
+		//this is wrong
 		auto transform = [&](double left, double right) -> std::complex<double> {
 			return left * path(right);
 		};
 
 		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), result, std::plus<>(), transform);
+	}
+
+	auto calculate_integral(const path_utils::path_function path1, const path_utils::path_function path2, std::vector<double> nodes, std::vector<double> weights)->std::complex<double> {
+		std::vector<std::complex<double>> eval_points1, eval_points2, eval_points_summed;
+		std::transform(nodes.begin(), nodes.end(), std::back_inserter(eval_points1), path1);
+		std::transform(nodes.begin(), nodes.end(), std::back_inserter(eval_points2), path2);
+		std::transform(eval_points1.begin(), eval_points1.end(), eval_points2.begin(), std::back_inserter(eval_points_summed), [](const auto left, const auto right) -> auto {
+			return left - right;
+			});
+		return std::inner_product(weights.begin(), weights.end(), eval_points_summed.begin(), 0. + 0.i);
 	}
 }
