@@ -50,10 +50,14 @@ namespace path_utils {
         //(const double x, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r) 
         auto S = 1.0 / (complex_root.c_0 - q * q);
         auto Psp = math_utils::calculate_P_x(split_point, y, A, b, r);
-        auto K = generate_K_x(split_point, Psp, q);
+        // K = @(t) sqrt(PsP)+q.*sP+1i.*t;
+        auto K = [=](const auto t) -> auto {
+            return std::sqrt(Psp) + q * split_point + 1.i * t;
+        };//generate_K_x(split_point, Psp, q);
         auto T = [=](const auto t) -> auto {
             return (q * K(t) - complex_root.c_0 * C) * S;
         };
+        std::cout << "K(1)" << K(1.) << std::endl;
 
         path_function path;
         if (std::abs(q - sqc) <= std::numeric_limits<double>::epsilon()) {
@@ -64,7 +68,7 @@ namespace path_utils {
                 return (U(t) * U(t) - cTimesCconj * complex_root.c_0) / (2. * (U(t) * sqc - complex_root.c_0 * C));
             };
         }
-        if (std::abs(q + sqc) <= std::numeric_limits<double>::epsilon()) {
+        else if (std::abs(q + sqc) <= std::numeric_limits<double>::epsilon()) {
             auto U = [&Psp, &sqc, &split_point](const double t) -> auto {
                 return std::sqrt(Psp) - sqc * split_point + 1i * t;
             };
@@ -73,21 +77,21 @@ namespace path_utils {
             };
         }
 
-        if (std::abs(q) > sqc) {
-            auto sign = q > 0 ? 1. : -1.;
+        else if (std::abs(q) > sqc) {
+            auto sign = q > 0 ? -1. : 1.;
             path = [=](const double t) -> auto {
-                return std::sqrt(sign * ((K(t) * K(t) - cTimesCconj * complex_root.c_0) * S * T(t) * T(t))) - T(t);
+                return sign * std::sqrt( (K(t) * K(t) - cTimesCconj * complex_root.c_0) * S + T(t) * T(t)) - T(t);
             };
         }
 
-        if (std::abs(q) < sqc) {
+        else if (std::abs(q) < sqc) {
             auto sign = std::real(split_point) >= std::real(sing_point) ? 1. : -1.;
             path = [=](const double t) -> auto {
-                return std::sqrt(sign * ((K(t) * K(t) - cTimesCconj * complex_root.c_0) * S * T(t) * T(t))) - T(t);
+                return sign * std::sqrt((std::pow(K(t),2.) - cTimesCconj * complex_root.c_0) * S + T(t) * T(t)) - T(t);
             };
         }
 
-        if (std::abs(q) <= std::numeric_limits<double>::epsilon()) {
+        else if (std::abs(q) <= std::numeric_limits<double>::epsilon()) {
             auto path_fun = [=](const double t) -> auto {
                 return std::sqrt((Psp + 2. * 1.i * std::sqrt(Psp) * t - t * t) * 1. / complex_root.c_0 - (std::imag(complex_root.c) * std::imag(complex_root.c))) + C;
             };
@@ -108,7 +112,7 @@ namespace path_utils {
         };
 
         path_derivative = [=](const double t) -> auto {
-            return std::sqrt(Pp(t)) * 1.i /std::sqrt(complex_root.c_0 * (path(t) - C) + q * (Pp(t)));
+            return std::sqrt(Pp(t)) * 1.i /(complex_root.c_0 * (path(t) - C) + q * std::sqrt(Pp(t)));
         };
    /*
 
@@ -123,11 +127,25 @@ ddtcPath = @(t) (Pp(t)).^(1/2)*1i./(c_0*(cPath(t)-  C)+q*(Pp(t)).^(1/2));*/
 
     auto get_weighted_path(const std::complex<double> split_point, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r, const double q, const double k, const double s, const datatypes::complex_root complex_root, const std::complex<double> sing_point)->path_function {
         auto [path, derivative] = get_complex_path(split_point, y, A, b, r, q, complex_root, sing_point);
+       /* std::cout << "split: " << split_point << std::endl;
+        std::cout << "path(1) " << path(1) << std::endl;
+        std::cout << "derivative(1) " << derivative(1) << std::endl;
+
+        std::cout << " ddtcPath(1 / k): " << derivative(1 / k) << std::endl;
+        std::cout << "  (Px(sP,y,A,b,r).^(1/2) " << std::sqrt(math_utils::calculate_P_x(split_point, y, A, b, r)) << std::endl;
+        std::cout << "q: " << q << std::endl;
+        std::cout << "sP: " << split_point << std::endl;
+        std::cout << "s: " << s << std::endl;
+
+        std::cout << " q*sP+s " << q * split_point + s << std::endl;
+        std::cout << " (Px(sP,y,A,b,r).^(1/2)+q*sP+s) " << (std::sqrt(math_utils::calculate_P_x(split_point, y, A, b, r)) + q * split_point + s) << std::endl;
+        std::cout << " exp(1i*k*(Px(sP,y,A,b,r).^(1/2)+q*sP+s)) " << std::exp(1i * k * (std::sqrt(math_utils::calculate_P_x(split_point, y, A, b, r)) + q * split_point + s)) << std::endl;
+        std::cout << " Px(cPath(t/k),y,A,b,r).^(-1/2): " << (1. / std::sqrt(math_utils::calculate_P_x(path(1 / k), y, A, b, r))) << std::endl;*/
         //
-        //
+        //    weightFunPerPath = @(t) ddtcPath(t/k).*exp(1i*k*(Px(sP,y,A,b,r).^(1/2)+q*sP+s)).*k^(-1).*Px(cPath(t/k),y,A,b,r).^(-1/2);  
         //@(t) ddtcPath(t/k).*exp(1i*k*(Px(sP,y,A,b,r).^(1/2)+q*sP+s)).*k^(-1).*Px(cPath(t/k),y,A,b,r).^(-1/2);
         return [=](const double t) -> auto {
-            return derivative(t / k) * std::exp(1i * k * std::sqrt(math_utils::calculate_P_x(split_point, y, A, b, r)) + q * sing_point + s) * (1. / k) * std::sqrt(math_utils::calculate_P_x(path(t / k), y, A, b, r));
+            return derivative(t / k) * std::exp(1i * k * (std::sqrt(math_utils::calculate_P_x(split_point, y, A, b, r)) + q * split_point + s)) * (1. / k) * (1. /std::sqrt(math_utils::calculate_P_x(path(t / k), y, A, b, r)));
         };
     }
 }
