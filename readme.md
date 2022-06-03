@@ -3,6 +3,7 @@
 
 ## Setting up my project:
 
+(gsl )
 * clone the repo
 * cd vcpkg
 * bootstrap-vcpkg.bat
@@ -10,12 +11,38 @@
 (todo: vcpkg install @ResponseFile)
 * vcpkg integrate install
 
+(armadillo)
+* clone the repo
+on windows:
+ * install intel mkl
+ *
+
 ## Thoughts
 
 The nature of the problem allows it to be splitted in many sub calculations.
 This should make it easier to run parts of this in threads or even in separate calls to the provided API with muliple machines (e.g. when scaling on a cluster)
 This has still to be verified, but each integration runs over a small triangular area, so the splitting could be achieved by an external call.
 We should provide each function in the planned APIs (Python / Matlab)
+
+
+## MatLab-Implementation analysis
+
+### (1) Calculating the laguerre nodes and weiths
+
+This is done in the function lagpts. It takes the order n and calculates n weights and nodes which than get used to solve the integral.
+
+### (2) Steepest Descent
+Function GetSteepDec1
+
+Uses the function f returned by WeightFunPerPath (3) to calculate the actual integral by using the gauﬂ-laguerre quadrature rule. We construct paths along the spitting points Sp_1 and Sp_2.
+
+With f we evaluate the complex function at the nodes calculated by (1) and weigh the results by the matching weights. The result is summed up and is the
+wanted integral for the path.
+
+### (3) WeightFunPerPath
+
+Calls GetComplexPath for the given splitting point which returns the path and its derivative. With that we construct a function which evaluates the complex function at the given path.
+In essence it calculates f(h(x)) for us, with x = [a,b].
 
 
 ## Implementation details
@@ -26,7 +53,9 @@ Programming language: C++
 
 Mathlibrary: Gnu Scientifc Library
 
-Testing: do be decided
+Testing: Catch2
+
+Benchmarking: to be decided
 
 Speedup: Intel-Threading-Building-Blocks, OpenCl, Cuda(?)
 
@@ -74,6 +103,11 @@ https://stackoverflow.com/questions/37296481/integration-with-quadrature-and-mul
 
 ## Useful links 
 
+<<<<<<< Updated upstream
+=======
+Gaussian quardarature explained:
+https://www.youtube.com/watch?v=w2xjlPwYock
+
 
 About the performanace:
 https://stackoverflow.com/questions/18009056/why-does-matlab-octave-wipe-the-floor-with-c-in-eigenvalue-problems
@@ -81,6 +115,7 @@ https://stackoverflow.com/questions/18009056/why-does-matlab-octave-wipe-the-flo
 About eigenvalue decomposition (german):
 http://www.peter-junglas.de/fh/vorlesungen/numa/html/kap6.html
 
+>>>>>>> Stashed changes
 Running GNU Octave on Gitlab:
 https://gitlab.com/mtmiller/octave-snapshot
 

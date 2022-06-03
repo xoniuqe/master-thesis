@@ -38,19 +38,40 @@ build:
      - git submodule sync --recursive
      - git submodule update --init --recursive
      - apt-get update --yes
-     - apt-get install --yes cmake build-essential gdb pkg-config curl zip unzip tar
-     - ls vcpkg
-     - echo "calling vcpkg"
-     - sh ./vcpkg/bootstrap-vcpkg.sh
-     - ./vcpkg/vcpkg install gsl 
-     - ./vcpkg/vcpkg integrate install
+     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
+     # We will install latest CMake, even though Ubuntu has a recent one
+     - mkdir -p $HOME/.local
+     - curl -s "https://cmake.org/files/v3.23/cmake-3.23.1-linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C $HOME/.local
+     - export PATH=$HOME/.local/bin:$PATH
 
     script:
-     - mkdir build
-     - cd build
-     - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake ..
-     - make
+     - cmake -S . -B build
+     - cmake --build build -v
+
     artifacts:
       paths:
        - build
   
+
+test:
+    stage: test
+    image: gcc
+    before_script:
+     - git submodule sync --recursive
+     - git submodule update --init --recursive
+     - apt-get update --yes
+     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
+     # We will install latest CMake, even though Ubuntu has a recent one
+     - mkdir -p $HOME/.local
+     - curl -s "https://cmake.org/files/v3.23/cmake-3.23.1-linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C $HOME/.local
+     - export PATH=$HOME/.local/bin:$PATH
+
+    script:
+    - cmake -S . -B build_test
+    - cmake --build build_test -v
+    - cmake --build build_test -t test
+
+    artifacts:
+      when: always
+      reports:
+        junit: build_test/tests/result.xml
