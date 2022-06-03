@@ -11,6 +11,8 @@
 #include <steepest_descent/math_utils.h>
 #include <steepest_descent/datatypes.h>
 #include <steepest_descent/path_utils.h>
+#include <steepest_descent/integrator.h>
+#include <steepest_descent/integral.h>
 
 #include <type_traits>
 using namespace std::complex_literals;
@@ -303,6 +305,44 @@ auto integral_test()
     end*/
 }
 
+auto integral_test2()
+{
+	arma::mat  A{ {0, 0}, {1, 0}, {1, 1 } };
+
+	arma::vec b{ 0,0,0 };
+
+	arma::vec r{ 1, -0.5, -0.5 };
+
+	arma::vec mu{ 1,-0.5, -0.5 };
+	auto y = 0.;
+	auto k = 100;
+	auto left_split = 0.;
+	auto right_split = 1.;
+	//integrator::integrator
+	//const std::complex<double>(const integrand_fun fun, const std::complex<double> first_split_point, const std::complex<double> second_split_point)
+	auto integrator = [](const integrator::integrand_fun fun, const std::complex<double> first_split_point, const std::complex<double> second_split_point) -> std::complex<double> {
+		return  -0.090716 + 0.259133i;
+	};
+	integral::integral_1d integral1d(k, integrator , 0.1);
+
+	std::cout << "result2: " << integral1d(A, b, r, mu, y, left_split, right_split) << std::endl;
+	return;
+
+
+
+	/*
+if specPoint >= lSp-tol && specPoint <= rSp+tol && imag(specPoint) == 0    %specPoint lies in the integration segment.
+	string = 'Spec';
+end
+
+
+if singPoint >= lSp-tol && singPoint <= rSp+tol && imag(singPoint) == 0    %singPoint lies in the integration segment.
+	string = 'Sing';
+end*/
+}
+
+
+
 int main()
 {
 	arma::mat  A{ {1, 1}, {1, 1,} , {0 ,0 } };
@@ -317,6 +357,7 @@ int main()
 	auto s = 3;
 
 	integral_test();
+	integral_test2();
 	/*
 	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
 

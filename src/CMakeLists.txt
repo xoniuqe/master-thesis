@@ -12,7 +12,7 @@ set(HEADER_LIST "${PROJECT_SOURCE_DIR}/include/steepest_descent/datatypes.h"
 # Make an automatic library - will be static or dynamic based on user setting
 
 
-add_library(SteepestDescentLib gauss_laguerre.cpp math_utils.cpp path_utils.cpp ${HEADER_LIST} )
+add_library(SteepestDescentLib gauss_laguerre.cpp math_utils.cpp path_utils.cpp ${HEADER_LIST}  "integral.cpp" "steepest_descent.cpp")
 
 # We need this directory, and users of our library will need it too
 target_include_directories(SteepestDescentLib PUBLIC ../include)
