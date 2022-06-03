@@ -264,7 +264,7 @@ auto integral_test()
 		auto path1 = path_utils::get_weighted_path(left_split, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
 		auto path2 = path_utils::get_weighted_path(sp1, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
 
-		auto I1 = gauss_laguerre::calculate_integral(path1, path2, nodes, weights);
+		auto I1 = gauss_laguerre::calculate_integral_cauchy(path1, path2, nodes, weights);
 
 	
 		auto path3 = path_utils::get_weighted_path(sp2, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
@@ -273,7 +273,7 @@ auto integral_test()
 		std::cout << "weighted path: " << path4(1) << std::endl;
 
 	
-		auto I2 = gauss_laguerre::calculate_integral(path3, path4, nodes, weights);
+		auto I2 = gauss_laguerre::calculate_integral_cauchy(path3, path4, nodes, weights);
 
 
 		std::cout << "I1: " << I1 << std::endl;
