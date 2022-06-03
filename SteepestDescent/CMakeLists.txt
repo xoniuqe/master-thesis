@@ -5,6 +5,7 @@ cmake_minimum_required (VERSION 3.14)
 #add_compile_definitions(HAVE_INLINE)
 #add_compile_definitions(GSL_DISABLE_DEPRECATED)
 
+
 find_package(Armadillo REQUIRED)
 #find_package(MKL REQUIRED)
 include_directories(${ARMADILLO_INCLUDE_DIRS})

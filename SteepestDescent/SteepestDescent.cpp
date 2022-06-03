@@ -6,7 +6,6 @@
 #include <variant>
 #include <tuple>
 
-//#undef ARMA_USE_SUPERLU
 #include <armadillo>
 #include <steepest_descent/gauss_laguerre.h>
 #include <steepest_descent/math_utils.h>

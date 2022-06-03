@@ -128,7 +128,7 @@ namespace math_utils {
 		auto ic = std::imag(complex_root.c);
 
 		auto cTimesCconj = rc * rc + ic * ic;
-		auto K = std::sqrt(1. / (complex_root.c_0 - q * q) * (q * q * C * C - complex_root.c_0 * cTimesCconj) + C * C);
+		auto K = std::sqrt(std::complex<double>(1. / (complex_root.c_0 - q * q) * (q * q * C * C - complex_root.c_0 * cTimesCconj) + C * C));
 
 		return q < 0 ? C + K : C - K;
 	}
@@ -193,6 +193,8 @@ namespace math_utils {
 	auto get_complex_roots(const double y, const datatypes::matrix& A, const datatypes::vector& b, const datatypes::vector& r) -> std::tuple<std::complex<double>, double> {
 		auto A_1 = A.col(0);
 		auto A_2 = A.col(1);
+
+
 		auto A_2copy = arma::vec(A_2);
 		A_2copy *= y;
 		A_2copy += b - r;
@@ -215,4 +217,5 @@ namespace math_utils {
 		auto c = real_c + std::sqrt((P_rc / c_0)) * 1i;
 		return std::make_tuple(c, c_0);
 	}
+
 }

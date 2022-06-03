@@ -12,6 +12,7 @@ namespace datatypes {
 
 #define DOT_PRODUCT(v1, v2) arma::dot(v1,v2);
 
+
 	struct triangle {
 		matrix* A;
 		vector* b;	

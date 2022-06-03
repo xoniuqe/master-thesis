@@ -3,12 +3,19 @@
 
 ## Setting up my project:
 
+(gsl )
 * clone the repo
 * cd vcpkg
 * bootstrap-vcpkg.bat
 * vcpkg install gsl gsl:x64-windows
 (todo: vcpkg install @ResponseFile)
 * vcpkg integrate install
+
+(armadillo)
+* clone the repo
+on windows:
+ * install intel mkl
+ *
 
 ## Thoughts
 
