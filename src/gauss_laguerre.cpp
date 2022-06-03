@@ -57,21 +57,11 @@ namespace gauss_laguerre {
 		return std::make_tuple(arma::conv_to<std::vector<double>>::from(laguerre_points), arma::conv_to<std::vector<double>>::from(quadrature_weights));
 	}
 
-	auto calculate_integral(const path_utils::path_function path, std::vector<double> nodes, std::vector<double> weights) -> std::complex<double> {
-		//std::vector<double> calculation_result;
-		auto result = 0. + 0.i;
-		//this is wrong
-		auto transform = [&](double left, double right) -> std::complex<double> {
-			return left * path(right);
-		};
 
-		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), result, std::plus<>(), transform);
-	}
-
-	auto calculate_integral(const path_utils::path_function path1, const path_utils::path_function path2, std::vector<double> nodes, std::vector<double> weights)->std::complex<double> {
+	auto calculate_integral_cauchy(const path_utils::path_function first_path, const path_utils::path_function second_path, std::vector<double> nodes, std::vector<double> weights)->std::complex<double> {
 		std::vector<std::complex<double>> eval_points1, eval_points2, eval_points_summed;
-		std::transform(nodes.begin(), nodes.end(), std::back_inserter(eval_points1), path1);
-		std::transform(nodes.begin(), nodes.end(), std::back_inserter(eval_points2), path2);
+		std::transform(nodes.begin(), nodes.end(), std::back_inserter(eval_points1), first_path);
+		std::transform(nodes.begin(), nodes.end(), std::back_inserter(eval_points2), second_path);
 		std::transform(eval_points1.begin(), eval_points1.end(), eval_points2.begin(), std::back_inserter(eval_points_summed), [](const auto left, const auto right) -> auto {
 			return left - right;
 			});
