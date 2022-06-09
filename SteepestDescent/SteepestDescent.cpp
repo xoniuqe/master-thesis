@@ -6,6 +6,14 @@
 #include <variant>
 #include <tuple>
 
+#include "gsl_function_wrapper.h"
+
+#include <gsl/gsl_complex.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_integration.h>
+#include <gsl/gsl_sf_laguerre.h>
+
 #include <armadillo>
 #include <steepest_descent/gauss_laguerre.h>
 #include <steepest_descent/math_utils.h>
@@ -305,6 +313,9 @@ auto integral_test()
     end*/
 }
 
+
+
+
 auto integral_test2()
 {
 	arma::mat  A{ {0, 0}, {1, 0}, {1, 1 } };
@@ -318,10 +329,59 @@ auto integral_test2()
 	auto k = 100;
 	auto left_split = 0.;
 	auto right_split = 1.;
+	const auto limit = 10000;
 	//integrator::integrator
 	//const std::complex<double>(const integrand_fun fun, const std::complex<double> first_split_point, const std::complex<double> second_split_point)
 	auto integrator = [](const integrator::integrand_fun fun, const std::complex<double> first_split_point, const std::complex<double> second_split_point) -> std::complex<double> {
-		return  -0.090716 + 0.259133i;
+		auto w
+			//= gsl_integration_workspace_alloc(limit);
+			= gsl_integration_cquad_workspace_alloc(limit);
+		double result_real, result_imag;// , error_real, error_imag;
+		double expected = -0.090716;
+		std::cout << "fun(0)" << fun(0) << std::endl;
+
+		std::cout << "fun(1)" << fun(1) << std::endl;
+
+		gsl_function_pp Fp_real([&fun](const double x) -> auto {
+			auto res = std::real(fun(x));
+			//std::cout << "fun(" << x << "): " << fun(x) << std::endl;
+			//std::cout << "in green fun real(green(" << x << ")): " << res <<  std::endl;
+			return res;
+			});
+
+		auto F_real = static_cast<gsl_function*>(&Fp_real);
+
+
+
+		//gsl_integration_qags(F, std::real(first_split_point), std::real(second_split_point), 0, 1e-12, limit,
+		//	w, &result, &error);
+		//gsl_integration_qag(F, std::real(first_split_point), std::real(second_split_point), 0, 1e-12, limit, 6,
+		//	w, &result, &error);
+		//gsl_integration_cquad(F, std::real(first_split_point), std::real(second_split_point), 0, 1e-12, w, &result, NULL, NULL);
+		gsl_integration_cquad(F_real, std::real(first_split_point), std::real(second_split_point), 1e-10, 1e-6, w, &result_real, NULL, NULL);
+		gsl_integration_cquad_workspace_free(w);
+		w
+			//= gsl_integration_workspace_alloc(limit);
+			= gsl_integration_cquad_workspace_alloc(limit);
+
+		gsl_function_pp Fp_imag([&fun](const double x) -> auto {
+			return std::imag(fun(x));
+			});
+
+		auto F_imag = static_cast<gsl_function*>(&Fp_imag);
+
+		gsl_integration_cquad(F_imag, std::real(first_split_point), std::real(second_split_point), 1e-10, 1e-6, w, &result_imag, NULL, NULL);
+
+		/*printf("result          = % .18f\n", result);
+		printf("exact result    = % .18f\n", expected);
+		printf("estimated error = % .18f\n", error);
+		printf("actual error    = % .18f\n", result - expected);
+		printf("intervals       = %zu\n", w->size);*/
+		//gsl_integration_workspace_free(w);
+		gsl_integration_cquad_workspace_free(w);
+		//gsl_integration_qags()
+		//return  -0.090716 + 0.259133i;
+		return result_real + result_imag * 1i;
 	};
 	integral::integral_1d integral1d(k, integrator , 0.1);
 
