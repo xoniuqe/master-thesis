@@ -89,8 +89,12 @@ namespace integral {
 		//just the "normal" integrate is missing
 		//    greenFun1D = @(x) exp(1i*k*(Px(x,y,A,b,r).^(1/2)+q*x+s)).*Px(x,y,A,b,r).^(-1/2); 
 		//matlab:  integral(greenFun1D,splitPt1,splitPt2, "ArrayValued", "True") 
-		auto green_fun = [k=k, y, A, b, r, q, s](const std::complex<double> x) -> auto {
-			return std::exp(1.i * k * std::sqrt(math_utils::calculate_P_x(x, y, A, b, r)) + q * x + s) * std::sqrt(math_utils::calculate_P_x(x, y, A, b, r));
+		auto& local_k = this->k;
+		auto green_fun = [k=local_k, y=y, &A, &b, &r, q, s](const std::complex<double> x) -> auto {
+			auto Px = math_utils::calculate_P_x(x, y, A, b, r);
+			auto sqrtPx = std::sqrt(Px);
+			auto res =  std::exp(1.i * k * (sqrtPx + q * x + s)) * (1. / sqrtPx);
+			return res;
 		};
 		auto x = integrator(green_fun, sp1, sp2);
 		//std::cout << "result: " << I1 + x + I2 << std::endl;
