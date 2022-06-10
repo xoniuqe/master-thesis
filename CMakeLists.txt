@@ -25,7 +25,10 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
 endif()
 
+add_subdirectory(extern/pybind)
 add_subdirectory(src)
+
+add_subdirectory(api)
 
 
 # Schließen Sie Unterprojekte ein.
