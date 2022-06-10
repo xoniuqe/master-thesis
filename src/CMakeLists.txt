@@ -7,18 +7,33 @@
 set(HEADER_LIST "${PROJECT_SOURCE_DIR}/include/steepest_descent/datatypes.h" 
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/gauss_laguerre.h" 
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/math_utils.h"
-				"${PROJECT_SOURCE_DIR}/include/steepest_descent/path_utils.h")
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/path_utils.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/steepest_descent.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/complex_comparison.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integrator.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral.h")
 
 # Make an automatic library - will be static or dynamic based on user setting
 
 
-add_library(SteepestDescentLib gauss_laguerre.cpp math_utils.cpp path_utils.cpp ${HEADER_LIST}  "integral.cpp" "steepest_descent.cpp")
+add_library(objlib OBJECT gauss_laguerre.cpp math_utils.cpp path_utils.cpp integral.cpp steepest_descent.cpp  ${HEADER_LIST})
+
+
+# This depends on (header only) boost
+target_link_libraries(objlib PRIVATE ${ARMADILLO_LIBRARIES})
+# We need this directory, and users of our library will need it too
+target_include_directories(objlib PUBLIC ../include)
+
+# shared libraries need PIC
+set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+# shared and static libraries built from the same object files
+add_library(SteepestDescentLib SHARED $<TARGET_OBJECTS:objlib>)
+add_library(SteepestDescentLib_static STATIC $<TARGET_OBJECTS:objlib>)
 
 # We need this directory, and users of our library will need it too
 target_include_directories(SteepestDescentLib PUBLIC ../include)
-
-# This depends on (header only) boost
-target_link_libraries(SteepestDescentLib PRIVATE ${ARMADILLO_LIBRARIES})
+target_include_directories(SteepestDescentLib_static PUBLIC ../include)
 
 # All users of this library will need at least C++11
 #target_compile_features(SteepestDescentLib PUBLIC cxx_std_20)
