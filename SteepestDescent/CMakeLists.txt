@@ -25,7 +25,7 @@ add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h")
 add_compile_definitions(SteepestDescent PUBLIC USE_ARMADILLO)
 # TODO: Fügen Sie bei Bedarf Tests hinzu, und installieren Sie Ziele.
  
-target_link_libraries(SteepestDescent  PRIVATE GSL::gsl SteepestDescentLib ${ARMADILLO_LIBRARIES} )
+target_link_libraries(SteepestDescent  PRIVATE GSL::gsl SteepestDescentLib_static ${ARMADILLO_LIBRARIES} )
 
 # from merge
 #target_link_libraries(SteepestDescent PRIVATE GSL::gsl ${ARMADILLO_LIBRARIES})# Boost::Multiprecision)
