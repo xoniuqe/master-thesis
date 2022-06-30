@@ -48,6 +48,9 @@ namespace math_utils {
 
 	auto get_spec_point(const double q, const datatypes::complex_root complex_root)->std::complex<double>;
 
+	auto is_within_split_point_tolerances(const std::complex<double> point, const double left_split, const double right_split, const double tolerance) -> bool;
+
+
 
 	/// <summary>
 	/// Takes only positive real values
@@ -63,6 +66,15 @@ namespace math_utils {
 
 	auto calculate_P_x(const std::complex<double> x, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r)->std::complex<double>;
 
+
+
+	template<typename T>
+	auto get_function_P_x(const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r) -> std::function<const T(const double x)>
+	{
+		return[=](const std::complex<double> x) -> auto {
+			return calculate_P_x(x, y, A, b, r);
+		};
+	}
 
 	/// <summary>
 	/// Calculates the partial derivative in x direction.

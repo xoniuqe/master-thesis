@@ -111,6 +111,10 @@ namespace math_utils {
 		return decide_split_points(left_zero_split, right_zero_split, left_split_point, right_split_point);
 	}
 
+	auto is_within_split_point_tolerances(const std::complex<double> point, const double left_split, const double right_split, const double tolerance) -> bool {
+		return std::real(point) >= (left_split - tolerance) && std::real(point) <= (right_split + tolerance) && std::abs(std::imag(point)) <= std::numeric_limits<double>::epsilon();
+	}
+
 	auto get_singularity_for_ODE(const double q, const datatypes::complex_root complex_root) -> std::complex<double> {
 		auto rc = std::real(complex_root.c);
 		auto ic = std::imag(complex_root.c);
@@ -132,7 +136,6 @@ namespace math_utils {
 
 		return q < 0 ? C + K : C - K;
 	}
-
 
 	/// <summary>
 	/// Takes only positive real values

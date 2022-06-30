@@ -1,6 +1,3 @@
-
-
-
 #include <steepest_descent/integral.h>
 #include <steepest_descent/math_utils.h>
 #include <steepest_descent/steepest_descent.h>
@@ -17,14 +14,19 @@
 
 namespace integral {
 	using namespace std::complex_literals;
-
+	
+	// das ganze funktor object ist fragwürdig, da diese funktion nur einmal mit einem Satz an parametern aufgerufen werdne wird
+	//k könnte auch parameter sein
 	integral_1d::integral_1d(int k, integrator::integrator integrator, double tolerance) : k(k), integrator(integrator), tolerance(tolerance) {
 
 	}
 
-
-
+	 
+	// prüfen ob A, b, r und mu überhaupt in dieser Form so benötigt sind
+	// im 1d Fall müsste das alles auf ein x zurückfallen?
+	// bzw. könnten diese auch in den constructor verscoben werden?
 	auto integral_1d::operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& mu, const double y, const double left_split, const double right_split) const -> std::complex<double> {
+		// move this to the outside
 		auto [nodes, weights] = gauss_laguerre::calculate_laguerre_points_and_weights(30);
 
 		auto q = arma::dot(A.col(0), mu);
@@ -41,50 +43,28 @@ namespace integral {
 		if (std::abs(std::imag(spec_point) < std::abs(std::imag(c)))) {
 			spec_point = std::real(spec_point);
 		}
+
 		steepest_descent::steepest_descend_1d steepest_desc(nodes, weights, k, y, A, b, r, q, s, { c, c_0 }, sing_point);
 
-
-
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
-		if (std::real(spec_point) >= (left_split - tolerance) && std::real(spec_point) <= (right_split + tolerance) && std::abs(std::imag(spec_point)) <= std::numeric_limits<double>::epsilon()) {
-			std::cout << "spec point" << spec_point << std::endl;
+		if (math_utils::is_within_split_point_tolerances(spec_point, left_split, right_split, tolerance)) {
 			split_points = math_utils::get_split_points_spec(q, k, s, { c, c_0 }, left_split, right_split);
 		}
-		else if (std::real(sing_point) >= (left_split - tolerance) && std::real(sing_point) <= (right_split + tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon()) {
-			std::cout << "sing point" << sing_point << std::endl;
-
+		else if (math_utils::is_within_split_point_tolerances(sing_point, left_split, right_split, tolerance)) {
 			split_points = math_utils::get_split_points_sing(q, k, s, { c, c_0 }, left_split, right_split);
 		} 
 		else
 		{
 			//no singularity
 			return steepest_desc(left_split, right_split);
-
 		}
 
 		auto [sp1, sp2] = split_points;
 
 		
-/*		auto path1 = path_utils::get_weighted_path(left_split, y, A, b, r, q, k, s, {c, c_0}, sing_point);
-		auto path2 = path_utils::get_weighted_path(sp1, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
-
-		auto I1 = gauss_laguerre::calculate_integral_cauchy(path1, path2, nodes, weights);*/
-
 		auto I1 = steepest_desc(left_split, sp1);
+		auto I2 = steepest_desc(sp2, right_split);
 
-/*
-		auto path3 = path_utils::get_weighted_path(sp2, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
-		std::cout << "weighted path: " << path3(1) << std::endl;
-		auto path4 = path_utils::get_weighted_path(right_split, y, A, b, r, q, k, s, { c, c_0 }, sing_point);
-		std::cout << "weighted path: " << path4(1) << std::endl;
-
-		sp1
-		auto I2 = gauss_laguerre::calculate_integral_cauchy(path3, path4, nodes, weights);
-
-	*/
-		auto I2 =  steepest_desc(sp2, right_split);
-		//std::cout << "I1: " << I1 << std::endl;
-		//std::cout << "I2: " << I2 << std::endl;
 
 		//just the "normal" integrate is missing
 		//    greenFun1D = @(x) exp(1i*k*(Px(x,y,A,b,r).^(1/2)+q*x+s)).*Px(x,y,A,b,r).^(-1/2); 
@@ -101,5 +81,12 @@ namespace integral {
 		return I1 + x + I2;
 	}
 
+	integral_2d::integral_2d(const int k, const steepest_descent::steepest_descend_2d steepest_descent_2d, integrator::integrator integrator, const double resolution, const double tolerance) : k(k), integrator(integrator), steepest_descend_2d(steepest_descend_2d), resolution(resolution), tolerance(tolerance) {
 
+	}
+
+	auto integral_2d::operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& mu) const->std::complex<double>
+	{
+
+	}
 }
