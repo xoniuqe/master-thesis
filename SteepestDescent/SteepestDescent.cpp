@@ -305,6 +305,9 @@ auto integral_test()
     end*/
 }
 
+
+
+
 auto integral_test2()
 {
 	arma::mat  A{ {0, 0}, {1, 0}, {1, 1 } };
@@ -318,14 +321,10 @@ auto integral_test2()
 	auto k = 100;
 	auto left_split = 0.;
 	auto right_split = 1.;
-	//integrator::integrator
-	//const std::complex<double>(const integrand_fun fun, const std::complex<double> first_split_point, const std::complex<double> second_split_point)
-	auto integrator = [](const integrator::integrand_fun fun, const std::complex<double> first_split_point, const std::complex<double> second_split_point) -> std::complex<double> {
-		return  -0.090716 + 0.259133i;
-	};
-	integral::integral_1d integral1d(k, integrator , 0.1);
-
-	std::cout << "result2: " << integral1d(A, b, r, mu, y, left_split, right_split) << std::endl;
+	integrator::gsl_integrator gslintegrator;
+	integral::integral_1d integral1d(k, gslintegrator, 0.1);
+	auto res = integral1d(A, b, r, mu, y, left_split, right_split);
+	std::cout << "result2: " << res << std::endl;
 	return;
 
 

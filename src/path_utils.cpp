@@ -27,17 +27,6 @@ namespace path_utils {
     //function[cPath,ddtcPath] = GetComplexPath(sP,y,A,b,r,q,c,c_0,singPoint)
 
     auto get_complex_path(const std::complex<double> split_point, const double y, const datatypes::matrix& A, const  datatypes::vector& b, const  datatypes::vector& r, const double q, const datatypes::complex_root complex_root, const std::complex<double> sing_point) -> std::tuple< path_function, path_function>{
-        /*
-
-    Cb = conj(c);
-    sqc = sqrt(c_0);
-    C = real(c);
-
-    S = 1/(c_0-q^2);
-    PsP = Px(sP,y,A,b,r);
-    K = @(t) sqrt(PsP)+q.*sP+1i.*t;
-    T = @(t) (q.*K(t)-c_0*real(c))*S;
-    */
 
         auto C = std::real(complex_root.c);
         auto c_real_squared = std::pow(C, 2);
@@ -60,6 +49,10 @@ namespace path_utils {
         std::cout << "K(1)" << K(1.) << std::endl;
 
         path_function path;
+        //observation:
+        // two cases q == sqc or q == -sqc
+        // in either case we coud just unify these branches because 
+        // all that changes in the path function is the sign in the denominator and U, indicating that abs(sqc) may be sufficient
         if (std::abs(q - sqc) <= std::numeric_limits<double>::epsilon()) {
             auto U = [=](const double t) -> auto {
                 return std::sqrt(Psp) + sqc * split_point + 1i * t;

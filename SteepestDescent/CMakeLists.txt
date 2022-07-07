@@ -2,8 +2,8 @@
 # projektspezifische Logik hier.
 #
 cmake_minimum_required (VERSION 3.14)
-#add_compile_definitions(HAVE_INLINE)
-#add_compile_definitions(GSL_DISABLE_DEPRECATED)
+add_compile_definitions(HAVE_INLINE)
+add_compile_definitions(GSL_DISABLE_DEPRECATED)
 
 
 find_package(Armadillo REQUIRED)
@@ -23,8 +23,8 @@ add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h")
 
 add_compile_definitions(SteepestDescent PUBLIC USE_ARMADILLO)
 # TODO: Fügen Sie bei Bedarf Tests hinzu, und installieren Sie Ziele.
-
-target_link_libraries(SteepestDescent PRIVATE SteepestDescentLib ${ARMADILLO_LIBRARIES})
+ 
+target_link_libraries(SteepestDescent  PRIVATE SteepestDescentLib ${ARMADILLO_LIBRARIES} )
 
 # from merge
 #target_link_libraries(SteepestDescent PRIVATE GSL::gsl ${ARMADILLO_LIBRARIES})# Boost::Multiprecision)

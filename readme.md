@@ -2,7 +2,7 @@
 
 
 ## Setting up my project:
-
+needs to be updated!
 (gsl )
 * clone the repo
 * cd vcpkg

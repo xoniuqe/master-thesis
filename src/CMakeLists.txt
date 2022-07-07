@@ -7,18 +7,26 @@
 set(HEADER_LIST "${PROJECT_SOURCE_DIR}/include/steepest_descent/datatypes.h" 
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/gauss_laguerre.h" 
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/math_utils.h"
-				"${PROJECT_SOURCE_DIR}/include/steepest_descent/path_utils.h")
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/path_utils.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integration/gsl_integrator.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integrator.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/steepest_descent.h")
 
 # Make an automatic library - will be static or dynamic based on user setting
 
 
-add_library(SteepestDescentLib gauss_laguerre.cpp math_utils.cpp path_utils.cpp ${HEADER_LIST}  "integral.cpp" "steepest_descent.cpp")
+
+add_library(SteepestDescentLib gauss_laguerre.cpp math_utils.cpp path_utils.cpp ${HEADER_LIST}  integral.cpp steepest_descent.cpp)
+
+find_package(GSL REQUIRED)
+
 
 # We need this directory, and users of our library will need it too
 target_include_directories(SteepestDescentLib PUBLIC ../include)
 
 # This depends on (header only) boost
-target_link_libraries(SteepestDescentLib PRIVATE ${ARMADILLO_LIBRARIES})
+target_link_libraries(SteepestDescentLib PRIVATE GSL::gsl ${ARMADILLO_LIBRARIES})
 
 # All users of this library will need at least C++11
 #target_compile_features(SteepestDescentLib PUBLIC cxx_std_20)
