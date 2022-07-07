@@ -84,7 +84,7 @@ valgrind:
       artifacts: true
     before_script:
      - apt-get update --yes
-     - apt-get install --yes valgrind python3-pip
+     - apt-get install --yes valgrind python3-pip libarmadillo libopenlas liblapack
      - pip install ValgrindCI
 
     script:
