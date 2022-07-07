@@ -84,8 +84,7 @@ valgrind:
       artifacts: true
     before_script:
      - apt-get update --yes
-     - apt-cache search libgsl
-     - apt-get install --yes valgrind python3-pip libarmadillo10   libopenblas-base liblapack3
+     - apt-get install --yes valgrind python3-pip libarmadillo10 libopenblas-base liblapack3 libgsl25 
      - pip install ValgrindCI
 
     script:
