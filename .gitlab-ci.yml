@@ -38,7 +38,7 @@ build:
      - git submodule sync --recursive
      - git submodule update --init --recursive
      - apt-get update --yes
-     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
+     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev
      # We will install latest CMake, even though Ubuntu has a recent one
      - mkdir -p $HOME/.local
      - curl -s "https://cmake.org/files/v3.23/cmake-3.23.1-linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C $HOME/.local
@@ -60,7 +60,7 @@ test:
      - git submodule sync --recursive
      - git submodule update --init --recursive
      - apt-get update --yes
-     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
+     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev
      # We will install latest CMake, even though Ubuntu has a recent one
      - mkdir -p $HOME/.local
      - curl -s "https://cmake.org/files/v3.23/cmake-3.23.1-linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C $HOME/.local
