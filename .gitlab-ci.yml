@@ -84,7 +84,7 @@ valgrind:
       artifacts: true
     before_script:
      - apt-get update --yes
-     - apt-get install --yes valgrind python3-pip libarmadillo8  libopenblas-base liblapack3
+     - apt-get install --yes valgrind python3-pip libarmadillo9  libopenblas-base liblapack3
      - pip install ValgrindCI
 
     script:
