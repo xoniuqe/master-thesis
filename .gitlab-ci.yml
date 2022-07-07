@@ -75,3 +75,28 @@ test:
       when: always
       reports:
         junit: build_test/tests/result.xml
+
+valgrind:
+    stage: postbuild
+    image: gcc
+    before_script:
+     - git submodule sync --recursive
+     - git submodule update --init --recursive
+     - apt-get update --yes
+     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev valgrind python3-pip
+     # We will install latest CMake, even though Ubuntu has a recent one
+     - mkdir -p $HOME/.local
+     - curl -s "https://cmake.org/files/v3.23/cmake-3.23.1-linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C $HOME/.local
+     - export PATH=$HOME/.local/bin:$PATH
+
+    script:
+    - cmake -S . -B build
+    - cmake --build build -v
+    - valgrind --xml=yes --xml-file=valgrind_report.xml build/SteepestDescent/SteepestDescent
+    - pip install VallgrindCI
+    - valgrind-ci build/SteepestDescent/valgrind_report.xml --source-dir=/ --output-dir=html
+
+    artifacts:
+      when: always
+      paths:
+        - html
