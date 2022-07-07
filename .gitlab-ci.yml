@@ -83,11 +83,8 @@ valgrind:
       job: build
       artifacts: true
     before_script:
+     - apt-get update --yes
      - apt-get install --yes valgrind python3-pip
-     # We will install latest CMake, even though Ubuntu has a recent one
-     - mkdir -p $HOME/.local
-     - curl -s "https://cmake.org/files/v3.23/cmake-3.23.1-linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C $HOME/.local
-     - export PATH=$HOME/.local/bin:$PATH
      - pip install VallgrindCI
 
     script:
