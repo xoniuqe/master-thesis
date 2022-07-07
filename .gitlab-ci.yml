@@ -88,7 +88,9 @@ valgrind:
      - pip install ValgrindCI
 
     script:
-    - cd build/SteepestDescent && valgrind --xml=yes --xml-file=valgrind_report.xml ./SteepestDescent
+    - cd build/SteepestDescent
+    - valgrind --xml=yes --xml-file=valgrind_report.xml ./SteepestDescent
+    - cd ../..
     - valgrind-ci build/SteepestDescent/valgrind_report.xml --source-dir=/ --output-dir=html
 
     artifacts:
