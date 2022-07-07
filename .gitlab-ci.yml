@@ -77,7 +77,7 @@ test:
         junit: build_test/tests/result.xml
 
 valgrind:
-    stage: post
+    stage: .post
     image: gcc
     before_script:
      - git submodule sync --recursive
