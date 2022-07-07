@@ -38,6 +38,7 @@ build:
      - git submodule sync --recursive
      - git submodule update --init --recursive
      - apt-get update --yes
+     - apt-get search libarmadillo
      - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
      # We will install latest CMake, even though Ubuntu has a recent one
      - mkdir -p $HOME/.local
