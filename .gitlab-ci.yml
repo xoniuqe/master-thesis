@@ -38,7 +38,6 @@ build:
      - git submodule sync --recursive
      - git submodule update --init --recursive
      - apt-get update --yes
-     - apt-get search libarmadillo
      - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev
      # We will install latest CMake, even though Ubuntu has a recent one
      - mkdir -p $HOME/.local
@@ -85,6 +84,7 @@ valgrind:
       artifacts: true
     before_script:
      - apt-get update --yes
+     - apt-cache search libarmadillo
      - apt-get install --yes valgrind python3-pip libarmadillo9  libopenblas-base liblapack3
      - pip install ValgrindCI
 
