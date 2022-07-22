@@ -90,10 +90,10 @@ valgrind:
     script:
     - cd build/SteepestDescent
     - valgrind --xml=yes --xml-file=valgrind_report.xml ./SteepestDescent
-    - cd ../..
-    - valgrind-ci build/SteepestDescent/valgrind_report.xml --output-dir=html
+    - valgrind-ci valgrind_report.xml --output-dir=../../html
 
     artifacts:
       when: always
       paths:
+        - build/SteepestDescent/valgrind_report.xml
         - html

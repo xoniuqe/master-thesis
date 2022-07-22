@@ -14,3 +14,8 @@ private:
 		return static_cast<gsl_function_pp*>(params)->_func(x);
 	}
 };
+
+template <typename F>
+gsl_function_pp<F> make_gsl_function(const F& func) {
+	return gsl_function_pp<F>(func);
+}

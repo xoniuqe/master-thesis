@@ -9,15 +9,17 @@ set(HEADER_LIST "${PROJECT_SOURCE_DIR}/include/steepest_descent/datatypes.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/math_utils.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/path_utils.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integration/gsl_integrator.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integration/gsl_integrator_2d.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integrator.h"
-				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral_1d.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral_2d.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/steepest_descent.h")
 
 # Make an automatic library - will be static or dynamic based on user setting
 
 
 
-add_library(SteepestDescentLib gauss_laguerre.cpp math_utils.cpp path_utils.cpp ${HEADER_LIST}  integral.cpp steepest_descent.cpp)
+add_library(SteepestDescentLib gauss_laguerre.cpp math_utils.cpp path_utils.cpp ${HEADER_LIST}  integral_1d.cpp integral_2d.cpp steepest_descent.cpp)
 
 find_package(GSL REQUIRED)
 

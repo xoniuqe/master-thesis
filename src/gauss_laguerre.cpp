@@ -57,6 +57,11 @@ namespace gauss_laguerre {
 		return std::make_tuple(arma::conv_to<std::vector<double>>::from(laguerre_points), arma::conv_to<std::vector<double>>::from(quadrature_weights));
 	}
 
+	auto calculate_integral_cauchy(const path_utils::path_function path, std::vector<double> nodes, std::vector<double> weights)->std::complex<double> {
+		std::vector<std::complex<double>> eval_points;
+		std::transform(nodes.begin(), nodes.end(), std::back_inserter(eval_points), path);
+		return std::inner_product(weights.begin(), weights.end(), eval_points.begin(), 0. + 0.i);
+	}
 
 	auto calculate_integral_cauchy(const path_utils::path_function first_path, const path_utils::path_function second_path, std::vector<double> nodes, std::vector<double> weights)->std::complex<double> {
 		std::vector<std::complex<double>> eval_points1, eval_points2, eval_points_summed;
