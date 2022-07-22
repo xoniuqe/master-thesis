@@ -4,6 +4,7 @@
 
 #include <steepest_descent/datatypes.h>
 #include <steepest_descent/math_utils.h>
+using namespace std::complex_literals;
 
 
 TEST_CASE("calculate spec and sing points", "[math_lib]") {
@@ -34,9 +35,19 @@ TEST_CASE("get complex roots", "[math_lib]") {
 
 	arma::vec r{ 0, 1, 2 };
 
-	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
+	SECTION("get complex root of real number") {
 
-	REQUIRE(std::real(c) == Approx(0.5));
-	REQUIRE(std::imag(c) == Approx(1.5));
-	REQUIRE(c_0  == Approx(2));
+		auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
+
+		REQUIRE(std::real(c) == Approx(0.5));
+		REQUIRE(std::imag(c) == Approx(1.5));
+		REQUIRE(c_0 == Approx(2));
+	}
+	SECTION(" get compelx root of complex number") {
+		auto [c, c_0] = math_utils::get_complex_roots(1. + 1.i, A, b, r);
+
+		REQUIRE(std::real(c) == Approx(-0.5));
+		REQUIRE(std::imag(c) == Approx(0.5));
+		REQUIRE(c_0 == Approx(2));
+	}
 }

@@ -4,7 +4,6 @@
 
 namespace datatypes {
 	typedef  arma::mat matrix;
-	typedef  arma::vec vector;
 
 #define VEC(name, size) arma::vec name(size);
 #define MATRIX_GET(m,x,y) m.at(x,y)
@@ -15,7 +14,7 @@ namespace datatypes {
 
 	struct triangle {
 		matrix* A;
-		vector* b;	
+		arma::vec3* b;
 	};
 
 	struct complex_root {
