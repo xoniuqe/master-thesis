@@ -15,15 +15,15 @@
 namespace integral {
 	using namespace std::complex_literals;
 
-	integral_1d::integral_1d(int k, integrator::gsl_integrator* integrator, double tolerance) : k(k), integrator(integrator), tolerance(tolerance) {
-
+	integral_1d::integral_1d(int k, integrator::gsl_integrator* integrator, double tolerance, size_t gauss_laguerre_precision) : k(k), integrator(integrator), tolerance(tolerance), precision(gauss_laguerre_precision) {
+		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(precision);
+		this->nodes = n;
+		this->weights = w;
 	}
 
 
 
 	auto integral_1d::operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& mu, const double y, const double left_split, const double right_split) const -> std::complex<double> {
-		auto [nodes, weights] = gauss_laguerre::calculate_laguerre_points_and_weights(30);
-
 		auto q = arma::dot(A.col(0), mu);
 		auto s = arma::dot(A.col(1), mu) * y + arma::dot(mu, b);
 		auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);

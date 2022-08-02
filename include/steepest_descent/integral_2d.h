@@ -9,9 +9,10 @@
 namespace integral {
 
 	struct integral_2d {
-		integral_2d(int k, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d, double tolerance, double resolution);
+		integral_2d(int k, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d, double tolerance, double resolution, size_t gauss_laguerre_precision);
 		auto operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& mus) const->std::complex<double>;
 	private:
+		size_t precision;
 		double k;
 		integrator::gsl_integrator* integrator;
 		integrator::gsl_integrator_2d* integrator_2d;

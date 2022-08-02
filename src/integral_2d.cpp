@@ -18,8 +18,8 @@
 namespace integral {
 	using namespace std::complex_literals;
 
-	integral_2d::integral_2d(int k, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d, double tolerance, double resolution) : k(k), integrator(integrator), integrator_2d(integrator_2d), tolerance(tolerance), resolution(resolution) {
-		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(30);
+	integral_2d::integral_2d(int k, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d, double tolerance, double resolution, size_t gauss_laguerre_precision) : k(k), integrator(integrator), integrator_2d(integrator_2d), tolerance(tolerance), resolution(resolution), precision(gauss_laguerre_precision) {
+		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(precision);
 		this->nodes = n;
 		this->weights = w;
 	}
