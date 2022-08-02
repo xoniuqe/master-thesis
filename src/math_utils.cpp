@@ -22,7 +22,6 @@ namespace math_utils {
 		auto C = complex_root.c_0 - q * q;
 		auto rc = std::real(complex_root.c);
 		auto ic = std::imag(complex_root.c);
-		auto sqc = std::sqrt(complex_root.c_0);
 		auto cTimesCconj = rc * rc + ic * ic;
 		auto tmp = (rc * rc * q * q + cTimesCconj * C);
 		auto tmp2 = complex_root.c_0 * rc * rc;
@@ -46,7 +45,6 @@ namespace math_utils {
 		auto C = complex_root.c_0 - q * q;
 		auto rc = std::real(complex_root.c);
 		auto ic = std::imag(complex_root.c);
-		auto sqc = std::sqrt(complex_root.c_0);
 		auto cTimesCconj = rc * rc + ic * ic;
 		auto tmp = (rc * rc * q * q + cTimesCconj * C);
 		auto tmp2 = complex_root.c_0 * rc * rc;
@@ -190,7 +188,6 @@ namespace math_utils {
 
 	auto get_spec_point(const double q, const datatypes::complex_root complex_root) -> std::complex<double> {
 		auto C = std::real(complex_root.c);
-		auto c_real_squared = std::pow(C, 2);
 		auto rc = std::real(complex_root.c);
 		auto ic = std::imag(complex_root.c);
 
@@ -218,7 +215,7 @@ namespace math_utils {
 		//arma::vec result = A * X + b - r;
 		//return result.at(0) + result.at(1) + result.at(2);
 		//return calculate_row(0) + calculate_row(1) + calculate_row(2);
-		auto calculate_row = [&](const int i) {
+		auto calculate_row = [&](const size_t i) {
 			auto first_val  = A.at(i, 0);
 			auto second_val = A.at(i, 1); 
 			auto b_element = b.at(i);
@@ -231,7 +228,7 @@ namespace math_utils {
 
 	auto calculate_P_x(const std::complex<double> x, const double y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r) -> std::complex<double> {
 		//fx = ((A(1, 1) * x + A(1, 2) * y + b(1) - r(1)). ^ 2 + (A(2, 1) * x + A(2, 2) * y + b(2) - r(2)). ^ 2 + (A(3, 1) * x + A(3, 2) * y + b(3) - r(3)). ^ 2);
-		auto calculate_row = [&](const int i) {
+		auto calculate_row = [&](const size_t i) {
 			auto first_val = A.at(i, 0);
 			auto second_val = A.at(i, 1);
 			auto b_element = b.at(i);
@@ -244,7 +241,7 @@ namespace math_utils {
 
 	auto calculate_P_x(const std::complex<double> x, const std::complex<double> y, const datatypes::matrix& A, const  arma::vec3& b, const arma::vec3& r) -> std::complex<double> {
 		//fx = ((A(1, 1) * x + A(1, 2) * y + b(1) - r(1)). ^ 2 + (A(2, 1) * x + A(2, 2) * y + b(2) - r(2)). ^ 2 + (A(3, 1) * x + A(3, 2) * y + b(3) - r(3)). ^ 2);
-		auto calculate_row = [&](const int i) {
+		auto calculate_row = [&](const size_t i) {
 			auto first_val = A.at(i, 0);
 			auto second_val = A.at(i, 1);
 			auto b_element = b.at(i);
@@ -265,7 +262,7 @@ namespace math_utils {
 	/// <param name="r">View vector </param>
 	/// <returns>The partial derivative in x direction </returns>
 	auto partial_derivative_P_x(const double x, const double y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r) -> double {
-		auto calculate_row = [&](const int i) {
+		auto calculate_row = [&](const size_t i) {
 			auto first_val = A.at(i, 0);
 			auto second_val = A.at(i, 1);
 			auto b_element = b.at(i);
@@ -285,7 +282,7 @@ namespace math_utils {
 	/// <param name="r">View vector </param>
 	/// <returns>The partial derivative in x direction </returns>
 	auto partial_derivative_P_x(const double x, const std::complex<double> y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r) -> std::complex<double> {
-		auto calculate_row = [&](const int i) {
+		auto calculate_row = [&](const size_t i) {
 			auto first_val = A.at(i, 0);
 			auto second_val = A.at(i, 1);
 			auto b_element = b.at(i);

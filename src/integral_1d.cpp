@@ -1,6 +1,3 @@
-
-
-
 #include <steepest_descent/integral_1d.h>
 #include <steepest_descent/math_utils.h>
 #include <steepest_descent/steepest_descent.h>

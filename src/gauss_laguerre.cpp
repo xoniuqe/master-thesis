@@ -10,7 +10,7 @@ using namespace std::literals::complex_literals;
 
 namespace gauss_laguerre {
 
-	auto calculate_laguerre_points_and_weights(int n) ->std::tuple<std::vector<double>, std::vector<double>>
+	auto calculate_laguerre_points_and_weights(size_t n) ->std::tuple<std::vector<double>, std::vector<double>>
 	{
 		std::vector<double> alpha(n);
 		std::iota(std::begin(alpha), std::end(alpha), 1);
@@ -28,20 +28,28 @@ namespace gauss_laguerre {
 			}
 		}
 
-
 		arma::mat evec(n, n);
 		arma::vec laguerre_points(n);
 		laguerre_points.zeros();
 		evec.zeros();
 		auto result = arma::eig_sym(laguerre_points, evec, T, "std");
+		
 		auto diag = evec.diag();
+		//differs from matlab
 
 
+		auto weight_sum = 0.;
 		arma::vec quadrature_weights(n);
 		for (auto i = 0; i < n; i++) {
 			auto value = evec(0, i);
-			quadrature_weights[i] = std::pow(value, 2.);// *value;
+			value = std::pow(value, 2);
+			weight_sum += value;
+			quadrature_weights[i] = value;
 		}
+
+		// normalize quadrature weights
+		quadrature_weights *= (1. / weight_sum);
+
 
 		arma::vec barycentric_weights(n);
 		auto max_value = -1.;

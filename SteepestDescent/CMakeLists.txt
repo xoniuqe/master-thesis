@@ -5,7 +5,6 @@ cmake_minimum_required (VERSION 3.14)
 add_compile_definitions(HAVE_INLINE)
 add_compile_definitions(GSL_DISABLE_DEPRECATED)
 
-
 find_package(Armadillo REQUIRED)
 #find_package(MKL REQUIRED)
 include_directories(${ARMADILLO_INCLUDE_DIRS})
@@ -19,7 +18,12 @@ add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h")
 
 
 #target_compile_features(SteepestDescent PRIVATE cxx_std_17)
-
+#target_compile_options(SteepestDescent PRIVATE
+	  #-pedantic
+	  #-Wall
+	  ##-Wextra
+	  #-Wconversion
+	  #-Wsign-conversion)
 
 add_compile_definitions(SteepestDescent PUBLIC USE_ARMADILLO)
 # TODO: Fügen Sie bei Bedarf Tests hinzu, und installieren Sie Ziele.

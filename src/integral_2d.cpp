@@ -19,9 +19,9 @@ namespace integral {
 	using namespace std::complex_literals;
 
 	integral_2d::integral_2d(int k, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d, double tolerance, double resolution) : k(k), integrator(integrator), integrator_2d(integrator_2d), tolerance(tolerance), resolution(resolution) {
-		auto [nodes, weights] = gauss_laguerre::calculate_laguerre_points_and_weights(30);
-		this->nodes = nodes;
-		this->weights = weights;
+		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(30);
+		this->nodes = n;
+		this->weights = w;
 	}
 
 
@@ -35,14 +35,6 @@ namespace integral {
 
 		auto prod = arma::dot(mu, b);
 		
-
-		auto abs_singularity = [](std::complex<double> sing_point, std::complex<double> c) -> std::complex<double> {
-			if (std::abs(std::imag(sing_point)) < std::abs(c)) {
-				return std::real(sing_point);
-			}
-			return sing_point;
-		};
-
 
 		auto A1 = arma::mat(A);
 		A1.swap_cols(0, 1);
@@ -68,6 +60,7 @@ namespace integral {
 		// render singularities exact
 		//sing_point2 = abs_singularity(sing_point2, c2);
 		//spec_point2 = abs_singularity(spec_point2, c2);
+
 		auto local_k = k;
 		auto green_fun_2d = [k = local_k, &A, &b, &r, qx, qy, prod](const double x, const double y) -> auto {
 			auto Px = math_utils::calculate_P_x(x, y, A, b, r);
@@ -139,14 +132,11 @@ namespace integral {
 
 			auto sx_intern_1 = arma::dot(A1.col(1), mu) * split_point1 + prod;
 			auto [cIntern1, c_0Intern1] = math_utils::get_complex_roots(split_point1, A1, b, r);
-			auto singPointIntern1 = math_utils::get_singularity_for_ODE(q1, { cIntern1, c_0Intern1 });
-			auto specPointIntern1 = math_utils::get_spec_point(q1, { cIntern1, c_0Intern1 });
 
 			//Vertical layer at splitPt2.
 			auto sx_intern_2 = arma::dot(A1.col(1), mu) * split_point2 + prod;
 			auto [cIntern2, c_0Intern2] = math_utils::get_complex_roots(split_point2, A1, b, r);
-			auto singPointIntern2 = math_utils::get_singularity_for_ODE(q1, { cIntern2, c_0Intern2 });
-			auto specPointIntern2 = math_utils::get_spec_point(q1, { cIntern2, c_0Intern2 });
+	
 
 			// Integration over these two segments.
 			auto intYintern1 = get_partial_integral(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + resolution);
@@ -158,6 +148,7 @@ namespace integral {
 			integral2_res = integral2(greenFun2D, real(splitPt1), real(splitPt2), y, y + resY);
 			int2D = int2D + Iin1 * intY - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * int1minusY;% integral2->may be source of error.
 				Lambda(count) = Iin1;*/
+
 			auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + resolution);
 			integration_result += Iin1 * integration_y - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * integration_1_minus_y;
 		
