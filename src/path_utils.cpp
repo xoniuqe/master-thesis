@@ -29,7 +29,6 @@ namespace path_utils {
     auto get_complex_path(const std::complex<double> split_point, const double y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r, const double q, const datatypes::complex_root complex_root, const std::complex<double> sing_point) -> std::tuple< path_function, path_function>{
 
         auto C = std::real(complex_root.c);
-        auto c_real_squared = std::pow(C, 2);
         auto rc = std::real(complex_root.c);
         auto ic = std::imag(complex_root.c);
 
@@ -120,7 +119,6 @@ ddtcPath = @(t) (Pp(t)).^(1/2)*1i./(c_0*(cPath(t)-  C)+q*(Pp(t)).^(1/2));*/
     auto get_complex_path(const std::complex<double> split_point, const std::complex<double> y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r, const double q, const datatypes::complex_root complex_root, const std::complex<double> sing_point) -> std::tuple< path_function, path_function> {
 
         auto C = std::real(complex_root.c);
-        auto c_real_squared = std::pow(C, 2);
         auto rc = std::real(complex_root.c);
         auto ic = std::imag(complex_root.c);
 

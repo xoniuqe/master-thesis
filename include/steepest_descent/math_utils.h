@@ -13,20 +13,13 @@ namespace math_utils {
 
 	using namespace complex_comparison;
 
-	
-	//template<class T> struct is_complex : std::false_type {};
-	//template<class T> struct is_complex<std::complex<T>> : std::true_type {};
-
-
 	inline auto floor(std::complex<double> && value) -> std::complex<double> {
 		return  std::floor(std::real(value)) + std::floor(std::imag(value)) * 1.i;
 	}
 
-
-
-
-
 	auto calculate_singularities_ODE(const datatypes::complex_root complex_root, const double q, const double k, const std::complex<double> s)->std::tuple<std::complex<double>, std::complex<double>, std::complex<double>>;
+
+
 
 	/// <summary>
 	/// singularity := definitionsl�cke
@@ -38,8 +31,6 @@ namespace math_utils {
 	/// <returns></returns>
 	auto calculate_singularities_ODE(const datatypes::complex_root complex_root, const double q, const double k, const double s)->std::tuple<std::complex<double>, std::complex<double>, std::complex<double>>;
 	
-	constexpr auto decide_split_points(const std::complex<double> left_split_zero, const std::complex<double> right_split_zero, const std::complex<double> left_split_point, const std::complex<double> right_split_point)->std::tuple<std::complex<double>, std::complex<double>>;
-	
 	auto get_split_points_sing(const double q, const double k, const std::complex<double> s, const datatypes::complex_root complex_root, const std::complex<double> left_split_point, const std::complex<double> right_split_point)->std::tuple<std::complex<double>, std::complex<double>>;
 
 	auto get_split_points_sing(const double q, const double k, const double s, const datatypes::complex_root complex_root, const std::complex<double> left_split_point, const std::complex<double> right_split_point)->std::tuple<std::complex<double>, std::complex<double>>;
@@ -49,6 +40,8 @@ namespace math_utils {
 	auto get_split_points_spec(const double q, const double k, const double s, const datatypes::complex_root complex_root, const std::complex<double> left_split_point, const std::complex<double> right_split_point)->std::tuple<std::complex<double>, std::complex<double>>;
 	
 	auto get_singularity_for_ODE(const std::complex<double> q, const datatypes::complex_root complex_root)->std::complex<double>;
+
+	constexpr auto decide_split_points(const std::complex<double> left_split_zero, const std::complex<double> right_split_zero, const std::complex<double> left_split_point, const std::complex<double> right_split_point)->std::tuple<std::complex<double>, std::complex<double>>;
 
 	auto get_singularity_for_ODE(const double q, const datatypes::complex_root complex_root)->std::complex<double>;
 
