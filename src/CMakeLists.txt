@@ -13,7 +13,8 @@ set(HEADER_LIST "${PROJECT_SOURCE_DIR}/include/steepest_descent/datatypes.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integrator.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral_1d.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral_2d.h"
-				"${PROJECT_SOURCE_DIR}/include/steepest_descent/steepest_descent.h")
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/steepest_descent.h" 
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/configuration.h")
 
 # Make an automatic library - will be static or dynamic based on user setting
 

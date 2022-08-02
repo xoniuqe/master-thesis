@@ -12,14 +12,14 @@
 
 
 #ifdef _WIN32
-#include <corecrt_math_defines.h>
+//#include <corecrt_math_defines.h>
 #endif
 
 namespace integral {
 	using namespace std::complex_literals;
 
-	integral_2d::integral_2d(int k, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d, double tolerance, double resolution, size_t gauss_laguerre_precision) : k(k), integrator(integrator), integrator_2d(integrator_2d), tolerance(tolerance), resolution(resolution), precision(gauss_laguerre_precision) {
-		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(precision);
+	integral_2d::integral_2d(const config::configuration_2d config, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d) : config(config), integrator(integrator), integrator_2d(integrator_2d) {
+		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(config.gauss_laguerre_nodes);
 		this->nodes = n;
 		this->weights = w;
 	}
@@ -61,7 +61,7 @@ namespace integral {
 		//sing_point2 = abs_singularity(sing_point2, c2);
 		//spec_point2 = abs_singularity(spec_point2, c2);
 
-		auto local_k = k;
+		auto local_k = config.wavenumber_k;
 		auto green_fun_2d = [k = local_k, &A, &b, &r, qx, qy, prod](const double x, const double y) -> auto {
 			auto Px = math_utils::calculate_P_x(x, y, A, b, r);
 			auto sqrtPx = std::sqrt(Px);
@@ -69,33 +69,33 @@ namespace integral {
 			return res;
 		};
 
-		auto is_singularity_in_layer = [](const std::complex<double> sing_point, const double first_split, const double second_split, const double tolerance) -> auto {
-			return (std::real(sing_point) >= (first_split - tolerance) && std::real(sing_point) <= (second_split + tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon());
+		auto is_singularity_in_layer = [this](const std::complex<double> sing_point, const double first_split, const double second_split) -> auto {
+			return (std::real(sing_point) >= (first_split - config.tolerance) && std::real(sing_point) <= (second_split + config.tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon());
 		};
 
 
 		auto integration_result = 0. + 0.i;
 
-		for (auto y = 0.; y < 1. - resolution; y += resolution) {
-			auto u = y + resolution * 0.5;
+		for (auto y = 0.; y < 1. - config.y_resolution; y += config.y_resolution) {
+			auto u = y + config.y_resolution * 0.5;
 			auto [c, c_0] = math_utils::get_complex_roots(u, A, b, r);
 			auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
 			auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
 
 			auto s = arma::dot(A.col(0), mu) * u + prod;
 
-			auto is_spec = is_singularity_in_layer(spec_point, 0, 1 - u, tolerance);
-			auto is_sing = is_singularity_in_layer(sing_point, 0, 1 - u, tolerance);
+			auto is_spec = is_singularity_in_layer(spec_point, 0, 1 - u);
+			auto is_sing = is_singularity_in_layer(sing_point, 0, 1 - u);
 
 
 
 			//intY = GetPartialInt(0, A1, b, r, q1, k, sx1, c1, c_01, y, y + resY, string1, singPoint1, lagPoints);% Compute the integral along the considered section of the vertical y layer.
 			//	int1minusY = GetPartialInt(1, A2, b2, r, q2, k, sx2, c2, c_02, y, y + resY, string2, singPoint2, lagPoints);% Compute the integral along the considered section of the slope.
 
-			auto integration_y = get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + resolution);
-			auto integration_1_minus_y = get_partial_integral(A2, b,r, 1., q2, sx2, c2, c2_0, y, y + resolution);
+			auto integration_y = get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
+			auto integration_1_minus_y = get_partial_integral(A2, b,r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
 
-			steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, k, u, A, b, r, q, s, { c, c_0 }, sing_point);
+			steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, config.wavenumber_k, u, A, b, r, q, s, { c, c_0 }, sing_point);
 			std::tuple<std::complex<double>, std::complex<double>> split_points;
 
 			if (!is_spec && !is_sing) {
@@ -106,12 +106,12 @@ namespace integral {
 				continue;
 			}
 			else if (is_spec) {
-				split_points = math_utils::get_split_points_spec(q, k, s, { c, c_0 }, 0, 1 - u);
+				split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
 			}
 			else if (is_sing) {
 				//split pt1 ist falsch? => gnu octave impl ist falsch!
 
-				split_points = math_utils::get_split_points_sing(q, k, s, { c, c_0 }, 0, 1 - u);
+				split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
 			}
 			auto [split_point1, split_point2] = split_points;
 
@@ -139,8 +139,8 @@ namespace integral {
 	
 
 			// Integration over these two segments.
-			auto intYintern1 = get_partial_integral(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + resolution);
-			auto intYintern2 = get_partial_integral(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + resolution);
+			auto intYintern1 = get_partial_integral(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + config.y_resolution);
+			auto intYintern2 = get_partial_integral(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 
 				/*% Final formula for the integral(considering each layer) in case of singularity on the
 				% layer.
@@ -149,7 +149,7 @@ namespace integral {
 			int2D = int2D + Iin1 * intY - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * int1minusY;% integral2->may be source of error.
 				Lambda(count) = Iin1;*/
 
-			auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + resolution);
+			auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
 			integration_result += Iin1 * integration_y - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * integration_1_minus_y;
 		
 		}
@@ -168,14 +168,14 @@ namespace integral {
 		if (std::abs(std::imag(spec_point) < std::abs(std::imag(c)))) {
 			spec_point = std::real(spec_point);
 		}
-		steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_y, nodes, weights, k, sPx, A, b, r, q, s, { c, c_0 }, sing_point);
+		steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_y, nodes, weights, config.wavenumber_k, sPx, A, b, r, q, s, { c, c_0 }, sing_point);
 
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
-		if (std::real(spec_point) >= (left_split - tolerance) && std::real(spec_point) <= (right_split + tolerance) && std::abs(std::imag(spec_point)) <= std::numeric_limits<double>::epsilon()) {
-			split_points = math_utils::get_split_points_spec(q, k, s, { c, c_0 }, left_split, right_split);
+		if (std::real(spec_point) >= (left_split - config.tolerance) && std::real(spec_point) <= (right_split + config.tolerance) && std::abs(std::imag(spec_point)) <= std::numeric_limits<double>::epsilon()) {
+			split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		}
-		else if (std::real(sing_point) >= (left_split - tolerance) && std::real(sing_point) <= (right_split + tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon()) {
-			split_points = math_utils::get_split_points_sing(q, k, s, { c, c_0 }, left_split, right_split);
+		else if (std::real(sing_point) >= (left_split - config.tolerance) && std::real(sing_point) <= (right_split + config.tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon()) {
+			split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		}
 		else
 		{
@@ -201,7 +201,7 @@ namespace integral {
 
 		auto I2 = steepest_desc(sp2) - steepest_desc(right_split);
 
-		auto green_fun = [k = k, y = sPx, &A, &b, &r, q, s](const double x) -> auto {
+		auto green_fun = [k = config.wavenumber_k, y = sPx, &A, &b, &r, q, s](const double x) -> auto {
 			auto Px = math_utils::calculate_P_x(x, y, A, b, r);
 			auto sqrtPx = std::sqrt(Px);
 			auto res = std::exp(1.i * k * (sqrtPx + q * x + s));

@@ -4,7 +4,7 @@
 #include "datatypes.h"
 #include "complex_comparison.h"
 #ifdef _WIN32
-#include <corecrt_math_defines.h>
+//#include <corecrt_math_defines.h>
 #endif
 #include <type_traits>
 

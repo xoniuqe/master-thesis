@@ -9,14 +9,14 @@
 
 
 #ifdef _WIN32
-#include <corecrt_math_defines.h>
+//#include <corecrt_math_defines.h>
 #endif
 
 namespace integral {
 	using namespace std::complex_literals;
 
-	integral_1d::integral_1d(int k, integrator::gsl_integrator* integrator, double tolerance, size_t gauss_laguerre_precision) : k(k), integrator(integrator), tolerance(tolerance), precision(gauss_laguerre_precision) {
-		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(precision);
+	integral_1d::integral_1d(const config::configuration config, integrator::gsl_integrator* integrator) : config(config), integrator(integrator) {
+		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(config.gauss_laguerre_nodes);
 		this->nodes = n;
 		this->weights = w;
 	}
@@ -38,14 +38,14 @@ namespace integral {
 		if (std::abs(std::imag(spec_point) < std::abs(std::imag(c)))) {
 			spec_point = std::real(spec_point);
 		}
-		steepest_descent::steepest_descend_1d steepest_desc(nodes, weights, k, y, A, b, r, q, s, { c, c_0 }, sing_point);
+		steepest_descent::steepest_descend_1d steepest_desc(nodes, weights, config.wavenumber_k, y, A, b, r, q, s, { c, c_0 }, sing_point);
 
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
-		if (std::real(spec_point) >= (left_split - tolerance) && std::real(spec_point) <= (right_split + tolerance) && std::abs(std::imag(spec_point)) <= std::numeric_limits<double>::epsilon()) {
-			split_points = math_utils::get_split_points_spec(q, k, s, { c, c_0 }, left_split, right_split);
+		if (std::real(spec_point) >= (left_split - config.tolerance) && std::real(spec_point) <= (right_split + config.tolerance) && std::abs(std::imag(spec_point)) <= std::numeric_limits<double>::epsilon()) {
+			split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		}
-		else if (std::real(sing_point) >= (left_split - tolerance) && std::real(sing_point) <= (right_split + tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon()) {
-			split_points = math_utils::get_split_points_sing(q, k, s, { c, c_0 }, left_split, right_split);
+		else if (std::real(sing_point) >= (left_split - config.tolerance) && std::real(sing_point) <= (right_split + config.tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon()) {
+			split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		} 
 		else
 		{
@@ -61,7 +61,7 @@ namespace integral {
 
 		auto I2 =  steepest_desc(sp2, right_split);
 
-		auto& local_k = this->k;
+		auto& local_k = this->config.wavenumber_k;
 		auto green_fun = [k=local_k, y=y, &A, &b, &r, q, s](const double x) -> auto { 
 			auto Px = math_utils::calculate_P_x(x, y, A, b, r);
 			auto sqrtPx = std::sqrt(Px);

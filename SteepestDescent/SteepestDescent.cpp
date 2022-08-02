@@ -81,11 +81,14 @@ auto integral_test_1d()
 
 	arma::vec mu{ 1,-0.5, -0.5 };
 	auto y = 0.;
-	auto k = 100;
 	auto left_split = 0.;
 	auto right_split = 1.;
+	config::configuration config;
+	config.wavenumber_k = 100;
+	config.tolerance = 0.1;
+	config.gauss_laguerre_nodes = 30;
 	integrator::gsl_integrator gslintegrator;
-	integral::integral_1d integral1d(k, &gslintegrator, 0.1, 30);
+	integral::integral_1d integral1d(config, &gslintegrator);
 	auto res = integral1d(A, b, r, mu, y, left_split, right_split);
 	std::cout << "result 1d: " << res << std::endl;
 	return;
@@ -100,10 +103,15 @@ auto integral_test_2d() {
 
 	arma::vec mu{ 1,-0.5, -0.5 };
 	auto k = 10;
+	config::configuration_2d config;
+	config.wavenumber_k = 100;
+	config.tolerance = 0.1;
+	config.y_resolution = 0.1;
+	config.gauss_laguerre_nodes = 30;
 
 	integrator::gsl_integrator gslintegrator;	
 	integrator::gsl_integrator_2d gsl_integrator_2d;
-	integral::integral_2d integral2d(k, &gslintegrator, &gsl_integrator_2d, 0.1, 0.1, 30);
+	integral::integral_2d integral2d(config, &gslintegrator, &gsl_integrator_2d);
 	auto res = integral2d(A, b, r, mu);
 	std::cout << "result 2d: " << res << std::endl;
 	return;
