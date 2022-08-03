@@ -54,12 +54,7 @@ namespace integral {
 		auto q2 = arma::dot(A2.col(0), mu);
 		auto sx2 = arma::dot(A2.col(1), mu) * 1. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
 		auto [c2, c2_0] = math_utils::get_complex_roots(1, A2, b, r);
-		//auto sing_point2 = math_utils::get_singularity_for_ODE(q2, { c2, c2_0 });
-		//auto spec_point2 = math_utils::get_spec_point(q2, { c2, c2_0 });
-		
-		// render singularities exact
-		//sing_point2 = abs_singularity(sing_point2, c2);
-		//spec_point2 = abs_singularity(spec_point2, c2);
+
 
 		auto local_k = config.wavenumber_k;
 		auto green_fun_2d = [k = local_k, &A, &b, &r, qx, qy, prod](const double x, const double y) -> auto {
@@ -68,11 +63,6 @@ namespace integral {
 			auto res = std::exp(1.i * k * (sqrtPx + qx * x + qy * y + prod)) * (1. / sqrtPx);
 			return res;
 		};
-
-		auto is_singularity_in_layer = [this](const std::complex<double> sing_point, const double first_split, const double second_split) -> auto {
-			return (std::real(sing_point) >= (first_split - config.tolerance) && std::real(sing_point) <= (second_split + config.tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon());
-		};
-
 
 		auto integration_result = 0. + 0.i;
 
@@ -84,8 +74,8 @@ namespace integral {
 
 			auto s = arma::dot(A.col(0), mu) * u + prod;
 
-			auto is_spec = is_singularity_in_layer(spec_point, 0, 1 - u);
-			auto is_sing = is_singularity_in_layer(sing_point, 0, 1 - u);
+			auto is_spec = math_utils::is_singularity_in_layer(config.tolerance, spec_point, 0, 1 - u);
+			auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, 0, 1 - u);
 
 
 
@@ -142,12 +132,8 @@ namespace integral {
 			auto intYintern1 = get_partial_integral(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + config.y_resolution);
 			auto intYintern2 = get_partial_integral(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 
-				/*% Final formula for the integral(considering each layer) in case of singularity on the
-				% layer.
-			% original: integral2_res = integral2(greenFun2D, splitPt1, splitPt2, y, y + resY);
-			integral2_res = integral2(greenFun2D, real(splitPt1), real(splitPt2), y, y + resY);
-			int2D = int2D + Iin1 * intY - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * int1minusY;% integral2->may be source of error.
-				Lambda(count) = Iin1;*/
+			/*% Final formula for the integral(considering each layer) in case of singularity on the
+			% layer.*/
 
 			auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
 			integration_result += Iin1 * integration_y - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * integration_1_minus_y;
@@ -156,6 +142,7 @@ namespace integral {
 
 		return integration_result;
 	}
+
 
 	auto integral_2d::get_partial_integral(const arma::mat& A, const arma::vec& b, const arma::vec& r, const std::complex<double> sPx, const double q, const std::complex<double> s, const std::complex<double> c, const double c_0, const double left_split, const double right_split) const -> std::complex<double> {
 		auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
@@ -171,14 +158,14 @@ namespace integral {
 		steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_y, nodes, weights, config.wavenumber_k, sPx, A, b, r, q, s, { c, c_0 }, sing_point);
 
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
-		if (std::real(spec_point) >= (left_split - config.tolerance) && std::real(spec_point) <= (right_split + config.tolerance) && std::abs(std::imag(spec_point)) <= std::numeric_limits<double>::epsilon()) {
+		if (math_utils::is_singularity_in_layer(config.tolerance, spec_point, left_split, right_split)) {
 			split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		}
-		else if (std::real(sing_point) >= (left_split - config.tolerance) && std::real(sing_point) <= (right_split + config.tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon()) {
+		else if (math_utils::is_singularity_in_layer(config.tolerance, sing_point, left_split, right_split)) {
 			split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		}
 		else
-		{
+		{	
 			auto left = steepest_desc(left_split);
 			auto right = steepest_desc(right_split);
 			//no singularity
@@ -195,7 +182,7 @@ namespace integral {
 		if (std::real(sp2) > right_split) {
 			sp2 = right_split;
 		}
-
+		// -> optimization: if either of these checks is true the according integral will be zero
 
 		auto I1 = steepest_desc(left_split) - steepest_desc(sp1);
 

@@ -359,4 +359,8 @@ namespace math_utils {
 		return std::make_tuple(c, c_0);
 	}
 
+
+	auto math_utils::is_singularity_in_layer(const double tolerance, const std::complex<double> sing_point, const double first_split, const double second_split) -> bool {
+		return (std::real(sing_point) >= (first_split - tolerance) && std::real(sing_point) <= (second_split + tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon());
+	}
 }

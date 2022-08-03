@@ -88,5 +88,5 @@ namespace math_utils {
 
 	auto singularity_as_real(const std::complex<double> singularity, const std::complex<double> c) -> bool;
 
-	auto layer_contains_singularity(const std::complex<double> candiate, const double point1, const double point2) -> bool;
+	auto is_singularity_in_layer(const double tolerance, const std::complex<double> candidate, const double first_point, const double second_point) -> bool;
 }
