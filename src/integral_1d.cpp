@@ -41,10 +41,10 @@ namespace integral {
 		steepest_descent::steepest_descend_1d steepest_desc(nodes, weights, config.wavenumber_k, y, A, b, r, q, s, { c, c_0 }, sing_point);
 
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
-		if (std::real(spec_point) >= (left_split - config.tolerance) && std::real(spec_point) <= (right_split + config.tolerance) && std::abs(std::imag(spec_point)) <= std::numeric_limits<double>::epsilon()) {
+		if (math_utils::is_singularity_in_layer(config.tolerance, spec_point, left_split, right_split)) {
 			split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		}
-		else if (std::real(sing_point) >= (left_split - config.tolerance) && std::real(sing_point) <= (right_split + config.tolerance) && std::abs(std::imag(sing_point)) <= std::numeric_limits<double>::epsilon()) {
+		else if (math_utils::is_singularity_in_layer(config.tolerance, sing_point, left_split, right_split)) {
 			split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		} 
 		else
