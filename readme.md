@@ -59,6 +59,10 @@ Benchmarking: to be decided
 
 Speedup: Intel-Threading-Building-Blocks, OpenCl, Cuda(?)
 
+### Speedup 
+
+I will use OneTBB (Intel threading building blocks) and try to use OpenCl
+
 ### Requirements
 
 1. The code should run faster than the Matlab implementation
@@ -70,7 +74,7 @@ Speedup: Intel-Threading-Building-Blocks, OpenCl, Cuda(?)
 
 ## Considerations for perfomance 
 
-Compile-time evaluation of Gauß-Laguerre stuff.
+Compile-time evaluation of Gauß-Laguerre stuff. => pretty hard and no critical path
 
 ### Running Matlab on Gitlab
 
@@ -103,8 +107,7 @@ https://stackoverflow.com/questions/37296481/integration-with-quadrature-and-mul
 
 ## Useful links 
 
-<<<<<<< Updated upstream
-=======
+
 Gaussian quardarature explained:
 https://www.youtube.com/watch?v=w2xjlPwYock
 
@@ -115,7 +118,6 @@ https://stackoverflow.com/questions/18009056/why-does-matlab-octave-wipe-the-flo
 About eigenvalue decomposition (german):
 http://www.peter-junglas.de/fh/vorlesungen/numa/html/kap6.html
 
->>>>>>> Stashed changes
 Running GNU Octave on Gitlab:
 https://gitlab.com/mtmiller/octave-snapshot
 
