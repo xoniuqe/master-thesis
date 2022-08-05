@@ -31,6 +31,7 @@ add_subdirectory(src)
 # Schließen Sie Unterprojekte ein.
 add_subdirectory ("SteepestDescent")
 
+add_subdirectory(benchmark)
 
 # Testing only available if this is the main app
 # Emergency override MODERN_CMAKE_BUILD_TESTING provided as well
