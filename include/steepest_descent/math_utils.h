@@ -57,18 +57,18 @@ namespace math_utils {
 	/// <param name="b"></param>
 	/// <param name="r"></param>
 	/// <returns></returns>
-	auto calculate_P_x(const double x, const double y, const datatypes::matrix& A, const  arma::vec3& b, const arma::vec3& r) -> double;
-
-	/*template<typename T>
-	auto calculate_P_x(const T x, const double y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r) -> auto {
-		//arma::vec X{ x, y };
-		arma::vec result = A * { x , y } + b - r;
-		return result.at(0) + result.at(1) + result.at(2);
-	}*/
-	auto calculate_P_x(const std::complex<double> x, const double y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r)->std::complex<double>;
-
-	auto calculate_P_x(const std::complex<double> x, const std::complex<double> y, const datatypes::matrix& A, const arma::vec3& b, const  arma::vec3& r)->std::complex<double>;
-
+	template<typename T1, typename T2>
+	auto calculate_P_x(const T1 x, const T2 y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r)->auto {
+		auto calculate_row = [&](const size_t i) {
+			auto first_val = A.at(i, 0);
+			auto second_val = A.at(i, 1);
+			auto b_element = b.at(i);
+			auto r_element = r.at(i);
+			auto tmp = ((first_val * x + second_val * y + b_element - r_element));
+			return tmp * tmp;
+		};
+		return calculate_row(0) + calculate_row(1) + calculate_row(2);
+	}
 	/// <summary>
 	/// Calculates the partial derivative in x direction.
 	/// </summary>
@@ -78,9 +78,18 @@ namespace math_utils {
 	/// <param name="b">Affine transformation Ax + b </param>
 	/// <param name="r">View vector </param>
 	/// <returns>The partial derivative in x direction </returns>
-	auto partial_derivative_P_x(const double x, const double y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r)->double;
-	auto partial_derivative_P_x(const double x, const std::complex<double> y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r)->std::complex<double>;
-
+	template<typename Tnumeric>
+	auto partial_derivative_P_x(const double x, const Tnumeric y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r)->auto
+	{
+		auto calculate_row = [&](const size_t i) {
+			auto first_val = A.at(i, 0);
+			auto second_val = A.at(i, 1);
+			auto b_element = b.at(i);
+			auto r_element = r.at(i);
+			return first_val * 2 * (first_val * x + second_val * y + b_element - r_element);
+		};
+		return calculate_row(0) + calculate_row(1) + calculate_row(2);
+	}
 
 	auto get_complex_roots(const std::complex<double> y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r)->std::tuple<std::complex<double>, double>;
 
