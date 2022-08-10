@@ -104,7 +104,7 @@ auto integral_test_2d() {
 	arma::vec mu{ 1,-0.5, -0.5 };
 	auto k = 10;
 	config::configuration_2d config;
-	config.wavenumber_k = 100;
+	config.wavenumber_k = 10;
 	config.tolerance = 0.1;
 	config.y_resolution = 0.1;
 	config.gauss_laguerre_nodes = 30;
