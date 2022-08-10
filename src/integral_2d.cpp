@@ -85,7 +85,13 @@ namespace integral {
 			auto integration_y = get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
 			auto integration_1_minus_y = get_partial_integral(A2, b,r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
 
+#ifdef USE_PATH_GEN
+			auto path_generator = path_utils::get_weighted_path_generator_2d(u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
+			steepest_descent::steepest_descend_2d_path steepest_desc(path_generator, nodes, weights);
+#else
 			steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, config.wavenumber_k, u, A, b, r, q, s, { c, c_0 }, sing_point);
+#endif
+
 			std::tuple<std::complex<double>, std::complex<double>> split_points;
 
 			if (!is_spec && !is_sing) {
@@ -103,7 +109,7 @@ namespace integral {
 
 				split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
 			}
-			auto [split_point1, split_point2] = split_points;
+			auto& [split_point1, split_point2] = split_points;
 
 			//singularity
 			/* %Since there is a singularity on the horizontal layer, compute 4 integrals from 0 to infty along the paths at different
@@ -155,7 +161,12 @@ namespace integral {
 		if (std::abs(std::imag(spec_point) < std::abs(std::imag(c)))) {
 			spec_point = std::real(spec_point);
 		}
+#ifdef USE_PATH_GEN
+		auto path_generator = path_utils::get_weighted_path_generator_y(sPx, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
+		steepest_descent::steepest_descend_2d_path steepest_desc(path_generator, nodes, weights);
+#else
 		steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_y, nodes, weights, config.wavenumber_k, sPx, A, b, r, q, s, { c, c_0 }, sing_point);
+#endif
 
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
 		if (math_utils::is_singularity_in_layer(config.tolerance, spec_point, left_split, right_split)) {
@@ -173,8 +184,9 @@ namespace integral {
 
 		}
 
-		auto [sp1, sp2] = split_points;
+		auto& [sp1, sp2] = split_points;
 
+		//this is done in decide_split_points!
 		if (std::real(sp1) < left_split) {
 			sp1 = left_split;
 		}
@@ -183,7 +195,6 @@ namespace integral {
 			sp2 = right_split;
 		}
 		// -> optimization: if either of these checks is true the according integral will be zero
-
 		auto I1 = steepest_desc(left_split) - steepest_desc(sp1);
 
 		auto I2 = steepest_desc(sp2) - steepest_desc(right_split);
