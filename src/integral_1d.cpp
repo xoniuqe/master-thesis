@@ -22,11 +22,13 @@ namespace integral {
 	}
 
 
+	auto integral_1d::operator()(const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const arma::vec3& mu, const double y, const double left_split, const double right_split) const -> std::complex<double> {
+		return integral_1d::operator()(A, b, r, arma::dot(A.col(0), mu), arma::dot(A.col(1), mu) * y + arma::dot(mu, b), std::move(y), std::move(left_split), std::move(right_split));
+	}
 
-	auto integral_1d::operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& mu, const double y, const double left_split, const double right_split) const -> std::complex<double> {
-		auto q = arma::dot(A.col(0), mu);
-		auto s = arma::dot(A.col(1), mu) * y + arma::dot(mu, b);
-		auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
+
+	auto integral_1d::operator()(const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const double q, const double s, const double y, const double left_split, const double right_split) const -> std::complex<double> {
+		auto [c, c_0] = math_utils::get_complex_roots(y, A, b, r);
 
 		auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
 		auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
