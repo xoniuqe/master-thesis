@@ -71,7 +71,13 @@ namespace gauss_laguerre {
 		return std::inner_product(weights.begin(), weights.end(), eval_points.begin(), 0. + 0.i);
 	}
 
+
 	auto calculate_integral_cauchy(const path_utils::path_function first_path, const path_utils::path_function second_path, std::vector<double> nodes, std::vector<double> weights)->std::complex<double> {
+#ifdef USE_TR
+		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), 0. + 0.i, std::plus<std::complex<double>>(), [&](const auto left, const auto right) -> auto {
+			return right * (first_path(left) - second_path(left));
+			});
+#else
 		std::vector<std::complex<double>> eval_points1, eval_points2, eval_points_summed;
 		std::transform(nodes.begin(), nodes.end(), std::back_inserter(eval_points1), first_path);
 		std::transform(nodes.begin(), nodes.end(), std::back_inserter(eval_points2), second_path);
@@ -79,5 +85,6 @@ namespace gauss_laguerre {
 			return left - right;
 			});
 		return std::inner_product(weights.begin(), weights.end(), eval_points_summed.begin(), 0. + 0.i);
+#endif
 	}
 }
