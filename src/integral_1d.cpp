@@ -54,7 +54,7 @@ namespace integral {
 
 		}
 
-		auto [sp1, sp2] = split_points;
+		auto& [sp1, sp2] = split_points;
 
 
 		auto I1 = steepest_desc(left_split, sp1);
