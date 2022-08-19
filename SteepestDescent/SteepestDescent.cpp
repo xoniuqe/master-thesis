@@ -118,6 +118,73 @@ auto integral_test_2d() {
 }
 
 
+auto integral_test_2d_multiple() {
+	arma::mat  A{ {0, 0}, {2, 0}, {0, 2} };
+
+	arma::vec b{ 0,-0.5,0 };
+
+	arma::vec r{ 1, 0, 0 };
+
+	arma::vec mu{ 1,0, 0 };
+
+	std::vector<double> alphas;
+	for (auto i = -0.5; i < 0.5; i += 0.05) {
+		alphas.push_back(i);
+	}
+	std::vector<double> rad_list;
+	for (auto i = 0.2; i < 3.8; i += 0.4) {
+		rad_list.push_back(i);
+	}
+
+	config::configuration_2d config;
+	config.wavenumber_k = 500;
+	config.tolerance = 0.1;
+	config.y_resolution = 0.0001;
+	config.gauss_laguerre_nodes = 1000;
+
+	integrator::gsl_integrator gslintegrator;
+	integrator::gsl_integrator_2d gsl_integrator_2d;
+	integral::integral_2d integral2d(config, &gslintegrator, &gsl_integrator_2d);
+
+	/*alpha = 2 * pi * alpha_list(a);
+	rad = rad_list(rr);
+
+	rot_mat = [cos(alpha), -sin(alpha), 0; sin(alpha), cos(alpha), 0; 0, 0, 1];
+	r = rad * rot_mat * r_0; % +[0; 0.5; 0];*/
+
+	std::vector<std::complex<double>> results(alphas.capacity() * rad_list.capacity());
+	std::vector<double> timings(alphas.capacity() * rad_list.capacity());
+
+	std::vector<arma::vec3> r_values(alphas.capacity() * rad_list.capacity());
+	std::chrono::steady_clock::time_point begin_init = std::chrono::steady_clock::now();
+	auto i = 0;
+	for (auto& rad : rad_list) {
+		for (auto& alpha : alphas) {
+			arma::mat rotation = { { cos(alpha), -sin(alpha), 0}, {sin(alpha), cos(alpha), 0}, {0, 0, 1 } };
+			arma::vec3 tmp_r = (rad * rotation * r);
+			r_values.push_back(tmp_r);
+			i++;
+		}
+	}
+	std::chrono::steady_clock::time_point end_init = std::chrono::steady_clock::now();
+	std::cout << "number of r_values: " << i << std::endl;
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end_init - begin_init).count() << "[ms]" << std::endl; 
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	for (auto& tmp_r : r_values) {
+		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+		auto result = integral2d(A, b, tmp_r, mu);
+		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+
+		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+		results.push_back(result);
+		timings.push_back(time);
+	}
+	auto average_time = std::accumulate(timings.begin(), timings.end(), 0.0) / timings.size();
+	std::cout << "Time difference (average) = " << average_time << "[ms]" << std::endl;
+
+}
+
 
 int main()
 {
@@ -163,13 +230,14 @@ int main()
 	integrator::gsl_integrator_2d gsl_integrator_2d;
 	auto x = gsl_integrator_2d(green_fun_2d, 0, 1., 0, 0.1);
 	std::cout << x << std::endl;*/
-	integral_test_1d();
+	/*integral_test_1d();
 
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	integral_test_2d();
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;*/
+	integral_test_2d_multiple();
 	return 0;
 }
 
