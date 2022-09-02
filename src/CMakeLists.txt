@@ -46,6 +46,7 @@ find_package(TBB REQUIRED)
 add_compile_definitions(HAVE_INLINE)
 add_compile_definitions(GSL_DISABLE_DEPRECATED)
 
+set_property(TARGET SteepestDescentLib PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 
 # We need this directory, and users of our library will need it too
 target_include_directories(SteepestDescentLib PUBLIC ../include)
