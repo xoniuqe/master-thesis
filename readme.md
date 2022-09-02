@@ -7,7 +7,8 @@ needs to be updated!
 * clone the repo
 * cd vcpkg
 * bootstrap-vcpkg.bat
-* vcpkg install gsl gsl:x64-windows
+* vcpkg install gsl gsl:x64-windows 
+ (add eigen3)
 (todo: vcpkg install @ResponseFile)
 * vcpkg integrate install
 
@@ -16,6 +17,15 @@ needs to be updated!
 on windows:
  * install intel mkl
  *
+
+#TODO
+
+* impl 2d:
+ - steepest descen in 2d and for Y axis, is slightly different than the 1d case
+* refactor the integral parameters (1d => nodes and weights are calculatet in the operator() => this could be simply passed via the constructor)
+* write benchmarks
+* write python api
+* write more tests
 
 ## Thoughts
 
@@ -46,6 +56,26 @@ In essence it calculates f(h(x)) for us, with x = [a,b].
 
 
 ## Implementation details
+
+### Representation of the general inputs
+
+Input Variable | Fields | Methods
+---------------|--------|--------
+to be named | A, b, r |  
+
+
+method | input | result | used_methods
+get_complex_roots | y, A, b, r | complex_root: {c_0, c}| calculate_P_x
+calculate_P_x | x, y, A, b, r | double | -
+get_complex_path | split_point, y(=), A(=), b(=), r(=), q, complex_root, sing_point(!) | path + derived path: {path_function, path_function} |calculate_P_x
+get_weighted_path | split_point, y(=), A(=), b(=), r(=), q, k, s, complex_root(=), sing_point(=) | weighted path: path_function | get_complex_path, calculate_P_x
+get_weighted_path_1d | split_point, q, k, s, function_Px, path, derivative | weighted path : path_function | (calculate_P_x via function pointer function_Px) 
+integral_1d | A, b, r, mu, y, left_split, right_split | integral | gauss_laguerre::calculate_laguerre_points_and_weights, math_utils::get_complex_roots 
+steepest_desc (constr) | nodes(=), weights(=), k(=), y(=), A(=), b(=), r(=), q(=), s(=), complex_root, sing_point | steepest_desc | -
+steepest_desc.operator() | first_split, second_split | integral | path_utils::get_weightet_path, gauss_laguerre::calculate_integral_cauchy
+Legend:
+ * (=): Just passed through
+ * (!): Just control flow
 
 ### Used technologies
 

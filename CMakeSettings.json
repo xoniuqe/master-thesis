@@ -13,6 +13,11 @@
           "name": "CMAKE_TOOLCHAIN_FILE",
           "value": "${projectDir}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake",
           "type": "STRING"
+        },
+        {
+          "name": "TBB_TEST",
+          "value": "False",
+          "type": "BOOL"
         }
       ]
     },
@@ -27,7 +32,14 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
-      "wslPath": "${defaultWSLPath}"
+      "wslPath": "${defaultWSLPath}",
+      "variables": [
+        {
+          "name": "TBB_TEST",
+          "value": "False",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "WSL-GCC-Release",
@@ -40,7 +52,14 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
-      "wslPath": "${defaultWSLPath}"
+      "wslPath": "${defaultWSLPath}",
+      "variables": [
+        {
+          "name": "TBB_TEST",
+          "value": "False",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "x64-Release",
@@ -51,8 +70,7 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": []
+      "inheritEnvironments": [ "msvc_x64_x64" ]
     }
   ]
 }

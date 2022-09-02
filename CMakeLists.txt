@@ -10,13 +10,6 @@ project(
 
 set (CMAKE_CXX_STANDARD 20)
 
-include(FetchContent)
-
-FetchContent_Declare(
-  tbb
-  GIT_REPOSITORY https://github.com/oneapi-src/oneTBB.git)
-
-FetchContent_MakeAvailable(tbb)
 
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
@@ -31,8 +24,11 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
 
 endif()
-
+add_subdirectory(extern/oneTBB)
+add_subdirectory(extern/pybind)
 add_subdirectory(src)
+
+add_subdirectory(api)
 
 
 # Schließen Sie Unterprojekte ein.
