@@ -15,6 +15,8 @@
 
 #include <type_traits>
 
+#include <numeric>
+
 using namespace std::complex_literals;
 
 
@@ -106,7 +108,7 @@ auto integral_test_2d() {
 	config::configuration_2d config;
 	config.wavenumber_k = 10;
 	config.tolerance = 0.1;
-	config.y_resolution = 0.1;
+	config.y_resolution = 0.0001;
 	config.gauss_laguerre_nodes = 30;
 
 	integrator::gsl_integrator gslintegrator;	
@@ -230,14 +232,17 @@ int main()
 	integrator::gsl_integrator_2d gsl_integrator_2d;
 	auto x = gsl_integrator_2d(green_fun_2d, 0, 1., 0, 0.1);
 	std::cout << x << std::endl;*/
-	/*integral_test_1d();
+	//integral_test_1d();
 
-	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-	integral_test_2d();
-	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	for (auto i = 0; i < (rand() % 40); i++) {
+		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+		integral_test_2d();
+		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;*/
-	integral_test_2d_multiple();
+		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+	}
+
+	//integral_test_2d_multiple();
 	return 0;
 }
 
