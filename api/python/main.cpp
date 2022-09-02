@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <steepest_descent/integrator.h>
-#include <steepest_descent/integral.h>
+#include <steepest_descent/integral_1d.h>
 
 
 //#include <complex>
