@@ -14,7 +14,8 @@ set(HEADER_LIST "${PROJECT_SOURCE_DIR}/include/steepest_descent/datatypes.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral_1d.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral_2d.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/steepest_descent.h" 
-				"${PROJECT_SOURCE_DIR}/include/steepest_descent/configuration.h")
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/configuration.h"
+				"${PROJECT_SOURCE_DIR}/include/steepest_descent/api.h")
 
 # Make an automatic library - will be static or dynamic based on user setting
 
@@ -29,17 +30,20 @@ add_compile_definitions(GSL_DISABLE_DEPRECATED)
 
 # We need this directory, and users of our library will need it too
 target_include_directories(SteepestDescentLib PUBLIC ../include)
+
 IF(WIN32)
 message("test ${ARMADILLO_LIBRARIES}")
 set(BLA_STATIC true)
+set(TBB_TEST off)
+
 find_package(OpenBLAS)
 find_package(LAPACK)
 find_package(Armadillo REQUIRED)
 message("test ${ARMADILLO_LIBRARIES}")
-target_link_libraries(SteepestDescentLib PRIVATE GSL::gsl LAPACK::LAPACK OpenBLAS::OpenBLAS ${ARMADILLO_LIBRARIES})
+target_link_libraries(SteepestDescentLib PRIVATE GSL::gsl LAPACK::LAPACK OpenBLAS::OpenBLAS ${ARMADILLO_LIBRARIES} TBB::tbb)
 ELSE()
 # This depends on (header only) boost
-target_link_libraries(SteepestDescentLib PRIVATE GSL::gsl ${ARMADILLO_LIBRARIES})
+target_link_libraries(SteepestDescentLib PRIVATE GSL::gsl ${ARMADILLO_LIBRARIES} TBB::tbb)
 ENDIF()
 
 #target_compile_options(SteepestDescentLib PRIVATE -pedantic -Wall -Wextra -Wconversion)

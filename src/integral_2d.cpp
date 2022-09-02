@@ -9,7 +9,9 @@
 #include <armadillo>
 #include <cmath>
 #include <complex>
-
+#include <mutex>
+#include <oneapi/tbb/parallel_reduce.h>
+#include <oneapi/tbb/blocked_range.h>
 
 #ifdef _WIN32
 //#include <corecrt_math_defines.h>
@@ -22,6 +24,7 @@ namespace integral {
 		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(config.gauss_laguerre_nodes);
 		this->nodes = n;
 		this->weights = w;
+
 	}
 
 
@@ -63,88 +66,118 @@ namespace integral {
 			auto res = std::exp(1.i * k * (sqrtPx + qx * x + qy * y + prod)) * (1. / sqrtPx);
 			return res;
 		};
-
+		//std::mutex write_mutex;
 		auto integration_result = 0. + 0.i;
+		int number_of_steps = 1. / config.y_resolution;
+		static bool init = true;
+		static int steppings = -1;
+		static 	std::vector<double> steps(number_of_steps);
 
-		for (auto y = 0.; y < 1. - config.y_resolution; y += config.y_resolution) {
-			auto u = y + config.y_resolution * 0.5;
-			auto [c, c_0] = math_utils::get_complex_roots(u, A, b, r);
-			auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
-			auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
-
-			auto s = arma::dot(A.col(0), mu) * u + prod;
-
-			auto is_spec = math_utils::is_singularity_in_layer(config.tolerance, spec_point, 0, 1 - u);
-			auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, 0, 1 - u);
-
-
-
-			//intY = GetPartialInt(0, A1, b, r, q1, k, sx1, c1, c_01, y, y + resY, string1, singPoint1, lagPoints);% Compute the integral along the considered section of the vertical y layer.
-			//	int1minusY = GetPartialInt(1, A2, b2, r, q2, k, sx2, c2, c_02, y, y + resY, string2, singPoint2, lagPoints);% Compute the integral along the considered section of the slope.
-
-			auto integration_y = get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
-			auto integration_1_minus_y = get_partial_integral(A2, b,r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
-
-#ifdef USE_PATH_GEN
-			auto path_generator = path_utils::get_weighted_path_generator_2d(u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
-			steepest_descent::steepest_descend_2d_path steepest_desc(path_generator, nodes, weights);
-#else
-			steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, config.wavenumber_k, u, A, b, r, q, s, { c, c_0 }, sing_point);
-#endif
-
-			std::tuple<std::complex<double>, std::complex<double>> split_points;
-
-			if (!is_spec && !is_sing) {
-				// no singularity
-				auto Iin = steepest_desc(0);
-				auto IfIn = steepest_desc(1 - u);
-				integration_result += Iin * integration_y - IfIn * integration_1_minus_y;
-				continue;
-			}
-			else if (is_spec) {
-				split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
-			}
-			else if (is_sing) {
-				//split pt1 ist falsch? => gnu octave impl ist falsch!
-
-				split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
-			}
-			auto& [split_point1, split_point2] = split_points;
-
-			//singularity
-			/* %Since there is a singularity on the horizontal layer, compute 4 integrals from 0 to infty along the paths at different
-            %starting points: 0, splitPt1, splitPt2 and 1-u on the horizontal layer.*/
-
-			auto Iin1 = steepest_desc(0);
-			auto Ifin1 = steepest_desc(split_point1);
-			auto Iin2 = steepest_desc(split_point2);
-			auto Ifin2 = steepest_desc(1 - u);
-
-			/*%We need to avoid an 'integration box' around the considered
-            %singularity. Hence we define 2 new vertical layers on which we
-            %have to test for new singularities.
-			*/
-			//Vertical layer at splitPt1.
-
-			auto sx_intern_1 = arma::dot(A1.col(1), mu) * split_point1 + prod;
-			auto [cIntern1, c_0Intern1] = math_utils::get_complex_roots(split_point1, A1, b, r);
-
-			//Vertical layer at splitPt2.
-			auto sx_intern_2 = arma::dot(A1.col(1), mu) * split_point2 + prod;
-			auto [cIntern2, c_0Intern2] = math_utils::get_complex_roots(split_point2, A1, b, r);
+		if (init || number_of_steps != steppings) {
+			steppings = number_of_steps;
+			auto y_res = config.y_resolution;
+			auto start = -y_res;
+			std::generate(steps.begin(), steps.end(), [&start, y_res = y_res]() {
+				start += y_res;
+				return start;
+				});
+			init = false;
+		}
 	
 
-			// Integration over these two segments.
-			auto intYintern1 = get_partial_integral(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + config.y_resolution);
-			auto intYintern2 = get_partial_integral(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 
-			/*% Final formula for the integral(considering each layer) in case of singularity on the
-			% layer.*/
 
-			auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
-			integration_result += Iin1 * integration_y - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * integration_1_minus_y;
-		
-		}
+		integration_result = tbb::parallel_reduce(tbb::blocked_range(0, number_of_steps), 0. + 0.i, [&](tbb::blocked_range<int> range, std::complex<double> integral) {
+			for (int i = range.begin(); i < range.end(); ++i)
+			{
+				auto y = steps[i];
+				auto u = y + config.y_resolution * 0.5;
+				auto [c, c_0] = math_utils::get_complex_roots(u, A, b, r);
+				auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
+				auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
+
+				auto s = arma::dot(A.col(0), mu) * u + prod;
+
+				auto is_spec = math_utils::is_singularity_in_layer(config.tolerance, spec_point, 0, 1 - u);
+				auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, 0, 1 - u);
+
+
+
+				//intY = GetPartialInt(0, A1, b, r, q1, k, sx1, c1, c_01, y, y + resY, string1, singPoint1, lagPoints);% Compute the integral along the considered section of the vertical y layer.
+				//	int1minusY = GetPartialInt(1, A2, b2, r, q2, k, sx2, c2, c_02, y, y + resY, string2, singPoint2, lagPoints);% Compute the integral along the considered section of the slope.
+
+				auto integration_y = get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
+				auto integration_1_minus_y = get_partial_integral(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
+
+#ifdef USE_PATH_GEN
+				auto path_generator = path_utils::get_weighted_path_generator_2d(u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
+				steepest_descent::steepest_descend_2d_path steepest_desc(path_generator, nodes, weights);
+#else
+				steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, config.wavenumber_k, u, A, b, r, q, s, { c, c_0 }, sing_point);
+#endif
+
+				std::tuple<std::complex<double>, std::complex<double>> split_points;
+
+				if (!is_spec && !is_sing) {
+					// no singularity
+					auto Iin = steepest_desc(0);
+					auto IfIn = steepest_desc(1 - u);
+					//std::lock_guard<std::mutex> guard(write_mutex);
+					integral += Iin * integration_y - IfIn * integration_1_minus_y;
+					continue;
+				}
+				else if (is_spec) {
+					split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
+				}
+				else if (is_sing) {
+					//split pt1 ist falsch? => gnu octave impl ist falsch!
+
+					split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
+				}
+				auto& [split_point1, split_point2] = split_points;
+
+				//singularity
+				/* %Since there is a singularity on the horizontal layer, compute 4 integrals from 0 to infty along the paths at different
+				%starting points: 0, splitPt1, splitPt2 and 1-u on the horizontal layer.*/
+
+				auto Iin1 = steepest_desc(0);
+				auto Ifin1 = steepest_desc(split_point1);
+				auto Iin2 = steepest_desc(split_point2);
+				auto Ifin2 = steepest_desc(1 - u);
+
+				/*%We need to avoid an 'integration box' around the considered
+				%singularity. Hence we define 2 new vertical layers on which we
+				%have to test for new singularities.
+				*/
+				//Vertical layer at splitPt1.
+
+				auto sx_intern_1 = arma::dot(A1.col(1), mu) * split_point1 + prod;
+				auto [cIntern1, c_0Intern1] = math_utils::get_complex_roots(split_point1, A1, b, r);
+
+				//Vertical layer at splitPt2.
+				auto sx_intern_2 = arma::dot(A1.col(1), mu) * split_point2 + prod;
+				auto [cIntern2, c_0Intern2] = math_utils::get_complex_roots(split_point2, A1, b, r);
+
+
+				// Integration over these two segments.
+				auto intYintern1 = get_partial_integral(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + config.y_resolution);
+				auto intYintern2 = get_partial_integral(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + config.y_resolution);
+
+				/*% Final formula for the integral(considering each layer) in case of singularity on the
+				% layer.*/
+
+				auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
+
+				//std::lock_guard<std::mutex> guard(write_mutex);
+				auto integration_result = Iin1 * integration_y - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * integration_1_minus_y;
+				integral += integration_result;
+			}
+			return integral;
+			}, std::plus<std::complex<double>>());
+		/*for (auto y = 0.; y < 1.; y += config.y_resolution) {
+
+	
+		}*/
 
 		return integration_result;
 	}
