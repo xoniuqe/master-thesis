@@ -45,8 +45,8 @@ build:
      - export PATH=$HOME/.local/bin:$PATH
 
     script:
-     - cmake -S . -B build
-     - cmake --build build -v
+     - cmake -S . -B build -DTBB_TEST=FALSE
+     - cmake --build build -v 
 
     artifacts:
       paths:
