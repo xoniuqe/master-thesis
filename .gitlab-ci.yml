@@ -67,7 +67,7 @@ test:
      - export PATH=$HOME/.local/bin:$PATH
 
     script:
-    - cmake -S . -B build_test
+    - cmake -S . -B build_test -DTBB_TEST=FALSE
     - cmake --build build_test -v
     - cmake --build build_test -t test
 
