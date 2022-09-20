@@ -12,12 +12,22 @@ needs to be updated!
 (todo: vcpkg install @ResponseFile)
 * vcpkg integrate install
 
+"D:/Master/SteepestDescent/vcpkg\vcpkg.exe" install TBB:x64-windows
+"D:/Master/SteepestDescent/vcpkg\vcpkg.exe" install Eigen3:x64-windows
+windows braucht wohl noch tbb wenn ich -DCMAKE_TOOLCHAIN_FILE=D:/Master/SteepestDescent/vcpkg/scripts/buildsystems/vcpkg.cmake nutze
+DCMAKE_TOOLCHAIN_FILE=$(SolutionDir)/vcpkg/scripts/buildsystems/vcpkg.cmake
+
 (armadillo)
 * clone the repo
 on windows:
  * install intel mkl
  *
 
+ 19.09.22
+
+ install onetbb seems to fix building on windows!
+
+ https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#onetbb
 #TODO
 
 * impl 2d:
