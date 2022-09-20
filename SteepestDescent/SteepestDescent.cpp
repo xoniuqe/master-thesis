@@ -9,7 +9,6 @@
 #include <armadillo>
 #include <steepest_descent/path_utils.h>
 #include <steepest_descent/math_utils.h>
-#include <steepest_descent/integrator.h>
 #include <steepest_descent/integral_1d.h>
 #include <steepest_descent/integral_2d.h>
 

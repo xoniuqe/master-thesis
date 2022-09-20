@@ -2,7 +2,6 @@
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
 
-#include <steepest_descent/integrator.h>
 #include <steepest_descent/integral_1d.h>
 #include <steepest_descent/gauss_laguerre.h>
 
