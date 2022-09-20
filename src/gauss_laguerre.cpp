@@ -5,7 +5,7 @@
 #include <armadillo>
 #include <numeric>
 #include <algorithm> 
-
+//slower: #define USE_TR
 using namespace std::literals::complex_literals;
 
 namespace gauss_laguerre {
@@ -75,7 +75,8 @@ namespace gauss_laguerre {
 	auto calculate_integral_cauchy(const path_utils::path_function first_path, const path_utils::path_function second_path, std::vector<double> nodes, std::vector<double> weights)->std::complex<double> {
 #ifdef USE_TR
 		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), 0. + 0.i, std::plus<std::complex<double>>(), [&](const auto left, const auto right) -> auto {
-			return right * (first_path(left) - second_path(left));
+			//slower: return right * (first_path(left) - second_path(left));
+			return (right * first_path(left) - right * second_path(left));
 			});
 #else
 		std::vector<std::complex<double>> eval_points1, eval_points2, eval_points_summed;
