@@ -29,9 +29,14 @@ namespace api {
 					for (int i = range.begin(); i < range.end(); ++i)
 					{
 						integral += integral2d(triangle.A, triangle.b, observation_points[i], direction);
-					}					);
+					});
 			});
 		return integration_result;
+
+	}
+
+	auto calculate_integral_2dconst config::configuration_2d& config, const std::vector<triangle> triangles, const arma::vec3 observation_point, const arma::vec3 direction)->std::complex<double> {
+			
 
 	}
 }
