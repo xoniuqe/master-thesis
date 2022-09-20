@@ -9,11 +9,7 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "ctestCommandArgs": "",
       "variables": [
-        {
-          "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "${projectDir}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake",
-          "type": "STRING"
-        },
+
         {
           "name": "TBB_TEST",
           "value": "False",
@@ -70,7 +66,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ]
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": [
+        {
+          "name": "TBB_TEST",
+          "value": "False",
+          "type": "BOOL"
+        }
+      ]
     }
   ]
 }
