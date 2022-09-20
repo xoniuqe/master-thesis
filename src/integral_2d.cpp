@@ -10,8 +10,13 @@
 #include <cmath>
 #include <complex>
 #include <mutex>
+#ifdef _WIN32
+#include <tbb/parallel_reduce.h>
+#include <tbb/blocked_range.h>
+#else
 #include <oneapi/tbb/parallel_reduce.h>
 #include <oneapi/tbb/blocked_range.h>
+#endif
 
 #ifdef _WIN32
 //#include <corecrt_math_defines.h>
@@ -24,6 +29,17 @@ namespace integral {
 		auto [n, w] = gauss_laguerre::calculate_laguerre_points_and_weights(config.gauss_laguerre_nodes);
 		this->nodes = n;
 		this->weights = w;
+
+	}
+
+	integral_2d::integral_2d(const config::configuration_2d config, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d, const std::vector<double> nodes, const std::vector<double> weights) : 
+		config(config), 
+		integrator(integrator), 
+		integrator_2d(integrator_2d),
+		nodes(nodes),
+		weights(weights)
+	{
+
 
 	}
 
@@ -69,20 +85,6 @@ namespace integral {
 		//std::mutex write_mutex;
 		auto integration_result = 0. + 0.i;
 		int number_of_steps = 1. / config.y_resolution;
-		static bool init = true;
-		static int steppings = -1;
-		static 	std::vector<double> steps(number_of_steps);
-
-		if (init || number_of_steps != steppings) {
-			steppings = number_of_steps;
-			auto y_res = config.y_resolution;
-			auto start = -y_res;
-			std::generate(steps.begin(), steps.end(), [&start, y_res = y_res]() {
-				start += y_res;
-				return start;
-				});
-			init = false;
-		}
 	
 
 
@@ -90,7 +92,7 @@ namespace integral {
 		integration_result = tbb::parallel_reduce(tbb::blocked_range(0, number_of_steps), 0. + 0.i, [&](tbb::blocked_range<int> range, std::complex<double> integral) {
 			for (int i = range.begin(); i < range.end(); ++i)
 			{
-				auto y = steps[i];
+				auto y = config.y_resolution * (double)i;// steps[i];
 				auto u = y + config.y_resolution * 0.5;
 				auto [c, c_0] = math_utils::get_complex_roots(u, A, b, r);
 				auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
@@ -100,11 +102,6 @@ namespace integral {
 
 				auto is_spec = math_utils::is_singularity_in_layer(config.tolerance, spec_point, 0, 1 - u);
 				auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, 0, 1 - u);
-
-
-
-				//intY = GetPartialInt(0, A1, b, r, q1, k, sx1, c1, c_01, y, y + resY, string1, singPoint1, lagPoints);% Compute the integral along the considered section of the vertical y layer.
-				//	int1minusY = GetPartialInt(1, A2, b2, r, q2, k, sx2, c2, c_02, y, y + resY, string2, singPoint2, lagPoints);% Compute the integral along the considered section of the slope.
 
 				auto integration_y = get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
 				auto integration_1_minus_y = get_partial_integral(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
@@ -122,7 +119,6 @@ namespace integral {
 					// no singularity
 					auto Iin = steepest_desc(0);
 					auto IfIn = steepest_desc(1 - u);
-					//std::lock_guard<std::mutex> guard(write_mutex);
 					integral += Iin * integration_y - IfIn * integration_1_minus_y;
 					continue;
 				}
@@ -145,10 +141,6 @@ namespace integral {
 				auto Iin2 = steepest_desc(split_point2);
 				auto Ifin2 = steepest_desc(1 - u);
 
-				/*%We need to avoid an 'integration box' around the considered
-				%singularity. Hence we define 2 new vertical layers on which we
-				%have to test for new singularities.
-				*/
 				//Vertical layer at splitPt1.
 
 				auto sx_intern_1 = arma::dot(A1.col(1), mu) * split_point1 + prod;
@@ -168,7 +160,6 @@ namespace integral {
 
 				auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
 
-				//std::lock_guard<std::mutex> guard(write_mutex);
 				auto integration_result = Iin1 * integration_y - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * integration_1_minus_y;
 				integral += integration_result;
 			}
