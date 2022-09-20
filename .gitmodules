@@ -6,7 +6,7 @@
 	path = extern/armadillo
 	url = https://gitlab.com/conradsnicta/armadillo-code
 [submodule "extern/pybind"]
-	path = extern/pybind
+	path = api/python/extern/pybind
 	url = https://github.com/pybind/pybind11
 [submodule "extern/oneTBB"]
 	path = extern/oneTBB
