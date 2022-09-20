@@ -11,3 +11,6 @@
 [submodule "extern/oneTBB"]
 	path = extern/oneTBB
 	url = https://github.com/oneapi-src/oneTBB.git
+[submodule "benchmark/extern"]
+	path = benchmark/extern/benchmark
+	url = https://github.com/google/benchmark

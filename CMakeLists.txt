@@ -30,7 +30,7 @@ add_subdirectory(src)
 
 add_subdirectory(api)
 
-
+add_subdirectory(benchmark)
 # Schließen Sie Unterprojekte ein.
 add_subdirectory ("SteepestDescent")
 

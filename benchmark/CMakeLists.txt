@@ -1,11 +1,10 @@
 # Testing library
 Include(FetchContent)
 
-FetchContent_Declare(
-  benchmark
-  GIT_REPOSITORY https://github.com/google/benchmark.git)
+set (BENCHMARK_ENABLE_INSTALL OFF)
+set (BENCHMARK_ENABLE_TESTING OFF)
+add_subdirectory(extern/benchmark)
 
-FetchContent_MakeAvailable(benchmark)
 # Adds google benchmark
 
 find_package(Armadillo REQUIRED)
@@ -15,7 +14,7 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 
 # Tests need to be added as executables first
-add_executable(benchmarks benchmark_1d.cpp)
+add_executable(benchmarks main.cpp benchmark_1d.cpp benchmark_2d.cpp)
 target_compile_features(benchmarks PRIVATE cxx_std_17)
 
 # I'm using C++17 in the test
