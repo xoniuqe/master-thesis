@@ -1,18 +1,20 @@
 #pragma once
 
-#include "integrator.h"
+#include "integration/gsl_integrator.h"
 #include "datatypes.h"
+#include "configuration.h"
 #include <armadillo>
 namespace integral {
 
 
 	struct integral_1d {
-		integral_1d(int k, integrator::gsl_integrator* integrator, double tolerance);
-		auto operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& mu, const double y, const double left_split, const double right_split) const -> std::complex<double>;
+		integral_1d(const config::configuration config, integrator::gsl_integrator* integrator);
+		auto operator()(const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const arma::vec3& mu, const double y, const double left_split, const double right_split) const->std::complex<double>;
+		auto operator()(const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const double q, const double s, const double y, const double left_split, const double right_split) const -> std::complex<double>;
 	private:
-		double k;
+		config::configuration config;
 		integrator::gsl_integrator* integrator;
-		double tolerance;
+		std::vector<double> nodes, weights;
 
 	};
 

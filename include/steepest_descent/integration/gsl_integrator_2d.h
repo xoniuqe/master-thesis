@@ -11,6 +11,7 @@
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_sf_laguerre.h>
 #include <iostream>
+#include <mutex>
 
 
 namespace integrator {
@@ -32,6 +33,8 @@ namespace integrator {
 		template<class integrand_fun>
 		auto operator()(integrand_fun integrand, const std::complex<double> x_start, const std::complex<double> x_end, const double y_start, const double y_end) const ->std::complex<double>
 		{
+			std::lock_guard<std::mutex> guard(integration_mutex);
+
 			double result_real, result_imag;
 
 			auto f_real = make_gsl_function([&](double x) {
@@ -68,6 +71,7 @@ namespace integrator {
 			return std::complex<double>(result_real, result_imag);
 		}
 	private:
+		mutable std::mutex integration_mutex;
 		gsl_integration_cquad_workspace *workspace, *inner_workspace;
 	};
 }

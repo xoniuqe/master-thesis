@@ -10,8 +10,8 @@ namespace datatypes {
 
 
 	struct triangle {
-		matrix* A;
-		arma::vec3* b;
+		matrix A;
+		arma::vec3 b;
 	};
 
 	struct complex_root {

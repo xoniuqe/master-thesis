@@ -10,7 +10,7 @@ project(
 
 set (CMAKE_CXX_STANDARD 20)
 
-include(FetchContent)
+
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -24,10 +24,13 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
 
 endif()
+add_subdirectory(extern/oneTBB)
 
 add_subdirectory(src)
 
+add_subdirectory(api)
 
+add_subdirectory(benchmark)
 # Schließen Sie Unterprojekte ein.
 add_subdirectory ("SteepestDescent")
 
