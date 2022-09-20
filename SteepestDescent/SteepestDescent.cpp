@@ -96,7 +96,7 @@ auto integral_test_1d()
 	return;
 }
 
-auto integral_test_2d() {
+auto integral_test_2d(double resolution) {
 	arma::mat  A{ {0, 0}, {1, 0}, {1, 1 } };
 
 	arma::vec b{ 0,0,0 };
@@ -108,8 +108,8 @@ auto integral_test_2d() {
 	config::configuration_2d config;
 	config.wavenumber_k = 10;
 	config.tolerance = 0.1;
-	config.y_resolution = 0.0001;
-	config.gauss_laguerre_nodes = 30;
+	config.y_resolution = resolution;
+	config.gauss_laguerre_nodes = 1000;
 
 	integrator::gsl_integrator gslintegrator;	
 	integrator::gsl_integrator_2d gsl_integrator_2d;
@@ -117,6 +117,51 @@ auto integral_test_2d() {
 	auto res = integral2d(A, b, r, mu);
 	std::cout << "result 2d: " << res << std::endl;
 	return;
+}
+
+auto eval_2d_article(int k)
+{
+	arma::mat  A{ {0, 0}, {1, 0}, {0, 1 } };
+
+	arma::vec b{ 0,0,0 };
+
+//	arma::vec r{ 1, 0, 1 };
+
+	//arma::vec mu{ 1, 4, 0 };
+	//auto k = 10;
+	config::configuration_2d config;
+	config.wavenumber_k = 5;
+	config.tolerance = 0.1;
+	config.y_resolution = 0.1;
+	config.gauss_laguerre_nodes = 600;
+
+	integrator::gsl_integrator gslintegrator;
+	integrator::gsl_integrator_2d gsl_integrator_2d;
+	integral::integral_2d integral2d(config, &gslintegrator, &gsl_integrator_2d);
+
+	std::vector<int64_t> timings(40);
+
+	std::random_device rd;  // Will be used to obtain a seed for the random number engine
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> dist(0, 1);
+	for (auto i = 0; i < 40; i++) {
+
+		arma::vec3 r { 10. * dist(gen) + 0.5, 5. * dist(gen) - 3., 0. };
+		arma::vec3 mu{ 10. * dist(gen) + 0.5, 5. * dist(gen) - 3., 0. };
+
+
+		auto start = std::chrono::steady_clock::now();
+		auto res = integral2d(A, b, r, mu);
+		auto end = std::chrono::steady_clock::now();;
+		timings[i] = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	}
+	auto [min, max] = std::minmax_element(timings.begin(), timings.end());
+	std::cout << "highest: " << *max << "\n";
+	std::cout << "lowest: " << *min << "\n";
+
+
+	auto average = std::accumulate(timings.begin(), timings.end(), 0.) / 40.;
+	std::cout << "Timing K (" << k << ") = " << average << std::endl;
 }
 
 
@@ -182,11 +227,10 @@ auto integral_test_2d_multiple() {
 		results.push_back(result);
 		timings.push_back(time);
 	}
+
 	auto average_time = std::accumulate(timings.begin(), timings.end(), 0.0) / timings.size();
 	std::cout << "Time difference (average) = " << average_time << "[ms]" << std::endl;
-
 }
-
 
 int main()
 {
@@ -198,6 +242,16 @@ int main()
 
 	arma::vec r{ 1, -0.5, -0.5 };
 	arma::vec mu{ 1,-0.5, -0.5 };
+	auto y = 0.;
+	auto k = 100;
+	auto left_split = 0.;
+	auto right_split = 1.;
+	//integrator::integrator
+	//const std::complex<double>(const integrand_fun fun, const std::complex<double> first_split_point, const std::complex<double> second_split_point)
+	auto integrator = [](const integrator::integrand_fun fun, const std::complex<double> first_split_point, const std::complex<double> second_split_point) -> std::complex<double> {
+		return  -0.090716 + 0.259133i;
+	};
+	integral::integral_1d integral1d(k, integrator , 0.1);
 
 
 	auto k = 10.;
@@ -234,13 +288,49 @@ int main()
 	std::cout << x << std::endl;*/
 	//integral_test_1d();
 
-	for (auto i = 0; i < (rand() % 40); i++) {
+
+	/*
+	std::cout << "Resolution 0.1" << std::endl;
+	for (auto i = 0; i < 5; i++) {
 		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-		integral_test_2d();
+		integral_test_2d(0.1);
 		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
 		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
 	}
+
+	std::cout << "Resolution 0.01" << std::endl;
+	for (auto i = 0; i < 5; i++) {
+		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+		integral_test_2d(0.01);
+		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+	}
+
+	std::cout << "Resolution 0.001" << std::endl;
+	for (auto i = 0; i < 5; i++) {
+		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+		integral_test_2d(0.001);
+		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+	}
+
+	std::cout << "Resolution 0.0001" << std::endl;
+	for (auto i = 0; i < 5; i++) {
+		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+		integral_test_2d(0.0001);
+		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+	}*/
+
+	eval_2d_article(100);
+	eval_2d_article(500);
+	eval_2d_article(1000);
+	eval_2d_article(3000);
+	eval_2d_article(5000);
 
 	//integral_test_2d_multiple();
 	return 0;
