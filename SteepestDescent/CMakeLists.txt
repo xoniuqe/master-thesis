@@ -8,7 +8,9 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 # Fügen Sie der ausführbaren Datei dieses Projekts eine Quelle hinzu.
 add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h")
 
-
+#if (MSVC)
+#set_target_properties(SteepestDescent PROPERTIES LINK_FLAGS "/PROFILE")
+#endif()
 
 #target_compile_features(SteepestDescent PRIVATE cxx_std_17)
 #target_compile_options(SteepestDescent PRIVATE
