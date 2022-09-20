@@ -84,7 +84,7 @@ benchmark:
       artifacts: true
     script:
      - cd build/benchmark
-     - ./benchmark --benchmark_out_format=json --benchmark_out=benchmark.json
+     - ./benchmarks --benchmark_out_format=json --benchmark_out=benchmark.json
 
     artifacts:
       when: always
