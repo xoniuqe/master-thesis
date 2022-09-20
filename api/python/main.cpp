@@ -71,7 +71,7 @@ auto integrate2d(const MatrixD A) -> auto {
 PYBIND11_MODULE(stedepy, m) {
 	m.doc() = "integrator test plugin";
 	m.def("integrate_1d", &integrate_1d, "Calculates the 1D complex integral");   
-	m.def("calcualte_laguerre_points", [](const int n) -> auto {
+	m.def("calculate_laguerre_points", [](const int n) -> auto {
 		return gauss_laguerre::calculate_laguerre_points_and_weights(n);
 	}, "Returns 'n' laguerre nodes and weights");
 	m.def("test", [](const std::vector<double> nodes) {
@@ -79,4 +79,13 @@ PYBIND11_MODULE(stedepy, m) {
 			std::cout << node << "\n";
 		}
 		});
+
+	py::class_<config::configuration> config(m, "Config");
+		
+
+	config.def(py::init<>())
+	    .def_readwrite("tol", &config::configuration::tolerance)
+		.def_readwrite("k", &config::configuration::wavenumber_k);
+		//.def_readwrite("tol", config::configuration::tolerance);
+	//py::class_<config::configuration_2d>(m, "Config2D");
 }
