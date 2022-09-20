@@ -82,6 +82,9 @@ benchmark:
     needs:
       job: build
       artifacts: true
+    before_script:
+     - apt-get update --yes
+     - apt-get install --yes libarmadillo10 libopenblas-base liblapack3 libgsl25 
     script:
      - cd build/benchmark
      - ./benchmarks --benchmark_out_format=json --benchmark_out=benchmark.json
