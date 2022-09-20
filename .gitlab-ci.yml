@@ -76,6 +76,25 @@ test:
       reports:
         junit: build_test/tests/result.xml
 
+benchmark:
+    stage: .post
+    image: gcc
+    needs:
+      job: build
+      artifacts: true
+    before_script:
+     - apt-get update --yes
+     - apt-get install --yes libarmadillo10 libopenblas-base liblapack3 libgsl25 lbtbb
+    script:
+     - cd build/benchmark
+     - ./benchmark --benchmark_out_format=json --benchmark_out=../../../benchmark.json
+
+    artifacts:
+      when: always
+      paths:
+        - benchmark.json
+        - json
+
 valgrind:
     stage: .post
     image: gcc
