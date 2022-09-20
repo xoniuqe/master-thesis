@@ -5,3 +5,12 @@
 [submodule "extern/armadillo"]
 	path = extern/armadillo
 	url = https://gitlab.com/conradsnicta/armadillo-code
+[submodule "extern/pybind"]
+	path = api/python/extern/pybind
+	url = https://github.com/pybind/pybind11
+[submodule "extern/oneTBB"]
+	path = extern/oneTBB
+	url = https://github.com/oneapi-src/oneTBB.git
+[submodule "benchmark/extern"]
+	path = benchmark/extern/benchmark
+	url = https://github.com/google/benchmark

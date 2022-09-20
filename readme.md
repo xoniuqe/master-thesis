@@ -7,15 +7,35 @@ needs to be updated!
 * clone the repo
 * cd vcpkg
 * bootstrap-vcpkg.bat
-* vcpkg install gsl gsl:x64-windows
+* vcpkg install gsl gsl:x64-windows 
+ (add eigen3)
 (todo: vcpkg install @ResponseFile)
 * vcpkg integrate install
+
+"D:/Master/SteepestDescent/vcpkg\vcpkg.exe" install TBB:x64-windows
+"D:/Master/SteepestDescent/vcpkg\vcpkg.exe" install Eigen3:x64-windows
+windows braucht wohl noch tbb wenn ich -DCMAKE_TOOLCHAIN_FILE=D:/Master/SteepestDescent/vcpkg/scripts/buildsystems/vcpkg.cmake nutze
+DCMAKE_TOOLCHAIN_FILE=$(SolutionDir)/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 (armadillo)
 * clone the repo
 on windows:
  * install intel mkl
  *
+
+ 19.09.22
+
+ install onetbb seems to fix building on windows!
+
+ https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#onetbb
+#TODO
+
+* impl 2d:
+ - steepest descen in 2d and for Y axis, is slightly different than the 1d case
+* refactor the integral parameters (1d => nodes and weights are calculatet in the operator() => this could be simply passed via the constructor)
+* write benchmarks
+* write python api
+* write more tests
 
 ## Thoughts
 
@@ -47,6 +67,26 @@ In essence it calculates f(h(x)) for us, with x = [a,b].
 
 ## Implementation details
 
+### Representation of the general inputs
+
+Input Variable | Fields | Methods
+---------------|--------|--------
+to be named | A, b, r |  
+
+
+method | input | result | used_methods
+get_complex_roots | y, A, b, r | complex_root: {c_0, c}| calculate_P_x
+calculate_P_x | x, y, A, b, r | double | -
+get_complex_path | split_point, y(=), A(=), b(=), r(=), q, complex_root, sing_point(!) | path + derived path: {path_function, path_function} |calculate_P_x
+get_weighted_path | split_point, y(=), A(=), b(=), r(=), q, k, s, complex_root(=), sing_point(=) | weighted path: path_function | get_complex_path, calculate_P_x
+get_weighted_path_1d | split_point, q, k, s, function_Px, path, derivative | weighted path : path_function | (calculate_P_x via function pointer function_Px) 
+integral_1d | A, b, r, mu, y, left_split, right_split | integral | gauss_laguerre::calculate_laguerre_points_and_weights, math_utils::get_complex_roots 
+steepest_desc (constr) | nodes(=), weights(=), k(=), y(=), A(=), b(=), r(=), q(=), s(=), complex_root, sing_point | steepest_desc | -
+steepest_desc.operator() | first_split, second_split | integral | path_utils::get_weightet_path, gauss_laguerre::calculate_integral_cauchy
+Legend:
+ * (=): Just passed through
+ * (!): Just control flow
+
 ### Used technologies
 
 Programming language: C++
@@ -59,6 +99,10 @@ Benchmarking: to be decided
 
 Speedup: Intel-Threading-Building-Blocks, OpenCl, Cuda(?)
 
+### Speedup 
+
+I will use OneTBB (Intel threading building blocks) and try to use OpenCl
+
 ### Requirements
 
 1. The code should run faster than the Matlab implementation
@@ -70,7 +114,7 @@ Speedup: Intel-Threading-Building-Blocks, OpenCl, Cuda(?)
 
 ## Considerations for perfomance 
 
-Compile-time evaluation of Gauß-Laguerre stuff.
+Compile-time evaluation of Gauß-Laguerre stuff. => pretty hard and no critical path
 
 ### Running Matlab on Gitlab
 
@@ -103,8 +147,7 @@ https://stackoverflow.com/questions/37296481/integration-with-quadrature-and-mul
 
 ## Useful links 
 
-<<<<<<< Updated upstream
-=======
+
 Gaussian quardarature explained:
 https://www.youtube.com/watch?v=w2xjlPwYock
 
@@ -115,7 +158,6 @@ https://stackoverflow.com/questions/18009056/why-does-matlab-octave-wipe-the-flo
 About eigenvalue decomposition (german):
 http://www.peter-junglas.de/fh/vorlesungen/numa/html/kap6.html
 
->>>>>>> Stashed changes
 Running GNU Octave on Gitlab:
 https://gitlab.com/mtmiller/octave-snapshot
 
