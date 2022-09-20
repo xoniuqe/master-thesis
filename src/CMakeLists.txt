@@ -10,7 +10,6 @@ set(HEADER_LIST "${PROJECT_SOURCE_DIR}/include/steepest_descent/datatypes.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/path_utils.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integration/gsl_integrator.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integration/gsl_integrator_2d.h"
-				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integrator.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral_1d.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/integral_2d.h"
 				"${PROJECT_SOURCE_DIR}/include/steepest_descent/steepest_descent.h" 
@@ -53,6 +52,8 @@ target_include_directories(SteepestDescentLib PUBLIC ../include)
 
 IF(WIN32)
 set(BLA_STATIC true)
+#target_include_directories(SteepestDescentLib PRIVATE ../extern/oneTbb/include)
+#target_link_libraries(SteepestDescentLib Private ${ONETBB_LIBRARIES})
 
 find_package(OpenBLAS)
 find_package(LAPACK)
@@ -62,7 +63,9 @@ ELSE()
 # This depends on (header only) boost
 target_link_libraries(SteepestDescentLib PRIVATE GSL::gsl ${ARMADILLO_LIBRARIES} TBB::tbb)
 ENDIF()
-
+if (MSVC)
+set_target_properties(SteepestDescentLib PROPERTIES LINK_FLAGS "/PROFILE")
+endif()
 #target_compile_options(SteepestDescentLib PRIVATE -pedantic -Wall -Wextra -Wconversion)
 
 IF(WIN32) 

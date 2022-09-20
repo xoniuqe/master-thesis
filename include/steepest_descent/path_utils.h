@@ -172,7 +172,7 @@ namespace path_utils {
     }
 
     template<typename Tnumeric>
-    auto get_path_derivative(const path_function & path, const Tnumeric y, const datatypes::matrix & A, const  arma::vec3 & b, const  arma::vec3 & r, const double& q, const datatypes::complex_root& complex_root) -> path_function {
+    inline auto get_path_derivative(const path_function & path, const Tnumeric y, const datatypes::matrix & A, const  arma::vec3 & b, const  arma::vec3 & r, const double& q, const datatypes::complex_root& complex_root) -> path_function {
         auto C = std::real(complex_root.c);
 
         auto Pp = [=](const double t) -> auto {

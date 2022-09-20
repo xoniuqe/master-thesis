@@ -1,6 +1,7 @@
 #pragma once
 
-#include "integrator.h"
+#include "integration/gsl_integrator.h"
+#include "integration/gsl_integrator_2d.h"
 #include "datatypes.h"
 #include "configuration.h"
 #include <armadillo>
@@ -11,6 +12,7 @@ namespace integral {
 
 	struct integral_2d {
 		integral_2d(const config::configuration_2d config, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d);
+		integral_2d(const config::configuration_2d config, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d, const std::vector<double> nodes, const std::vector<double> weights);
 		auto operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& mus) const->std::complex<double>;
 	private:
 		config::configuration_2d config;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "integrator.h"
+#include "integration/gsl_integrator.h"
 #include "datatypes.h"
 #include "configuration.h"
 #include <armadillo>
