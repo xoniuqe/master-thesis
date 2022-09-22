@@ -12,7 +12,7 @@ set (CMAKE_CXX_STANDARD 20)
 
 option(STEDEPY_TEST "Enable testing" ON)
 option(STEDEPY_BENCHMARK "Enable benchmarks" ON)
-option(STEDEPY_BUILD_MATLAB "Builds the mex functions" ON)
+option(STEDEPY_BUILD_MATLAB "Builds the mex functions" OFF)
 option(STEDEPY_BUILD_PYTHON_MODULE "Builds the python module" ON)
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
