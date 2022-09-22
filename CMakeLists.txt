@@ -10,7 +10,10 @@ project(
 
 set (CMAKE_CXX_STANDARD 20)
 
-
+option(STEDEPY_TEST "Enable testing" ON)
+option(STEDEPY_BENCHMARK "Enable benchmarks" ON)
+option(STEDEPY_BUILD_MATLAB "Builds the mex functions" ON)
+option(STEDEPY_BUILD_PYTHON_MODULE "Builds the python module" ON)
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -22,22 +25,21 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   # since it calls enable_testing, which must be in the
   # main CMakeLists.
   include(CTest)
-
 endif()
+
 add_subdirectory(extern/oneTBB)
-
 add_subdirectory(src)
-
 add_subdirectory(api)
-
-add_subdirectory(benchmark)
-# Schließen Sie Unterprojekte ein.
-add_subdirectory ("SteepestDescent")
+add_subdirectory (SteepestDescent)
 
 
 # Testing only available if this is the main app
 # Emergency override MODERN_CMAKE_BUILD_TESTING provided as well
-if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
+if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR STEDEPY_TEST)
   AND BUILD_TESTING)
   add_subdirectory(tests)
+endif()
+
+if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR STEDEPY_BENCHMARK))
+  add_subdirectory(benchmark)
 endif()
