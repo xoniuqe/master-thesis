@@ -20,7 +20,7 @@ build-latex:
     script:
      - cd latex
      - pdflatex thesis.tex
-     - bibtex thesis
+     - biber thesis
      - pdflatex thesis.tex
      #- biber literatur.bib
     # - pdflatex thesis.tex

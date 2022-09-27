@@ -30,8 +30,17 @@
 \usepackage[pdftex, plainpages=false]{hyperref}
 \usepackage{textcomp}
 
-\usepackage{bibgerm}
-\bibliographystyle{geralpha}
+\usepackage[
+    backend=biber,
+    style=authoryear-icomp,
+    sortlocale=de_DE,
+    natbib=true,
+    url=false, 
+    doi=true,
+    eprint=false
+]{biblatex}
+\usepackage[style=apa]{biblatex}
+\addbibresource{literatur.bib}
 
 \usepackage{makeidx}
 \usepackage{multicol}
@@ -66,15 +75,15 @@
 %------------------ Titelseite -------------------------------------------------
 \begin{document}
 
-\title{Titel der Arbeit auf Deutsch}
-\subtitle{English Title of the Thesis}
+\title{Implementierung eines Verfahrens zu effizienten Berechnung oszillierender Integrale}
+\subtitle{Implementation of a method for the efficient calculation of oscillatory integrals}
 
 \author{Tobias Arens}
 
 \supervisor{Titel Vorname Nachname}
 
-\address{Ort}
-\submitdate{DD.MM.YYYY}
+\address{Mehren}
+\submitdate{08.10.2022}
 
 %------------------ Projektart -------------------------------------------------
 \project{Master-Abschlussarbeit}
@@ -102,7 +111,8 @@
 
 %------------------ Literaturverzeichnis & Index -------------------------------
 \backmatter
-\bibliography{literatur}								% Literaturverzeichnis (literatur.bib)
+\printbibliography
+%\bibliography{literatur}								% Literaturverzeichnis (literatur.bib)
 \printindex												% Index (optional)
 
 
