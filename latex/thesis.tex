@@ -39,7 +39,6 @@
     doi=true,
     eprint=false
 ]{biblatex}
-\usepackage[style=apa]{biblatex}
 \addbibresource{literatur.bib}
 
 \usepackage{makeidx}
@@ -92,7 +91,6 @@
 
 %------------------ Vorwort, Kurzfassung, Verzeichnisse ------------------------
 \frontmatter
-\input{chapters/Vorwort}								% Vorwort (optional)
 \input{chapters/Kurzfassung}							% Kurzfassung/Abstract
 \tableofcontents										% Inhaltsverzeichnis
 \listoffigures											% Abbildungsverzeichnis (optional)
@@ -103,9 +101,10 @@
 %------------------ Kapitel ----------------------------------------------------
 \mainmatter
 \input{chapters/EinleitungProblemstellung}
-\input{chapters/WeitereKapitel}
-\input{chapters/Bausteine}
-\input{chapters/Beispiel}
+\input{chapters/Algorithmus}
+\input{chapters/Entwurf}
+\input{chapters/Implemnetierung}
+\input{chapters/Performance}
 \input{chapters/ZusammenfassungAusblick}
 
 
