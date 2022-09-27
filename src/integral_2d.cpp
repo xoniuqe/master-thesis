@@ -45,21 +45,23 @@ namespace integral {
 
 
 
-	auto integral_2d::operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& mu) const -> std::complex<double> {
+	auto integral_2d::operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& theta) const -> std::complex<double> {
 
  
-		auto q = arma::dot(A.col(0), mu);
-		auto qx = arma::dot(A.col(0), mu);
-		auto qy = arma::dot(A.col(1), mu);
+		auto q = arma::dot(A.col(0), theta);
+		auto qx = arma::dot(A.col(0), theta);
+		auto qy = arma::dot(A.col(1), theta);
 
-		auto prod = arma::dot(mu, b);
+		auto prod = arma::dot(theta, b);
 		
+		//berechnet die grenzen der kommenden partiellen integration (von x=0 -> x=1)
+		//warum wird die matrix geswapt, bzw wieso wird eine rotation?
 
 		auto A1 = arma::mat(A);
 		A1.swap_cols(0, 1);
-		auto q1 = arma::dot(A1.col(0), mu);
+		auto q1 = arma::dot(A1.col(0), theta);
 		//sx1 = (mu(1) * A1(1, 2) + mu(2) * A1(2, 2) + mu(3) * A1(3, 2)) * 0 + prod;
-		auto sx1 = arma::dot(A1.col(1), mu) * 0. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
+		auto sx1 = arma::dot(A1.col(1), theta) * 0. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
 		auto [c1, c1_0] = math_utils::get_complex_roots(0, A1, b, r);
 		//auto sing_point1 = math_utils::get_singularity_for_ODE(q1, { c1, c1_0 });
 		//auto spec_point1 = math_utils::get_spec_point(q1, { c1, c1_0 });
@@ -70,8 +72,8 @@ namespace integral {
 
 		arma::mat rotation{ {-1, 1}, {1, 0} };
 		arma::mat A2 = A * rotation;
-		auto q2 = arma::dot(A2.col(0), mu);
-		auto sx2 = arma::dot(A2.col(1), mu) * 1. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
+		auto q2 = arma::dot(A2.col(0), theta);
+		auto sx2 = arma::dot(A2.col(1), theta) * 1. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
 		auto [c2, c2_0] = math_utils::get_complex_roots(1, A2, b, r);
 
 
@@ -85,9 +87,6 @@ namespace integral {
 		//std::mutex write_mutex;
 		auto integration_result = 0. + 0.i;
 		int number_of_steps = 1. / config.y_resolution;
-	
-
-
 
 		integration_result = tbb::parallel_reduce(tbb::blocked_range(0, number_of_steps), 0. + 0.i, [&](tbb::blocked_range<int> range, std::complex<double> integral) {
 			for (int i = range.begin(); i < range.end(); ++i)
@@ -98,7 +97,7 @@ namespace integral {
 				auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
 				auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
 
-				auto s = arma::dot(A.col(0), mu) * u + prod;
+				auto s = arma::dot(A.col(0), theta) * u + prod;
 
 				auto is_spec = math_utils::is_singularity_in_layer(config.tolerance, spec_point, 0, 1 - u);
 				auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, 0, 1 - u);
@@ -114,12 +113,13 @@ namespace integral {
 #endif
 
 				std::tuple<std::complex<double>, std::complex<double>> split_points;
+				
+				auto Iin = steepest_desc(0);
+				auto Ifin = steepest_desc(1 - u);
 
 				if (!is_spec && !is_sing) {
 					// no singularity
-					auto Iin = steepest_desc(0);
-					auto IfIn = steepest_desc(1 - u);
-					integral += Iin * integration_y - IfIn * integration_1_minus_y;
+					integral += Iin* integration_y - Ifin * integration_1_minus_y;
 					continue;
 				}
 				else if (is_spec) {
@@ -131,23 +131,22 @@ namespace integral {
 					split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
 				}
 				auto& [split_point1, split_point2] = split_points;
-
+	
+			
 				//singularity
 				/* %Since there is a singularity on the horizontal layer, compute 4 integrals from 0 to infty along the paths at different
 				%starting points: 0, splitPt1, splitPt2 and 1-u on the horizontal layer.*/
 
-				auto Iin1 = steepest_desc(0);
 				auto Ifin1 = steepest_desc(split_point1);
 				auto Iin2 = steepest_desc(split_point2);
-				auto Ifin2 = steepest_desc(1 - u);
 
 				//Vertical layer at splitPt1.
 
-				auto sx_intern_1 = arma::dot(A1.col(1), mu) * split_point1 + prod;
+				auto sx_intern_1 = arma::dot(A1.col(1), theta) * split_point1 + prod;
 				auto [cIntern1, c_0Intern1] = math_utils::get_complex_roots(split_point1, A1, b, r);
 
 				//Vertical layer at splitPt2.
-				auto sx_intern_2 = arma::dot(A1.col(1), mu) * split_point2 + prod;
+				auto sx_intern_2 = arma::dot(A1.col(1), theta) * split_point2 + prod;
 				auto [cIntern2, c_0Intern2] = math_utils::get_complex_roots(split_point2, A1, b, r);
 
 
@@ -160,16 +159,11 @@ namespace integral {
 
 				auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
 
-				auto integration_result = Iin1 * integration_y - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin2 * integration_1_minus_y;
+				auto integration_result = Iin * integration_y - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin * integration_1_minus_y;
 				integral += integration_result;
 			}
 			return integral;
 			}, std::plus<std::complex<double>>());
-		/*for (auto y = 0.; y < 1.; y += config.y_resolution) {
-
-	
-		}*/
-
 		return integration_result;
 	}
 
@@ -182,7 +176,7 @@ namespace integral {
 			sing_point = std::real(sing_point);
 		}
 
-		if (std::abs(std::imag(spec_point) < std::abs(std::imag(c)))) {
+		if (std::abs(std::imag(spec_point)) < std::abs(std::imag(c))) {
 			spec_point = std::real(spec_point);
 		}
 #ifdef USE_PATH_GEN
