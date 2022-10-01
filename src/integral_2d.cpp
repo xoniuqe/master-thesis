@@ -129,8 +129,6 @@ namespace integral {
 					split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
 				}
 				else if (is_sing) {
-					//split pt1 ist falsch? => gnu octave impl ist falsch!
-
 					split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
 				}
 				auto& [split_point1, split_point2] = split_points;
@@ -204,14 +202,6 @@ namespace integral {
 
 		auto& [sp1, sp2] = split_points;
 
-		//this is done in decide_split_points!
-		/*if (std::real(sp1) < left_split) {
-			sp1 = left_split;
-		}
-
-		if (std::real(sp2) > right_split) {
-			sp2 = right_split;
-		}*/
 		// -> optimization: if either of these checks is true the according integral will be zero
 		auto I1 = steepest_desc(left_split) - steepest_desc(sp1);
 
@@ -220,7 +210,7 @@ namespace integral {
 		auto green_fun = [k = config.wavenumber_k, y = sPx, &A, &b, &r, q, s](const double x) -> auto {
 			auto Px = math_utils::calculate_P_x(x, y, A, b, r);
 			auto sqrtPx = std::sqrt(Px);
-			auto res = std::exp(1.i * k * (sqrtPx + q * x + s));
+			auto res = std::exp(1.i * k * (sqrtPx + q * x + s)); //this formular differs because equation 28 in PAPERHIFE!
 			return res;
 		};
 		auto x = integrator->operator()(green_fun, sp1, sp2);

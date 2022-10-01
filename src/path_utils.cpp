@@ -46,7 +46,7 @@ namespace path_utils {
         auto derivative = get_path_derivative(path, y, A, b, r, q, complex_root);
         return [=](const double t) -> auto {
             return derivative(t / k) * (1. / k) * (1. / std::sqrt(math_utils::calculate_P_x(path(t / k), y, A, b, r)));
-        };
+        }; // Equation (2.2) from APPLYING THE NUMERICAL METHOD OF STEEPEST DESCENT ON MULTIVARIATE OSCILLATORY INTEGRALS IN SCATTERING THEORY?
     }
 
     auto get_weighted_path_y(const std::complex<double> split_point, const std::complex<double> y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r, const double q, const double k, const std::complex<double> s, const datatypes::complex_root complex_root, const std::complex<double> sing_point)->path_function {

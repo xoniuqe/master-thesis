@@ -58,12 +58,12 @@ namespace integral {
 
 		auto& [sp1, sp2] = split_points;
 
-
 		auto I1 = steepest_desc(left_split, sp1);
 
 		auto I2 =  steepest_desc(sp2, right_split);
 
 		auto& local_k = this->config.wavenumber_k;
+
 		auto green_fun = [k=local_k, y=y, &A, &b, &r, q, s](const double x) -> auto { 
 			auto Px = math_utils::calculate_P_x(x, y, A, b, r);
 			auto sqrtPx = std::sqrt(Px);
