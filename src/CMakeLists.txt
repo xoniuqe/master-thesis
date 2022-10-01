@@ -65,7 +65,7 @@ ELSE()
 target_link_libraries(SteepestDescentLib PRIVATE GSL::gsl ${ARMADILLO_LIBRARIES} TBB::tbb)
 ENDIF()
 #if (MSVC)
-set_target_properties(SteepestDescentLib PROPERTIES LINK_FLAGS "/PROFILE")
+#set_target_properties(SteepestDescentLib PROPERTIES LINK_FLAGS "/PROFILE")
 #endif()
 #target_compile_options(SteepestDescentLib PRIVATE -pedantic -Wall -Wextra -Wconversion)
 
