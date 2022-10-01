@@ -16,8 +16,8 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 
 # Tests need to be added as executables first
-add_executable(tests tests_main.cpp math_lib_tests.cpp gauss_laguerre_tests.cpp steepest_descent_tests.cpp gsl_integrator_tests.cpp)
-target_compile_features(tests PRIVATE cxx_std_17)
+add_executable(tests tests_main.cpp math_lib_tests.cpp gauss_laguerre_tests.cpp steepest_descent_tests.cpp gsl_integrator_tests.cpp integrate_2d_tests.cpp)
+#target_compile_features(tests PRIVATE cxx_std_17)
 
 # I'm using C++17 in the test
 #target_compile_features(math_lib_tests PRIVATE cxx_std_17)
