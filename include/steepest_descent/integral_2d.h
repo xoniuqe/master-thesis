@@ -13,7 +13,11 @@ namespace integral {
 	struct integral_2d {
 		integral_2d(const config::configuration_2d config, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d);
 		integral_2d(const config::configuration_2d config, integrator::gsl_integrator* integrator, integrator::gsl_integrator_2d* integrator_2d, const std::vector<double> nodes, const std::vector<double> weights);
-		auto operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& mus) const->std::complex<double>;
+		auto operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& theta) const->std::complex<double>;
+		
+		
+		//mutable int partial_integrations = 0, partial_no_singularities = 0, partial_first_reset=0, partial_second_reset=0;
+	
 	private:
 		config::configuration_2d config;
 

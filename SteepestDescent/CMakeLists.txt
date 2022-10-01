@@ -9,7 +9,7 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h")
 
 #if (MSVC)
-#set_target_properties(SteepestDescent PROPERTIES LINK_FLAGS "/PROFILE")
+set_target_properties(SteepestDescent PROPERTIES LINK_FLAGS "/PROFILE")
 #endif()
 
 #target_compile_features(SteepestDescent PRIVATE cxx_std_17)

@@ -22,8 +22,8 @@ namespace integral {
 	}
 
 
-	auto integral_1d::operator()(const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const arma::vec3& mu, const double y, const double left_split, const double right_split) const -> std::complex<double> {
-		return integral_1d::operator()(A, b, r, arma::dot(A.col(0), mu), arma::dot(A.col(1), mu) * y + arma::dot(mu, b), std::move(y), std::move(left_split), std::move(right_split));
+	auto integral_1d::operator()(const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const arma::vec3& theta, const double y, const double left_split, const double right_split) const -> std::complex<double> {
+		return integral_1d::operator()(A, b, r, arma::dot(A.col(0), theta), arma::dot(A.col(1), theta) * y + arma::dot(theta, b), y, left_split,right_split);
 	}
 
 
@@ -37,7 +37,7 @@ namespace integral {
 			sing_point = std::real(sing_point);
 		}
 
-		if (std::abs(std::imag(spec_point) < std::abs(std::imag(c)))) {
+		if (std::abs(std::imag(spec_point)) < std::abs(std::imag(c))) {
 			spec_point = std::real(spec_point);
 		}
 		steepest_descent::steepest_descend_1d steepest_desc(nodes, weights, config.wavenumber_k, y, A, b, r, q, s, { c, c_0 }, sing_point);

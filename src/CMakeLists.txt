@@ -38,8 +38,9 @@ set(HEADER_LIST "${PROJECT_SOURCE_DIR}/include/steepest_descent/datatypes.h"
 add_library(SteepestDescentLib gauss_laguerre.cpp math_utils.cpp path_utils.cpp ${HEADER_LIST}  integral_1d.cpp integral_2d.cpp steepest_descent.cpp)
 #set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")  # <--- this is needed to replace the default
 find_package(GSL REQUIRED)
-set(TBB_FIND_RELEASE_ONLY TRUE)
+set(TBB_FIND_RELEASE_ONLY FALSE)
 set(TBB_TEST FALSE)
+set(TBB_USE_DEBUG FALSE)
 find_package(TBB REQUIRED)
 
 add_compile_definitions(HAVE_INLINE)
@@ -63,22 +64,23 @@ ELSE()
 # This depends on (header only) boost
 target_link_libraries(SteepestDescentLib PRIVATE GSL::gsl ${ARMADILLO_LIBRARIES} TBB::tbb)
 ENDIF()
-if (MSVC)
+#if (MSVC)
 set_target_properties(SteepestDescentLib PROPERTIES LINK_FLAGS "/PROFILE")
-endif()
+#endif()
 #target_compile_options(SteepestDescentLib PRIVATE -pedantic -Wall -Wextra -Wconversion)
 
-IF(WIN32) 
+IF(MSVC) 
 	target_compile_options(SteepestDescentLib PRIVATE
 	  /DARMA_DONT_USE_WRAPPER
-	  /static
-	  /pedantic
-	  /Wall
+	 # /static
+	 # /pedantic
+	  /W4
 	  /BUILD_STATIC_LIBS
+	  /GS
 	  $<$<CONFIG:DEBUG>:/g3>
-	  $<$<CONFIG:RELEASE>:/O3>
+	  $<$<CONFIG:RELEASE>:/O2>
 	)
-ELSE()
+ELSEIF(GCC)
 	target_compile_options(SteepestDescentLib PRIVATE
 	 # -DARMA_DONT_USE_WRAPPER
 	  -BUILD_STATIC_LIBS
@@ -91,6 +93,7 @@ ELSE()
 	  $<$<CONFIG:DEBUG>:-Og>
 	  $<$<CONFIG:RELEASE>:-O3>
 	)
+ELSEIF()
 ENDIF()
 
 add_compile_definitions(

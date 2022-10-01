@@ -91,7 +91,7 @@ namespace math_utils {
 
 		}
 
-		auto c = real_c + std::sqrt((P_rc / c_0)) * 1i;
+		auto c = real_c + std::sqrt((P_rc / c_0)) * 1.i;
 		return std::make_tuple(c, c_0);
 	}
 }

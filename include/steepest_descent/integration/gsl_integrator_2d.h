@@ -25,6 +25,8 @@ namespace integrator {
 			inner_workspace = gsl_integration_cquad_workspace_alloc(n);
 		}
 
+		gsl_integrator_2d(gsl_integrator_2d& other) = delete;
+
 		~gsl_integrator_2d() {
 			gsl_integration_cquad_workspace_free(inner_workspace);
 			gsl_integration_cquad_workspace_free(workspace);

@@ -87,6 +87,10 @@ Legend:
  * (=): Just passed through
  * (!): Just control flow
 
+
+### Matlab plugin details
+
+Implmented as so-called 'Mexfunctions'. Assumes RAII (explain that concept in a footnote?)
 ### Used technologies
 
 Programming language: C++

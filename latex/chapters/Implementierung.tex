@@ -2,8 +2,72 @@
 
 \section{Verwendete Technologien}
 
+
+Mit Stern markierte gerne etwas weiter ausführen
+\begin{itemize}
+    \item Armadillo
+    \item GNU Scientific Library *
+    \item Pybind (Eigen3) *
+    \item OneTBB *
+    \item Catch2
+    \item Google Benchmarks
+    \item CMake
+    \item Visualstudio Profiler
+    \item Gprof (malsehen ob das noch genutzt wird)
+    \item Valgrind*
+\end{itemize}
+
+
+
+Nicht genutzte Alternativen
+
+Gründe noch aufführen
+\begin{itemize}
+    \item SIMD intrinsics * (mal sehen ob das sinnvoll ist)
+    \item Boost numeric
+    \item OpenCL
+    \item OpenMP
+    \item CUDA
+\end{itemize}
+
 \subsection{GNU Scientific Library}
+
+Gerade bei der Frage nach dem Framework für Linalg und numerischer Integration lässt sich nicht abschätzen was die beste Lösung ist. Es gibt
+so viele Frameworks und Bibliotheken, dass es nicht möglich ist alle gegeneinander Abzwuwägen.
+
+Die Entshceidung GSL und Armadillo basier auf: Aramdillo ist einfach einzubinden und unkompliziert in der Anwendung.
+GSL hat eine gute Perfomance. Der Verglecih lief mit Boost wobei einfache Tests zeigten das GSL schneller ist und mit weitaus weniger Aufwand in das Projekt integriert werden kann.
+(Boost integration ist furchtbar!)
+
 
 \subsection{Armadillo}
 
+Kurze Einführng (1 Seite max?)
+
 \subsection{Intel Threading Building Blocks}
+
+Darstellung der beschleunigten Stellen, bzw beispiele wie man damit was parallelsiert + kurze einführenng
+
+\subsection{Valgrind}
+
+Erklärung der genutzten Tools Cachegrind und Cachetool?
+
+\subsection{Pybind}
+
+Kurze erklärung wie es klappt und beispiel für einfaches Plugin
+
+
+\section{Ausgewählte Codestellen}
+
+\subsection{Gauss laguerre integration und Cauchy Integral Theoerem}
+
+\lstinputlisting[language=C++,style=cpp]{gauss_laguerre.cpp}
+
+\subsection{1D Integration}
+
+
+
+\subsection{2D Integration}
+
+Warum konnte 1d Integration hier nicht direkt genutzt werden?
+=> Indirektion durch das 1d Integral war relativ hoch, das teste ich aber besser noch mal

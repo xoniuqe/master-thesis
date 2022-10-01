@@ -19,6 +19,24 @@ namespace math_utils {
 		return  std::floor(std::real(value)) + std::floor(std::imag(value)) * 1.i;
 	}
 
+	template<typename T>
+	constexpr auto get_q(const arma::subview_col<T>& A, const arma::vec3& theta) -> double {
+		return arma::dot(A, theta);
+	}
+
+
+	template<typename T>
+	constexpr auto get_singularity_for_ODE(const T q, const datatypes::complex_root complex_root) -> std::complex<double> {
+		auto rc = std::real(complex_root.c);
+		auto ic = std::imag(complex_root.c);
+
+		auto cTimesCconj = rc * rc + ic * ic;
+		// streng genommen nur real!
+		auto F = std::sqrt(std::complex<double>(rc * rc - (q * q / complex_root.c_0 * cTimesCconj - rc * rc) / (q * q / complex_root.c_0 - 1.)));
+
+		return std::real(q) < 0. ? rc + F : rc - F;
+	}
+
 	/// <summary>
 	/// singularity := definitionsl�cke
 	/// </summary>
@@ -83,7 +101,6 @@ namespace math_utils {
 		auto left_split_zero = e_sing - r_sing;
 		auto right_split_zero = e_sing + r_sing;
 
-
 		return decide_split_points(left_split_zero, right_split_zero, left_split_point, right_split_point);
 	}
 
@@ -116,17 +133,7 @@ namespace math_utils {
 		return decide_split_points(left_zero_split, right_zero_split, left_split_point, right_split_point);
 	}
 
-	template<typename T>
-	constexpr auto get_singularity_for_ODE(const T q, const datatypes::complex_root complex_root) -> std::complex<double> {
-		auto rc = std::real(complex_root.c);
-		auto ic = std::imag(complex_root.c);
-
-		auto cTimesCconj = rc * rc + ic * ic;
-		// streng genommen nur real!
-		auto F = std::sqrt(std::complex<double>(rc * rc - (q * q / complex_root.c_0 * cTimesCconj - rc * rc) / (q * q / complex_root.c_0 - 1.)));
-
-		return std::real(q) < 0. ? rc + F : rc - F;
-	}
+	
 
 
 	auto get_spec_point(const double q, const datatypes::complex_root complex_root)->std::complex<double>;

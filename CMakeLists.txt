@@ -10,6 +10,16 @@ project(
 
 set (CMAKE_CXX_STANDARD 20)
 
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  MESSAGE("Clang")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  MESSAGE("GNU")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  MESSAGE("Intel")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  MESSAGE("MSVC")
+endif()
+
 option(STEDEPY_TEST "Enable testing" ON)
 option(STEDEPY_BENCHMARK "Enable benchmarks" ON)
 option(STEDEPY_BUILD_MATLAB "Builds the mex functions" OFF)

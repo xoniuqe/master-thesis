@@ -96,19 +96,28 @@ auto integral_test_1d()
 }
 
 auto integral_test_2d(double resolution) {
-	arma::mat  A{ {0, 0}, {1, 0}, {1, 1 } };
+	//arma::mat  A{ {0, 0}, {1, 0}, {1, 1 } };
 
-	arma::vec b{ 0,0,0 };
+	//arma::vec b{ 0,0,0 };
 
-	arma::vec r{ 1, -0.5, -0.5 };
+	//arma::vec r{ 1, -0.5, -0.5 };
 
-	arma::vec mu{ 1,-0.5, -0.5 };
-	auto k = 10;
+	//arma::vec mu{ 1,-0.5, -0.5 };
+	// 
+	arma::mat  A{ {1, 1}, {1,1}, {0, 1 } };
+
+	arma::vec b{ 1,0,-1 };
+
+	arma::vec r{ 0, 1, 2};
+
+	arma::vec mu{ 1,0,0 };
+
+
 	config::configuration_2d config;
 	config.wavenumber_k = 10;
 	config.tolerance = 0.1;
 	config.y_resolution = resolution;
-	config.gauss_laguerre_nodes = 1000;
+	config.gauss_laguerre_nodes = 30;
 
 	integrator::gsl_integrator gslintegrator;	
 	integrator::gsl_integrator_2d gsl_integrator_2d;
@@ -143,6 +152,7 @@ auto eval_2d_article(int k)
 	std::random_device rd;  // Will be used to obtain a seed for the random number engine
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dist(0, 1);
+
 	for (auto i = 0; i < 40; i++) {
 
 		arma::vec3 r { 10. * dist(gen) + 0.5, 5. * dist(gen) - 3., 0. };
@@ -161,6 +171,8 @@ auto eval_2d_article(int k)
 
 	auto average = std::accumulate(timings.begin(), timings.end(), 0.) / 40.;
 	std::cout << "Timing K (" << k << ") = " << average << std::endl;
+
+	//std::cout << "Partialintegration details: \nnumber of partial integrations: " << integral2d.partial_integrations << "\nno singularity paths: " << integral2d.partial_no_singularities << "\nfirst resets: " << integral2d.partial_first_reset << "\nsecond resets: " << integral2d.partial_second_reset << std::endl;
 }
 
 
@@ -330,8 +342,9 @@ int main()
 	eval_2d_article(1000);
 	eval_2d_article(3000);
 	eval_2d_article(5000);
-
+	
 	//integral_test_2d_multiple();
+	//integral_test_2d(1);
 	return 0;
 }
 

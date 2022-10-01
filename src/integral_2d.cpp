@@ -5,6 +5,7 @@
 #include <steepest_descent/math_utils.h>
 #include <steepest_descent/steepest_descent.h>
 #include <steepest_descent/gauss_laguerre.h>
+#include <steepest_descent/integration/gsl_integrator_2d.h>
 
 #include <armadillo>
 #include <cmath>
@@ -86,9 +87,11 @@ namespace integral {
 		};
 		//std::mutex write_mutex;
 		auto integration_result = 0. + 0.i;
-		int number_of_steps = 1. / config.y_resolution;
+		int number_of_steps = (int) 1. / config.y_resolution;
 
-		integration_result = tbb::parallel_reduce(tbb::blocked_range(0, number_of_steps), 0. + 0.i, [&](tbb::blocked_range<int> range, std::complex<double> integral) {
+
+		integration_result = tbb::parallel_reduce(tbb::blocked_range(0, number_of_steps, 1), 0. + 0.i, [&](tbb::blocked_range<int> range, std::complex<double> integral) {
+			integrator::gsl_integrator_2d integrator;
 			for (int i = range.begin(); i < range.end(); ++i)
 			{
 				auto y = config.y_resolution * (double)i;// steps[i];
@@ -157,7 +160,8 @@ namespace integral {
 				/*% Final formula for the integral(considering each layer) in case of singularity on the
 				% layer.*/
 
-				auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
+				auto integral2_res = integrator.operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
+				//auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
 
 				auto integration_result = Iin * integration_y - Ifin1 * intYintern1 + integral2_res + Iin2 * intYintern2 - Ifin * integration_1_minus_y;
 				integral += integration_result;
@@ -179,12 +183,8 @@ namespace integral {
 		if (std::abs(std::imag(spec_point)) < std::abs(std::imag(c))) {
 			spec_point = std::real(spec_point);
 		}
-#ifdef USE_PATH_GEN
-		auto path_generator = path_utils::get_weighted_path_generator_y(sPx, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
-		steepest_descent::steepest_descend_2d_path steepest_desc(path_generator, nodes, weights);
-#else
+
 		steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_y, nodes, weights, config.wavenumber_k, sPx, A, b, r, q, s, { c, c_0 }, sing_point);
-#endif
 
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
 		if (math_utils::is_singularity_in_layer(config.tolerance, spec_point, left_split, right_split)) {
@@ -205,13 +205,13 @@ namespace integral {
 		auto& [sp1, sp2] = split_points;
 
 		//this is done in decide_split_points!
-		if (std::real(sp1) < left_split) {
+		/*if (std::real(sp1) < left_split) {
 			sp1 = left_split;
 		}
 
 		if (std::real(sp2) > right_split) {
 			sp2 = right_split;
-		}
+		}*/
 		// -> optimization: if either of these checks is true the according integral will be zero
 		auto I1 = steepest_desc(left_split) - steepest_desc(sp1);
 

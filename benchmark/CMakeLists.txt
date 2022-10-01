@@ -15,7 +15,7 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 # Tests need to be added as executables first
 add_executable(benchmarks main.cpp benchmark_1d.cpp benchmark_2d.cpp)
-target_compile_features(benchmarks PRIVATE cxx_std_17)
+#target_compile_features(benchmarks PRIVATE cxx_std_17)
 
 # I'm using C++17 in the test
 #target_compile_features(math_lib_tests PRIVATE cxx_std_17)

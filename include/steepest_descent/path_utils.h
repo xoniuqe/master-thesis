@@ -41,19 +41,13 @@ namespace path_utils {
         // in either case we coud just unify these branches because 
         // all that changes in the path function is the sign in the denominator and U, indicating that abs(sqc) may be sufficient
         if (std::abs(q - sqc) <= std::numeric_limits<double>::epsilon()) {
-            auto U = [=](const double t) -> auto {
-                return std::sqrt(Psp) + sqc * split_point + 1i * t;
-            };
             path = [=](const double t) -> auto {
-                return (U(t) * U(t) - cTimesCconj * complex_root.c_0) / (2. * (U(t) * sqc - complex_root.c_0 * C));
+                return (K(t) * K(t) - cTimesCconj * complex_root.c_0) / (2. * (K(t) * sqc - complex_root.c_0 * C));
             };
         }
         else if (std::abs(q + sqc) <= std::numeric_limits<double>::epsilon()) {
-            auto U = [&Psp, &sqc, &split_point](const double t) -> auto {
-                return std::sqrt(Psp) - sqc * split_point + 1i * t;
-            };
             path = [=](const double t) -> auto {
-                return (U(t) * U(t) - cTimesCconj * complex_root.c_0) / (2. * (-1. * U(t) * sqc - complex_root.c_0 * C));
+                return (K(t) * K(t) - cTimesCconj * complex_root.c_0) / (2. * (-1. * K(t) * sqc - complex_root.c_0 * C));
             };
         }
 
@@ -108,6 +102,8 @@ namespace path_utils {
 
         auto sqrtPx = std::sqrt(Px);
         auto cTimesCconj = rc * rc + ic * ic;
+        //chapter 4.1 
+        // 
         //(const double x, const double y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r) 
         auto S = 1.0 / (complex_root.c_0 - q * q);
         // K = @(t) sqrt(PsP)+q.*sP+1i.*t;
@@ -122,23 +118,26 @@ namespace path_utils {
         // two cases q == sqc or q == -sqc
         // in either case we coud just unify these branches because 
         // all that changes in the path function is the sign in the denominator and U, indicating that abs(sqc) may be sufficient
+        //case q = +/- sqrt(c_0)
         if (std::abs(q - sqc) <= std::numeric_limits<double>::epsilon()) {
-            auto U = [=](const double t) -> auto {
-                return sqrtPx + sqc * split_point + 1i * t;
-            };
             path = [=](const double t) -> auto {
-                return (U(t) * U(t) - cTimesCconj * complex_root.c_0) / (2. * (U(t) * sqc - complex_root.c_0 * C));
+                return (K(t) * K(t) - cTimesCconj * complex_root.c_0) / (2. * (K(t) * sqc - complex_root.c_0 * C));
             };
         }
         else if (std::abs(q + sqc) <= std::numeric_limits<double>::epsilon()) {
-            auto U = [=](const double t) -> auto {
-                return sqrtPx - sqc * split_point + 1i * t;
-            };
             path = [=](const double t) -> auto {
-                return (U(t) * U(t) - cTimesCconj * complex_root.c_0) / (2. * (-1. * U(t) * sqc - complex_root.c_0 * C));
+                return (K(t) * K(t) - cTimesCconj * complex_root.c_0) / (2. * (-1. * K(t) * sqc - complex_root.c_0 * C));
             };
         }
+        //case |q| < sqrt(c_0)
+        else if (std::abs(q) < sqc) {
+            auto sign = std::real(split_point) >= std::real(sing_point) ? 1. : -1.;
+            path = [=](const double t) -> auto {
+                return sign * std::sqrt((std::pow(K(t), 2.) - cTimesCconj * complex_root.c_0) * S + T(t) * T(t)) - T(t);
+            };
 
+        }
+        //case |q| > sqrt(c_0)
         else if (std::abs(q) > sqc) {
             auto sign = q > 0 ? -1. : 1.;
             path = [=](const double t) -> auto {
@@ -146,15 +145,11 @@ namespace path_utils {
             };
         }
 
-        else if (std::abs(q) < sqc) {
-            auto sign = std::real(split_point) >= std::real(sing_point) ? 1. : -1.;
-            path = [=](const double t) -> auto {
-                return sign * std::sqrt((std::pow(K(t), 2.) - cTimesCconj * complex_root.c_0) * S + T(t) * T(t)) - T(t);
-            };
-        }
 
+        //what case is this? q == 0 was the first case in matlab code. maybe an optimization?
         else if (std::abs(q) <= std::numeric_limits<double>::epsilon()) {
-            auto path_fun = [=](const double t) -> auto {
+            std::cout << "blb" << std::endl;
+            auto path_fun =  [=](const double t) -> auto {
                 return std::sqrt((Px + 2. * 1.i * sqrtPx * t - t * t) * 1. / complex_root.c_0 - (std::imag(complex_root.c) * std::imag(complex_root.c))) + C;
             };
             if (std::real(split_point) < C) {
@@ -175,6 +170,7 @@ namespace path_utils {
     inline auto get_path_derivative(const path_function & path, const Tnumeric y, const datatypes::matrix & A, const  arma::vec3 & b, const  arma::vec3 & r, const double& q, const datatypes::complex_root& complex_root) -> path_function {
         auto C = std::real(complex_root.c);
 
+        //chapter   4.2
         auto Pp = [=](const double t) -> auto {
             return  math_utils::calculate_P_x(path(t), y, A, b, r);
         };

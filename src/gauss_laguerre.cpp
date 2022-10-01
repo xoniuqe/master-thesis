@@ -32,7 +32,7 @@ namespace gauss_laguerre {
 		arma::vec laguerre_points(n);
 		laguerre_points.zeros();
 		evec.zeros();
-		auto result = arma::eig_sym(laguerre_points, evec, T, "std");
+		arma::eig_sym(laguerre_points, evec, T, "std");
 		
 		auto diag = evec.diag();
 		//differs from matlab

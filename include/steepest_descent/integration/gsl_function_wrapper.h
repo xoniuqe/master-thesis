@@ -8,7 +8,9 @@ public:
 		function = &gsl_function_pp::invoke;
 		params = this;
 	}
+	gsl_function_pp(gsl_function_pp& other) = delete;
 
+	gsl_function_pp(gsl_function_pp&& other) = delete;
 private:
 	const F _func;
 	static double invoke(double x, void* params) {

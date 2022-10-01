@@ -1,12 +1,33 @@
 \chapter{Vorgehensweise}
 
+
+\begin{itemize}
+    \item Einfache implementierung in simplen FUnktionen
+    \item Hotpath-"Analyse"
+    \item Parallelisierung mit OneTBB
+    \item Evaluierung von Parallen Architekturen
+\end{itemize}
+
 Vorgehensweise zum Optimieren darlegen.
+
+Historie der Implementierung ggf darstellen?
 
 \section{Profiling}
 
+Hotpath darstellen?
+
+
 \section{Benchmarks}
 
+Automatische Benchmarks mit Googlebenchmark => genereller Überblick
+
+Implementiertes Matlab Plugin kann im direkten Verlgeich mit der origniallen Matlab Implementierung ausgeführt werden
+
+
 \section{Manuelle Tests}
+
+Manuelle TEsts + PRofiling haben gezeig,t dass in den TEsts der Hotpath wie erwartet der Fall ohne Singularität ist.
+D.h. die Optimierung lohnt sich am meisten auf dem Hotpath! (Ambehls law oder wie hießt das?)
 
 \section{Nicht berücksichtigte Optimierungen}
 
@@ -14,3 +35,6 @@ Vorgehensweise zum Optimieren darlegen.
     \item Verschiedene Compiler
     \item GPU beschleunigung: Numerische integrationsverfahren nicht auf GPU implementiert
 \end{itemize}
+
+\section{Architekturmodelle}
+
