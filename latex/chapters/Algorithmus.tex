@@ -4,12 +4,18 @@ In diesem Kapitel wird das zu implemnetierende VErfahren vorgestellt.
 \section{Accoustic single-layer integral operator}
 
 Welches Problem löst das Verfahren:
-\begin{equation*}
+\begin{equation}
     \Delta
     I_{r,\Delta}(k) = \int_{\Delta}^{}  \frac{e^{ik(\left\lVert r-r'\right\rVert + \theta \cdot r')}}{\left\lVert r-r'\right\rVert} \,dr'
-\end{equation*}
+\end{equation}
 
 Wie wird es im Paper angegangen:
+
+
+\begin{equation} \label{eq:2}
+    \Delta
+    I_{r,\Delta}(k) = \int_{\Delta}^{}  \frac{e^{ik(\left\lVert r-r'\right\rVert + \theta \cdot r')}}{\left\lVert r-r'\right\rVert} \,dr'
+\end{equation}
 
 Und dann auf die relevanten Mathematischen "Grundlagen" eingehen die verwendet werden um das Verfahren implementieren:
 
@@ -18,9 +24,34 @@ Und dann auf die relevanten Mathematischen "Grundlagen" eingehen die verwendet w
 
 
 
+
 \subsection{Gauss-Laguerre Quadratur}
+
+Die Gauss-Laguerre Quadratur ist eine Aproxmiation zur Auswertung von Integralen:
+\begin{equation}
+    \int_{0}^{\inf } f(t) e^-t  \,dt  \approx \sum_{i = 1}^{n} w_if(x_i) 
+\end{equation}
+
+Diese wird in dem steepest-descent Verfahren in Kombination mit dem Cauchy-Integral-Theorem genutzt um das Integral "LINK AUF FORMEL" zu berechnen.
 
 \subsection{Steepest Descent Method}
 
+In der Arbeit von \cite{gasperini:hal-03209144} wird das Integral \ref{eq:2} aus Formel 1 für ein Dreieck $\Delta \in \mathbb{R}^3$ und einen Einheitsvektor $\theta \in \mathbb{R}^3$ wie folgt definiert:
+\begin{equation}
+    I_{\Delta}(k) = | A_1 \times A_2 | \int_{0}^{1} \int_{0}^{1-y} \frac{e^{ik(\left\lVert Ax + b - r\right\rVert+\theta \cdot(Ax +b))}}{\left\lVert Ax + b - r\right\rVert }  \,dx \,dy 
+\end{equation}
+Dabei wird das Dreieck $\Delta$ als parametrisierties Einheitsdreieck mit der affinen Abbildung $x \mapsto Ax + $ mit $x = (x, y)^T, A \in \mathbb{R}^3$ und $b \in \mathbb{R}^3$ beschrieben.
 
+Zusammen mit der Wellenzahl $k$ sind $A$, $b$, $r$ und $\theta$ die Eingabegrößen des zu implementierenden Algorithmus.
+In Kapitel 2 von \cite*{gasperini:hal-03209144} wird hergeleitet wie die Gleichung \ref{2} in Abhängigkeit von diesen Eingabegrößen
+definieren lässt.
+Die Funktion $g$ in Gleichung \ref{2} lässt sich mithilfe der Funktion $P(x)$: 
+\begin{equation}
+    P(x) = c_0 x^2 + c_0|c|^2-2c_0xRe(c)
+\end{equation}
+wie folgt beschreiben:
+\begin{equation}
+    g(x) = \sqrt{P(x)} + qx + s
+\end{equation}
 
+ 

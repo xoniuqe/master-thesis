@@ -61,10 +61,28 @@ Kurze erklärung wie es klappt und beispiel für einfaches Plugin
 
 \subsection{Gauss laguerre integration und Cauchy Integral Theoerem}
 
-\lstinputlisting[language=C++,style=cpp]{gauss_laguerre.cpp}
+Implementiert das Gauss laguerre Qudarature mit der Pfad auswertung kombiniert.
 
-\subsection{1D Integration}
+\begin{figure}
+    \lstinputlisting[language=C++,style=cpp]{gauss_laguerre.cpp}
+    \caption{Implementierung der Gauss-Laguerre Quadratur}
+\end{figure}
+\subsection{1D Integration Berechnung der Singularität}
 
+\begin{equation}
+    I(k,y,a,b,) = I(k,y,a,a_1) + I(k,y,a_1, b_1) + I(k,y,b_1,b)
+\end{equation}
+
+Dabei wird $I(k,y,a_1, b_1)$ mithilfe klassischer Integrationsverfahren berechnet, dabei muss das folgene Integral berecnet werden:
+
+\begin{equation}
+    I(k,y,a,b) := \int_{a}^{b}  \frac{e^ikg(x)}{\sqrt{P(x)}} \,dx 
+\end{equation}
+
+\begin{figure}
+    \lstinputlisting[language=C++,style=cpp,mathescape=true]{1d_integration_singularity.cpp}
+    \caption{Implementierung des 1D-Falls (Singularität)}
+\end{figure}
 
 
 \subsection{2D Integration}

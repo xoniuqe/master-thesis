@@ -23,6 +23,10 @@
 
 \usepackage{filecontents}
 
+%\usepackage[numbers]{natbib} 
+%\usepackage[english]{babel} 
+%\usepackage[     %backend=biber,      natbib=true,     style=numeric,     sorting=none ]{biblatex}
+
 \begin{filecontents*}{eprint-hal.dbx}
 	\ProvidesFile{eprint-hal.dbx}[2018/09/26 HAL/TEL eprints]
 	\DeclareDatamodelFields[type=field,datatype=verbatim]{arxiv,hal}
@@ -33,7 +37,7 @@
 	
 \usepackage[
     backend=biber,
-    style=authoryear-icomp,
+    style=numeric,%authoryear-icomp,
     sortlocale=de_DE,
     natbib=true,
     url=true, 
