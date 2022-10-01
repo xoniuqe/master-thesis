@@ -1,18 +1,74 @@
 \chapter{Entwurf}
 
-\section{Nichtfunktionale Anforderungen}
-
-\begin{itemize}
-    \item Geschwindigkeit
-    \item Genauigkeit
-    \item Bedienbarkeit
-\end{itemize}
+In diesem Kapitel wird auf verschiedene Aspekte der Entwurfsphase eingegangen.
+Zum einen wird dargelegt mit welcher Herangehensweise der Algorithmus umgesetzt wird und zum anderen werden die Entscheidungen über die verwendeten Technologien begründet.
 
 \section{Anforderungen}
 
-Trivial: Implementierung des Algorithmus
+Ziel dieser Arbeit ist es das in \cite*[]{gasperini:hal-03209144} beschriebene Verfahren zu implementieren.
+Dabei sind drei Anforderungsbereiche auszumachen, welche in diesem Abschnitt behandelt werden.
+
+
+\subsection{Korrektheit}
+
+Die trivialste Anforderung ist den beschriebenen Algorithmus korrekt zu implementieren.
+Diese Anforderung ist erfüllt, wenn die Rechenresultate der Implementierung eine Genauigkeit der gleichen Größenordnung wie die MatLab-Implementierung von \cite*[]{gasperini:hal-03209144}.
+Dort werden in Kapitel 6.1 (Tabelle 3) für die Parameter 
+\begin{equation}
+    A = \begin{pmatrix}
+        0 & 0 \\
+        2 & 0 \\
+        0 & 2 \\
+    \end{pmatrix}, b = \begin{pmatrix}
+        0 \\ -1 \\ 0
+    \end{pmatrix},
+    r = \begin{pmatrix}
+        0.6 \\ 0 \\0 
+    \end{pmatrix},
+    \theta = \begin{pmatrix}
+        1 \\ 0 \\
+    \end{pmatrix}
+\end{equation}
+
+die relativen Fehler des implementierten Verfahrens mit der Matlab $integral$ Funktion für verschiedene Wellenzahlen $k$ verglichen.
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|l|}
+    \hline
+    k & Relativer Fehler \\ 
+    \hline \hline
+    100  & $1.44 × 10^{-15}$ \\
+    500  &  $1.15 × 10^{-14}$ \\
+    1000 &  $9.71 × 10^{-5}$ \\
+    3000 &  $5.11 × 10^{-7}$ \\
+    5000 & $1.31 × 10^{-8}$ \\  \hline
+    \end{tabular}    
+    \caption{Genauigkeit der Implementierung von \cite*[]{gasperini:hal-03209144}}
+\end{table} 
+Das Kriterium der Korrektheit wird als erfüllt angesehen wenn die Implementierung höchstens Fehler der gleichen Größenordnung liefert.
+
+\pagebreak
+
+\subsection{Bedienbarkeit}
+
+Die Anforderung der Bedienbarkeit wird im Rahmen dieser Arbeit wie folgt definiert:
+
+\begin{enumerate}
+    \item Es wird eine C++ Bibliothek bereitgstellt welche Mithilfe des Build-Systesm CMake eingebunden werden kann. 
+    \item Es wird eine oder mehrere Matlab-Mex Funktionen ausgeliefert welche, den Algorithmus in Matlab benutzbar machen. 
+    \item Es wird ein Python-Modul bereitgesellt mit welchem die 1D und 2D Algorithmen genutzt werden können.
+\end{enumerate}
+
+Dabei ist es nicht das Ziel die beschriebenen Pakete offiziel auszuliefern, das eingehändige Compilieren der Bilbiothek und ggf. der Module ist erforderlich.
+
+\subsection{Geschwindigkeit}
+
+Der implementierte Algorithmus darf nicht langsamer als die bereitgestellte Matlab-Implementierung sein.
+
 
 \section{Architektur}
+
+
 
 \begin{itemize}
     \item Iteratives Design 
