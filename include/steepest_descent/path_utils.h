@@ -170,7 +170,7 @@ namespace path_utils {
     inline auto get_path_derivative(const path_function & path, const Tnumeric y, const datatypes::matrix & A, const  arma::vec3 & b, const  arma::vec3 & r, const double& q, const datatypes::complex_root& complex_root) -> path_function {
         auto C = std::real(complex_root.c);
 
-        //chapter   4.2
+        //chapter   4.2 Equation 15
         auto Pp = [=](const double t) -> auto {
             return  math_utils::calculate_P_x(path(t), y, A, b, r);
         };
