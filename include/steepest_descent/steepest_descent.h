@@ -22,7 +22,7 @@ namespace steepest_descent {
 
 	template<typename T>
 	struct steepest_descend_2d {
-		steepest_descend_2d(T& path_weighter, std::vector<double> nodes, std::vector<double> weights, const double k, const std::complex<double> y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r,
+		steepest_descend_2d(T& path_weighter, const std::vector<double>& nodes, const std::vector<double>& weights, const double k, const std::complex<double> y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r,
 			const double q, const std::complex<double> s, const datatypes::complex_root complex_root, const std::complex<double> sing_point) : path_weighter(path_weighter), nodes(nodes), weights(weights), k(k), y(y), A(A), b(b), r(r), q(q), s(s), complex_root(complex_root), sing_point(sing_point) {
 
 		}
@@ -37,7 +37,7 @@ namespace steepest_descent {
 
 	private:
 		T& path_weighter;
-		std::vector<double> nodes, weights;
+		const std::vector<double>& nodes, weights;
 		double k, q;
 		std::complex<double> y, s;
 		datatypes::matrix A;
