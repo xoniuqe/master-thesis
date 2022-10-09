@@ -1,23 +1,40 @@
 \chapter{Das Verfahren}
 
-In diesem Kapitel wird das zu implemnetierende VErfahren vorgestellt.
 \section{Accoustic single-layer integral operator}
 
-Welches Problem löst das Verfahren:
+In der Arbeit \citetitle{gasperini:hal-03209144} wird ein Verfahren zum lösen von Problemen der folgenden Art
 \begin{equation}
     \Delta
     I_{r,\Delta}(k) = \int_{\Delta}^{}  \frac{e^{ik(\left\lVert r-r'\right\rVert + \theta \cdot r')}}{\left\lVert r-r'\right\rVert} \,dr'
 \end{equation}
+vorgestellt.
 
-Wie wird es im Paper angegangen:
+Die Autoren zeigen, dass sich das Problem wie folgt umformulieren lässt:
 
-
-\begin{equation} \label{eq:2}
-    \Delta
-    I_{r,\Delta}(k) = \int_{\Delta}^{}  \frac{e^{ik(\left\lVert r-r'\right\rVert + \theta \cdot r')}}{\left\lVert r-r'\right\rVert} \,dr'
+\begin{equation}
+    I(k,a,b) = \int_{0}^{\infty} h'_a(t)f(h_a(t))e^{ikg(h_a(t))} \,dt - \int_{0}^{\infty} h'_b(t)f(h_b(t))e^{ikg(h_b(t))} \,dt
 \end{equation}
 
+
 Und dann auf die relevanten Mathematischen "Grundlagen" eingehen die verwendet werden um das Verfahren implementieren:
+
+Idee: Die einzelnen "teile" des Algorithmuses getrennt erklären:
+Fall mit und ohne Singularität und dann in der Implementierung darauf referenzieren und die jeweiligen Teile verlinken.
+
+\subsection{Das 1D-Verfahren}
+\subsection{Das Verfahren über Dreiecksoberflächen}
+
+In Kapitel 5.2 von \cite*{gasperini:hal-03209144} wird gezeigt wie das Verfahren auf das ursprüngliche Ziel erweitert wird.
+Dazu wird das zu berechnende Integral für ein Dreieck in mehrere parallele Schichten aufgeteilt, welche jeweils mit dem eindimenisionalen Verfahren angehnähert werden können.
+
+\begin{equation}
+    \resizebox{.9\hsize}{!}{$\hat{I}_{\Delta_1,n_y}(k) = \sum_{j = 1}^{n_y} \left[ \Lambda_0(y_{m_j}) \int_{y_{j-1}}^{y_j}  e^{ik(\sqrt(P(0,y))+q_yy+s)}\,dy - \Lambda_{1-y_{m_j}}(y_{m_j}) \int_{y_{j-1}}^{y_j}  e^{ik(\sqrt(P(1-y,y))+q_x(1-y)+q_yy+s)}\,dy  \right]$}
+\end{equation}
+
+Die Anzahl $n_y$ dieser Schichten wird als Parameter der zu implementierenden Lösung angesehen.
+
+
+
 
 \section{Mathematische Grundlagen}
 \subsection{Cauchy-Integral-Theorem}
@@ -54,4 +71,6 @@ wie folgt beschreiben:
     g(x) = \sqrt{P(x)} + qx + s
 \end{equation}
 
- 
+ Worauf will ich hinaus?
+
+

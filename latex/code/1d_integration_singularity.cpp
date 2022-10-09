@@ -5,7 +5,7 @@ auto I1 = steepest_desc(left_split, sp1);
 auto I2 =  steepest_desc(sp2, right_split);
 
 
-// Berechnung der um die Singularitaet $I(k,y,a_1,b_1)$
+// Berechnung der um die Singularität $I(k,y,a_1,b_1)$
 auto& local_k = this->config.wavenumber_k;
 auto green_fun = [k=local_k, y=y, &A, &b, &r, q, s](const double x) -> auto { 
     auto Px = math_utils::calculate_P_x(x, y, A, b, r);

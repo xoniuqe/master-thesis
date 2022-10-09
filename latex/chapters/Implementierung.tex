@@ -3,7 +3,8 @@
 In diesem Kapitel wird dargelegt wie der Algorithmus implementiert wird. Zu Beginn wird erläutert warum welche Technologie zum Einsatz kommt und welche Alternativen es gibt.
 \section{Verwendete Technologien}
 
-
+Nur die Tools die für die Implementierung Nötig waren,
+Profiler (VAlgrind) kommen ins Kapitel "Analyse und Bewertung"
 Mit Stern markierte gerne etwas weiter ausführen
 \begin{itemize}
     \item Armadillo
@@ -14,7 +15,6 @@ Mit Stern markierte gerne etwas weiter ausführen
     \item Google Benchmarks
     \item CMake
     \item Visualstudio Profiler
-    \item Gprof (malsehen ob das noch genutzt wird)
     \item Valgrind*
 \end{itemize}
 
@@ -40,6 +40,31 @@ Die Entshceidung GSL und Armadillo basier auf: Aramdillo ist einfach einzubinden
 GSL hat eine gute Perfomance. Der Verglecih lief mit Boost wobei einfache Tests zeigten das GSL schneller ist und mit weitaus weniger Aufwand in das Projekt integriert werden kann.
 (Boost integration ist furchtbar!)
 
+In dieser Arbeit wird das sogenannte \textit{CQUAD}-Integrationsverfahren verwendet.
+Im Handbuch der GSL wird dieses Verfahren als
+\begin{quotation}
+    [...]CQUAD is a new doubly-adaptive general-purpose quadrature routine[...]
+\end{quotation} \cite*[Kapitel 17.11]{book} beschrieben. Dieses Verfahren wird ausgewählt,da 
+dies das selbe Verfahren ist welches in Matlab mit der Funktion \textit{integral2} verwendet wird.
+
+Dieses Verfahren kann nicht direkt genutzt werden um die benötigten Integrationen aus \cite*{gasperini:hal-03209144} zu berechnen, da 
+der \textit{CQUAD}-Algorithmus zum einen nur für eindimensionale Integrale und nur für den reellen Zahlenraum definiert ist.
+
+Um dies zu ermöglichen sind zwei Anpassungen nötig:
+\begin{enumerate}
+    \item Das Verschachteln von zwei \textit{CQUAD} Aufrufen, und
+    \item das auftrennen in zwei getrennte Aufrufe, jeweils für den Real- und Imaginär-teil der Integranden
+\end{enumerate}
+
+Die Implementierung für den Realteil ist in \ref{integration_2d} zu sehen.
+
+\begin{figure}
+    \lstinputlisting[language=C++,style=cpp]{gsl_integrator_2d.cpp}
+    \caption{Implementierung des 1D-Falls (Singularität)}
+    \label{integration_2d}
+\end{figure}
+
+
 
 \subsection{Armadillo}
 
@@ -49,20 +74,43 @@ Kurze Einführng (1 Seite max?)
 
 Darstellung der beschleunigten Stellen, bzw beispiele wie man damit was parallelsiert + kurze einführenng
 
-\subsection{Valgrind}
-
-Erklärung der genutzten Tools Cachegrind und Cachetool?
+\begin{itemize}
+    \item Grobe EInleitugn was das ist und wie es klappt
+    \item Grobes Beispiel anhand von \texttt{parallel\_for} und dann:
+    \item \texttt{blocked\_range}
+    \item \texttt{parallel\_reduce}
+    \item \texttt{parallel\_deterministic\_reduce}
+\end{itemize}
 
 \subsection{Pybind}
 
 Kurze erklärung wie es klappt und beispiel für einfaches Plugin
 
+\subsection{Matlab Mex-Funktion}
+
+Um eine C++-Funktion in Matlab zur Verfügung zu Stellen gibt es mehrere Ansätze.
+Zum einen kann mithilfe von Matlab C++-Code kompiliert und anschließend genutzt werden. 
+Die für den Endnutzer einfacherer Variante ist das Bereitstellen von sogenannten Mex-Funktionen.
+
+Um eine Mex-Funktion zu implementieren müssen die Header-Dateien \texttt{mex.hpp} und \texttt{mexAdapter.hpp} inkludiert werden
+und eine Funktion mit dem Namen \textit{MexFunction} implementiert werden. 
+
+In Abbildung \ref{mexfunction} ist eine Beispiel-Implementierung zu sehen 
+\begin{center}
+    \lstinputlisting[language=C++,style=cpp]{mex_function.cpp}
+    \captionof{figure}{Eine einfache Mex-Funktion ohne Logik}
+    \label{mexfunction}
+\end{center}
+
+Nachdem diese kompiliert wurde lässt sie sich aus Matlab heraus aufrufen.
 
 \section{Ausgewählte Codestellen}
 
 \subsection{Gauss laguerre integration und Cauchy Integral Theoerem}
 
 Implementiert das Gauss laguerre Qudarature mit der Pfad auswertung kombiniert.
+
+Hier liegt noch der falsce code( für 1d aer wir wollen 2d zeigen)
 
 \begin{figure}
     \lstinputlisting[language=C++,style=cpp]{gauss_laguerre.cpp}
@@ -90,3 +138,5 @@ Dabei wird $I(k,y,a_1, b_1)$ mithilfe klassischer Integrationsverfahren berechne
 
 Warum konnte 1d Integration hier nicht direkt genutzt werden?
 => Indirektion durch das 1d Integral war relativ hoch, das teste ich aber besser noch mal
+
+

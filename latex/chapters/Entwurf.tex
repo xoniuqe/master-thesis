@@ -1,5 +1,4 @@
 \chapter{Entwurf}
-
 In diesem Kapitel wird auf verschiedene Aspekte der Entwurfsphase eingegangen.
 Zum einen wird dargelegt mit welcher Herangehensweise der Algorithmus umgesetzt wird und zum anderen werden die Entscheidungen über die verwendeten Technologien begründet.
 
@@ -61,9 +60,12 @@ Die Anforderung der Bedienbarkeit wird im Rahmen dieser Arbeit wie folgt definie
 
 Dabei ist es nicht das Ziel die beschriebenen Pakete offiziel auszuliefern, das eingehändige Compilieren der Bilbiothek und ggf. der Module ist erforderlich.
 
-\subsection{Geschwindigkeit}
+\subsection{Geschwindigkeit}\label{Performance}
+
 
 Der implementierte Algorithmus darf nicht langsamer als die bereitgestellte Matlab-Implementierung sein.
+Zu diesesm Zweck werden einige Auswertungen mit randomisierten Daten mithilfe von MatLab ausgeführt und direkt mit der vorhandenen MatLab-Implementierung verglichen.
+
 
 
 \section{Architektur}
@@ -77,9 +79,9 @@ Der implementierte Algorithmus darf nicht langsamer als die bereitgestellte Matl
     \item Numerische Integraiton mit GSL muss noch gelöst werden
 \end{itemize}
 
-\section{Multithreading betrachtung des Algorithmus}
+%\section{Multithreading betrachtung des Algorithmus}
 
-Was kann man wo Parallelisieren?
+%Was kann man wo Parallelisieren?
 
-\section{Thread pool bzw. object pool}
+%\section{Thread pool bzw. object pool}
 
