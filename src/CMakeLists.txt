@@ -69,16 +69,20 @@ ENDIF()
 #endif()
 #target_compile_options(SteepestDescentLib PRIVATE -pedantic -Wall -Wextra -Wconversion)
 
+set_property(TARGET SteepestDescentLib
+             PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 IF(MSVC) 
 	target_compile_options(SteepestDescentLib PRIVATE
 	  /DARMA_DONT_USE_WRAPPER
 	 # /static
 	 # /pedantic
-	  /W4
+	 # /LTCG 
+	  #/W4
 	  /BUILD_STATIC_LIBS
 	  /GS
-	  $<$<CONFIG:DEBUG>:/g3>
-	  $<$<CONFIG:RELEASE>:/O2>
+	  /O2
+	#  $<$<CONFIG:DEBUG>:/g3>
+	#  $<$<CONFIG:RELEASE>:/O2>
 	)
 ELSEIF(GCC)
 	target_compile_options(SteepestDescentLib PRIVATE
@@ -96,9 +100,9 @@ ELSEIF(GCC)
 ELSEIF()
 ENDIF()
 
-add_compile_definitions(
-  $<$<CONFIG:DEBUG>:DEBUG>
-)
+#add_compile_definitions(
+#  $<$<CONFIG:DEBUG>:DEBUG>
+#)
 
 #pybind stuff:
 #target_include_directories(SteepestDescentLib PUBLIC ../include)

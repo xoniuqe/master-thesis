@@ -20,6 +20,35 @@ add_executable (SteepestDescent "SteepestDescent.cpp" "SteepestDescent.h")
 	  #-Wconversion
 	  #-Wsign-conversion)
 
+	#  set_property(TARGET SteepestDescent
+     #        PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+IF(MSVC) 
+	target_compile_options(SteepestDescent PRIVATE
+	  #/DARMA_DONT_USE_WRAPPER
+	 # /static
+	 # /pedantic	  /W4
+	  #/BUILD_STATIC_LIBS
+	  #/GS
+	  #/O2
+	  #$<$<CONFIG:DEBUG>:/g3>
+	  #$<$<CONFIG:RELEASE>:/O2>
+	)
+ELSEIF(GCC)
+	target_compile_options(SteepestDescent PRIVATE
+	 # -DARMA_DONT_USE_WRAPPER
+	  -BUILD_STATIC_LIBS
+	  -pedantic
+	  -Wall
+	  -Wextra
+	  -Wconversion
+	  -Wsign-conversion
+	  $<$<CONFIG:DEBUG>:-g3>
+	  $<$<CONFIG:DEBUG>:-Og>
+	  $<$<CONFIG:RELEASE>:-O3>
+	)
+ELSEIF()
+ENDIF()
+
 add_compile_definitions(SteepestDescent PUBLIC USE_ARMADILLO)
 # TODO: Fügen Sie bei Bedarf Tests hinzu, und installieren Sie Ziele.
  
