@@ -8,16 +8,16 @@
 
 
 
-template <class ...Args>
-void Benchmark_1DIntegration_Varying_K(benchmark::State& state, Args&&... args) {
-	auto args_tuple = std::make_tuple(std::move(args)...);
-	auto [nodes, weights] = gauss_laguerre::calculate_laguerre_points_and_weights(160);
+//template <class ...Args>
+void Benchmark_1DIntegration_Varying_K(benchmark::State& state, int k) {
+	//auto args_tuple = std::make_tuple(std::move(args)...);
+	//auto [nodes, weights] = gauss_laguerre::calculate_laguerre_points_and_weights(600);
 	for (auto _ : state) {
 		arma::mat  A{ {0, 0}, {1, 0}, {0, 1 } };
 
 		arma::vec b{ 0,0,0 };
 		config::configuration config;
-		config.wavenumber_k = 5;
+		config.wavenumber_k = k;
 		config.tolerance = 0.1;
 		config.gauss_laguerre_nodes = 600;
 
