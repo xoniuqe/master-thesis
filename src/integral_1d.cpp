@@ -40,7 +40,8 @@ namespace integral {
 		if (std::abs(std::imag(spec_point)) < std::abs(std::imag(c))) {
 			spec_point = std::real(spec_point);
 		}
-		steepest_descent::steepest_descend_1d steepest_desc(nodes, weights, config.wavenumber_k, y, A, b, r, q, s, { c, c_0 }, sing_point);
+		steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path, nodes, weights, config.wavenumber_k, y, A, b, r, q, s, { c, c_0 }, sing_point);
+		//steepest_descent::steepest_descend_1d steepest_desc(nodes, weights, config.wavenumber_k, y, A, b, r, q, s, { c, c_0 }, sing_point);
 
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
 		if (math_utils::is_singularity_in_layer(config.tolerance, spec_point, left_split, right_split)) {
@@ -52,15 +53,15 @@ namespace integral {
 		else
 		{
 			//no singularity
-			return steepest_desc(left_split, right_split);
+			return steepest_desc(left_split) - steepest_desc(right_split);
 
 		}
 
 		auto& [sp1, sp2] = split_points;
 
-		auto I1 = steepest_desc(left_split, sp1);
+		auto I1 = steepest_desc(left_split) - steepest_desc(sp1);
 
-		auto I2 =  steepest_desc(sp2, right_split);
+		auto I2 =  steepest_desc(sp2) - steepest_desc(right_split);
 
 		auto& local_k = this->config.wavenumber_k;
 
