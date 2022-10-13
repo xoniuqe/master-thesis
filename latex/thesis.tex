@@ -80,6 +80,7 @@
 \pagestyle{myheadings}
 \setlength{\textheight}{1.1\textheight}
 
+%\usepackage{showframe}
 \lstset{
 	basicstyle=\scriptsize\ttfamily,
 	commentstyle=\scriptsize\ttfamily\color{Gray},
@@ -96,6 +97,8 @@
 	xleftmargin=10mm,
 	linewidth=144mm,
 	captionpos=b,
+  xleftmargin=3mm, 
+  xrightmargin=3mm,
 }
 
 %-- styles for code
@@ -106,12 +109,12 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
 \lstdefinestyle{cpp}{
-	backgroundcolor=\color{backcolour},   
+	  backgroundcolor=\color{backcolour},   
     commentstyle=\color{codegreen},
     keywordstyle=\color{magenta},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize,
+    %basicstyle=\ttfamily\footnotesize,
     breakatwhitespace=false,         
     breaklines=true,                 
     keepspaces=true,                 

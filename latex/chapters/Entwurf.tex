@@ -70,18 +70,47 @@ Zu diesesm Zweck werden einige Auswertungen mit randomisierten Daten mithilfe vo
 
 \section{Architektur}
 
+Die Anwendung wird in drei Module aufgeteilt. 
+Die Hauptbibliothek \texttt{steepest\_descent}, in welcher der eigentliche Algorithmus implementiert wird, sowie eine API definiert sodass sich die 1D-Integration, die 2D-Integration und ein Funktion für das parallele Verarbeiten von mehreren 2D-Integrationen von aussen Ansprechen lassen.
+Diese API-Endpunkte dienen den Python- und Matlab-Wrappern die nötigen Anknüpfpunkte. 
 
+Das Python-Modul \texttt{stedepy}welches die in der Hauptbibliothek API-Endpunkte bereitstellt, sowie eine Möglichkeit die benötigten Gauss-Laguerre-Knoten vorab zu berechnen.
+Das Matlab-Modul, welches sich aus mehreren Mex-Funktionen zusammen setzt welche die Funkionen der API bereitstellen.
+
+
+Abgesehen von dieser Aufteilung wird keine Architektur vorab definiert und es wird ein iteratives Vorgehen durchgeführt.
+Die einzelnen API-Aufrufe teilen nur wenige gemeinsame Daten:
+\begin{itemize}
+    \item Die Wellenzahl $k$,
+    \item den Beobachtungspunkt $r$,
+    \item die Anzahl an Knoten für das Gauss-Laguerre-Verfahren,
+    \item sowie die gewünschte Auflösung im zweidimensionalen Fall
+\end{itemize}
+Diese werden, abgesehen von dem Beobachtungspunkt $r$, in eine Konfigurationsklasse zusammengefasst.
+
+
+\subsection{Parameter der Integration}
+
+Die Parameter einer Integration eines Dreiecks teilen sich wie folgt auf:
 
 \begin{itemize}
-    \item Iteratives Design 
-    \item In Tests hat sich gezeigt, dass zu viel Design zu schlechtere Performance führt (z.B. nutzen von Parameterobjekten oder zu viel indirektion für besser lesbaren code)
-    \item Functor Objekte erläutern
-    \item Numerische Integraiton mit GSL muss noch gelöst werden
+    \item Das Dreieck als parametrisierties Einheitsdreieck, bestehend aus einer $2x3$-Matrix $A$ und einem Verschiebungsvektor $b$,
+    \item der Beobachtungspunkt $r$,
+    \item ein Richtungsvektor $\theta$
 \end{itemize}
 
-%\section{Multithreading betrachtung des Algorithmus}
+Zusätzlich wird noch der Beobachtungspunkt als Parameter mitgereicht, dies ermöglicht eine vollständige Kompabilität mit der Matlab-Implementierung.
 
-%Was kann man wo Parallelisieren?
+\subsection{Functor-Objekte}\label{sec_functor}
 
-%\section{Thread pool bzw. object pool}
+Die Hauptkomponenten zur Integrationen werden als sogenannte \textit{Functor}-Objekte (Funktor) implementiert.
+Diese Datenstruktur zeichnet sich dadurch aus, dass sie den C++-Funktionsaufrufsoperator \textit{\(\)} bereitstellen und wie einfache C++-Funktionen aufgerufen werden können.
+Da Funktoren durch Klassen bzw. \textit{structs} definiert werden kann in ihnen ein Zustand gespeichert werden.
+In Abbildung \ref{2d_integral_functor} ist die Header-Definition des Funktor für das berechnen des zweidimensionalen Falls gezeigt.
+In den Konstruktoren werden Parameter übergeben welche für mehr als eine Integration invariant sind. In der Implementierung des Funktionsaufrufsoperators werden die im vorherigen Abschnitt definierten Parameter erwartet.
 
+\begin{center}
+    \lstinputlisting{2d_integral.hpp}
+    \captionof{figure}{Funktordefinition der zweidimensionalen Integration}
+    \label{2d_integral_functor}
+\end{center}

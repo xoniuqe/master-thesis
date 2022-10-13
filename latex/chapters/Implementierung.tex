@@ -3,50 +3,25 @@
 In diesem Kapitel wird dargelegt wie der Algorithmus implementiert wird. Zu Beginn wird erläutert warum welche Technologie zum Einsatz kommt und welche Alternativen es gibt.
 \section{Verwendete Technologien}
 
-Nur die Tools die für die Implementierung Nötig waren,
-Profiler (VAlgrind) kommen ins Kapitel "Analyse und Bewertung"
-Mit Stern markierte gerne etwas weiter ausführen
-\begin{itemize}
-    \item Armadillo
-    \item GNU Scientific Library *
-    \item Pybind (Eigen3) *
-    \item OneTBB *
-    \item Catch2
-    \item Google Benchmarks
-    \item CMake
-    \item Visualstudio Profiler
-    \item Valgrind*
-\end{itemize}
+In diesem Abschnit werden die verwendeten Technologien vorgestellt. 
 
-
-
-Nicht genutzte Alternativen
-
-Gründe noch aufführen
-\begin{itemize}
-    \item SIMD intrinsics * (mal sehen ob das sinnvoll ist)
-    \item Boost numeric
-    \item OpenCL
-    \item OpenMP
-    \item CUDA
-\end{itemize}
 
 \subsection{GNU Scientific Library}
 
-Gerade bei der Frage nach dem Framework für Linalg und numerischer Integration lässt sich nicht abschätzen was die beste Lösung ist. Es gibt
-so viele Frameworks und Bibliotheken, dass es nicht möglich ist alle gegeneinander Abzwuwägen.
+Die GNU Scientific Library (GSL) ist eine Sammlung von numerischen Funktionen\cite{gsl}. Die GSL wird unter der GNU General Public License veröffentlicht und ist in der Programmiersprache C geschrieben.
 
-Die Entshceidung GSL und Armadillo basier auf: Aramdillo ist einfach einzubinden und unkompliziert in der Anwendung.
-GSL hat eine gute Perfomance. Der Verglecih lief mit Boost wobei einfache Tests zeigten das GSL schneller ist und mit weitaus weniger Aufwand in das Projekt integriert werden kann.
-(Boost integration ist furchtbar!)
-
+Die GSL bietet unter anderem Funktionen für \textit{BAsic linear Algebrar Subprograms}(BLAS), verschiedene Interpolationsalgorihtmen, Monte-Carlo-Algorithmen, Implementierung für Fast Forier Tranformationen und die für diese 
+Arbeit benötigten Algorithmen für die numerische Integration.
+GSL bietet eine Reimplementierung des QUADPACK\cite{quadpack}, eine Fortran Bibiliothek für numerische Integration.
+Diese umfasst eine mehrere verschiedene Verfahren die ihren Namen einer Buchstaben Kodierung verdanken.
+%QAG noch gegne CQUAD testn erseres müsste schneller sein
+\\
 In dieser Arbeit wird das sogenannte \textit{CQUAD}-Integrationsverfahren verwendet.
 Im Handbuch der GSL wird dieses Verfahren als
 \begin{quotation}
     [...]CQUAD is a new doubly-adaptive general-purpose quadrature routine[...]
-\end{quotation} \cite*[Kapitel 17.11]{book} beschrieben. Dieses Verfahren wird ausgewählt,da 
-dies das selbe Verfahren ist welches in Matlab mit der Funktion \textit{integral2} verwendet wird.
-
+\end{quotation} \cite*[Kapitel 17.11]{gsl} beschrieben.
+\\
 Dieses Verfahren kann nicht direkt genutzt werden um die benötigten Integrationen aus \cite*{gasperini:hal-03209144} zu berechnen, da 
 der \textit{CQUAD}-Algorithmus zum einen nur für eindimensionale Integrale und nur für den reellen Zahlenraum definiert ist.
 
@@ -60,31 +35,98 @@ Die Implementierung für den Realteil ist in \ref{integration_2d} zu sehen.
 
 \begin{figure}
     \lstinputlisting[language=C++,style=cpp]{gsl_integrator_2d.cpp}
-    \caption{Implementierung des 1D-Falls (Singularität)}
+    \caption{Berechnung von komplexem Integral mit GSL}
     \label{integration_2d}
 \end{figure}
 
 
-
 \subsection{Armadillo}
 
-Kurze Einführng (1 Seite max?)
+Armadillo ist eine C++-Bibliothek von \citeauthor{armadillo}, welche Datenstrukturen und Algorithmen der linearen Algebra bereitstellt.
+Die Funktionalität uns Syntax ist an die von Matlab angelehnt mit dem Ziel die Umsetzung von \textit{Researchcode} in Produktivcode möglichst einfach zu gestalten \cite{armadillo}.
+
+
+\begin{center}
+    \begin{lstlisting}[language=C++,style=cpp]
+        arma::mat A = {{0, 0} , {1, 0}, {0, 1}};
+        //use matrix 
+        // ...
+    \end{lstlisting}
+    \begin{lstlisting}[language=C++,style=cpp]
+        gsl_matrix * m = gsl_matrix_alloc (3, 2);
+        gsl_matrix_set(m, 0, 0) = 0;
+        gsl_matrix_set(m, 0, 1) = 0;
+        gsl_matrix_set(m, 1, 0) = 1;
+        gsl_matrix_set(m, 1, 1) = 0;
+        gsl_matrix_set(m, 2, 0) = 0;
+        gsl_matrix_set(m, 2, 1) = 1;
+        //use matrix 
+        // ...
+        //free
+        gsl_matrix_free (m);
+    \end{lstlisting}
+    \captionof{figure}{Vergleich von Matrizen in Armadillo und GSL}
+    \label{gslarma}
+\end{center}
+
+Die GSL bietet zwar auch ein Framework für lineare Algebra, allerdings ist die API von Matlab deutlich moderner und einfacher zu verwenden (siehe Abbildung \ref{gslarma}).
+
+%Warum wurde neben GSL noch Armadilo genutz? => Moderne API von Armadillo
+
+%%Gerade bei der Frage nach dem Framework für Linalg und numerischer Integration lässt sich nicht abschätzen was die beste Lösung ist. Es gibt
+%so viele Frameworks und Bibliotheken, dass es nicht möglich ist alle gegeneinander Abzwuwägen.
+
+%Die Entshceidung GSL und Armadillo basier auf: Aramdillo ist einfach einzubinden und unkompliziert in der Anwendung.
+%GSL hat eine gute Perfomance. Der Verglecih lief mit Boost wobei einfache Tests zeigten das GSL schneller ist und mit weitaus weniger Aufwand in das Projekt integriert werden kann.
+%(Boost integration ist furchtbar!)
+
 
 \subsection{Intel Threading Building Blocks}
 
-Darstellung der beschleunigten Stellen, bzw beispiele wie man damit was parallelsiert + kurze einführenng
 
-\begin{itemize}
-    \item Grobe EInleitugn was das ist und wie es klappt
-    \item Grobes Beispiel anhand von \texttt{parallel\_for} und dann:
-    \item \texttt{blocked\_range}
-    \item \texttt{parallel\_reduce}
-    \item \texttt{parallel\_deterministic\_reduce}
-\end{itemize}
+Die Intel\textsuperscript{\textcopyright} oneAPI Threading Building BLocks (oneTBB) ist eine Template-basierte Bibliothek zur effizienten Parallelisierung von Anwendungen. 
+Mithilfe von oneTBB ist es möglich mit wenigen Schritten einen Algorithmus auf mehreren Threads auszuführen.
+%Die API bietet Datenstrukturen und Algorithmen um di
 
-\subsection{Pybind}
+oneTBB bietet für diverse Parallelisierungsprobleme  Algorithmen und Datenstrukturen an, von einfachen Schleifen, bis hin zu Graph-Based-Parallel Computing.
+In dieser Arbeit wurden lediglich die einfacheren Konzepte von parallelen Schleifen genutzt. Für diese Anwendungsfälle stellt oneTBB, unter anderem, die Funktionen \texttt{parallel\_for} und \texttt{parallel\_reduce}
+zur Verfügung. Diese arbeiten auf sogenannten \textit{Ranges}, welche eine Abstraktion der zu bearbeitenden Daten sind.
 
-Kurze erklärung wie es klappt und beispiel für einfaches Plugin
+Ranges können die zu verarbeitende Datenmenge in kleinere Bereiche aufteilen. Diese Teilbereiche werden von oneTBB dann parallelisiert. Die Daten innerhalb einer Range werden sequenziell verarbeitet. 
+Wie groß diese Teilbereiche werden und welcher Art die Aufteilung ist kann mithilfe von Parametern gesteuert werden. In diser Arbeit werden dies mit der sogenannten Blocked-Ranges (\texttt{blocked\_range}) realisiert, welche die Datenmenge in kontinuierliche Blöcke aufteilt. Die größe der jeweiligen Blöcke wird mit der sogenannten \textit{Grainsize} gesteuert.
+oneTBB bietet verschiedene Arten von Blocked-Ranges für bis zu 3 dimensionen. Die Grainsize muss dem zu lösenden Problem entsprechend groß gewählt werden.
+
+\begin{center}
+    \lstinputlisting[language=C++,style=cpp]{tbb_example.cpp}
+    \captionof{figure}{Minimalbeispiel von \texttt{paralell\_reduce}}
+\end{center}
+
+In dieser Arbeit werden ausschließlich Parallelisierungen mithilfe von \texttt{parallel\_recude} umgesetzt.
+Dieses bietet die Möglichkeit für jedes Datum eine Transformation durchzuführen und anschließend die tranformierten Daten zu vereinigen. 
+So wird beispielsweise in der Implementierung (siehe Abschnitt \ref{gauss_laguerre_section}) des Gauss-Laguerrre Verfahrens ein zu integrierender Pfad parallel an den einzelnen Gauss-Laguerre-Knotenpunkten ausgewertet und entsprechend gewichtet.
+Die so berechneten Teilwerte werden nur noch addiert und ergeben so das komplexe (Teil-)Integral des Pfades. 
+
+\subsection{Pybind11}
+
+Das Python-Modul wird mithilfe der Bibliothek \textit{pybind11} umgesetzt.
+Pybind11 ist eine sogenannte Header-only Bibliothek mit dem Ziel eine leichtgewichtige Alternative zu bestehenden Bibliotheken zur Erstellung  von
+Python-bindings für C++ Bibliotheken anzubieten.
+Pybind11\cite{pybind} ist ein Opensource-Projekt und wird unter einer BSD-artigen Lizenz veröffentlicht. 
+
+Folgendes Beispiel\footnote{Beispielcode stammt von \url{https://pybind11.readthedocs.io/en/latest/basics.html} aus der pybind-Dokumenation\cite{pybind}.} stellt die C++Funktion \textit{add} als Python Modul bereit:
+\begin{center}
+\lstinputlisting[language=C++,style=cpp]{pybind11_example.cpp}
+\end{center}
+Dieses kann in einer Pythonumgebung wie folgt verwendet werden:
+
+\begin{center}
+\begin{lstlisting}[language=Python]
+import example;
+example.add(1, 2);
+\end{lstlisting}
+\end{center}
+
+
 
 \subsection{Matlab Mex-Funktion}
 
@@ -104,39 +146,80 @@ In Abbildung \ref{mexfunction} ist eine Beispiel-Implementierung zu sehen
 
 Nachdem diese kompiliert wurde lässt sie sich aus Matlab heraus aufrufen.
 
+
+\subsection{Sonstige}
+
+Als Testframework für automatisierte Unit-Tests wird die Bilbiothek \textit{catch2} verwendet.
+Zum Durchführen der automatisierten Benchmarks wird auf die Bibliothek \textit{Benchmark} von Google zurückgegriffen.
+
+
+%\subsection{Ungenutzte alternativen}
+
+
+%\begin{itemize}
+%    \item Boost numeric
+%    \item OpenCL
+%    \item OpenMP
+%    \item CUDA
+%\end{itemize}
+
+
 \section{Ausgewählte Codestellen}
 
-\subsection{Gauss laguerre integration und Cauchy Integral Theoerem}
+In diesem Abschnitt werden Details der Implementierung näher beleuchtet. Es werden ausgewählte Codestellen vorgestellt, die wesentliche Funktionen implementieren.
 
-Implementiert das Gauss laguerre Qudarature mit der Pfad auswertung kombiniert.
+\subsection{Gauss laguerre integration und Cauchy Integral Theoerem}\label{gauss_laguerre_section}
 
-Hier liegt noch der falsce code( für 1d aer wir wollen 2d zeigen)
+Die Berechnung der Pfadintegrale wird mithilfe des Gauss-Laguerre-Verfahrens realisiert.
+Da die Auswertung der Pfadfunktion an den Gauss-Laguerre-Knoten unabhängig voneinander ist wird diese Berechnung mithilfe der Funktion \texttt{parallel\_determinictic\_reduce} der oneTBB API parallisiert.
+Diese Funktion verhält sich ähnlich wie \texttt{parallel\_reduce} hat jedoch ein anderes Verhalten hinsichtlich des sogenannten \textit{splittings} der Ranges. 
+Die \textit{Grainsize} ist auf 100 Elemente festgelegt, kleinere Blockgrößen haben in Performanztests keine signifikante Beschleunigung ermöglicht und größere haben die Laufzeit negativ beeinflusst.
 
-\begin{figure}
+\begin{center}
     \lstinputlisting[language=C++,style=cpp]{gauss_laguerre.cpp}
-    \caption{Implementierung der Gauss-Laguerre Quadratur}
-\end{figure}
+    \captionof{figure}{Implementierung der Gauss-Laguerre Quadratur}
+    \label{gauss_laguerre_impl}
+\end{center}
+
+
 \subsection{1D Integration Berechnung der Singularität}
+
+In Kapitel 5.1 \cite[12]{gasperini:hal-03209144} (Formel 16) wird die Formel für den eindimenisionalen Fall, im Fall einer Singularität im Interval $[a_1, b_1]$ wie folgt beschrieben:
 
 \begin{equation}
     I(k,y,a,b,) = I(k,y,a,a_1) + I(k,y,a_1, b_1) + I(k,y,b_1,b)
 \end{equation}
 
-Dabei wird $I(k,y,a_1, b_1)$ mithilfe klassischer Integrationsverfahren berechnet, dabei muss das folgene Integral berecnet werden:
+Die partiellen Integrale in den Intervallen $[a,a_1]$ und  $[b_1,b_1]$ können mithilfe des \textit{steepest-descent}-Verfahrens berechnet werden.
+Lediglich das verbleibende Interval muss mit einem klassischen Integrationsverfahren berechnet werden.
+Dieses Verfahren muss also fähig sein Singularitäten in einem Integral zu berechnen. Dies ist nicht bei allen Integrationsverfahren gegeben (z.B. dem sogenannten QAG-Verfahren aus der GSL).
 
-\begin{equation}
-    I(k,y,a,b) := \int_{a}^{b}  \frac{e^ikg(x)}{\sqrt{P(x)}} \,dx 
-\end{equation}
-
-\begin{figure}
+und wird in dieser Arbeit wie folgt berechnet:
+\begin{center}
     \lstinputlisting[language=C++,style=cpp,mathescape=true]{1d_integration_singularity.cpp}
-    \caption{Implementierung des 1D-Falls (Singularität)}
-\end{figure}
+    \captionof{figure}{Implementierung des 1D-Falls (Singularität)}
+\end{center}
+
+Dabei werden die Intervalle ohne Singularität mit dem Gauss-Laguerre-Verfahren (siehe Abbildung \ref{gauss_laguerre_impl}) berechnet und die verbleibende partielle Integration,
+welches die Form
+\begin{equation*}
+    I(k,y,a,b) := \int_{a}^{b}  \frac{e^ikg(x)}{\sqrt{P(x)}} \,dx 
+\end{equation*}
+hat, mithilfe eines Aufruf des GSL-Integrators berechnet (Analog zum 2D Fall, siehe Abbildung \ref{integration_2d})
 
 
-\subsection{2D Integration}
 
-Warum konnte 1d Integration hier nicht direkt genutzt werden?
-=> Indirektion durch das 1d Integral war relativ hoch, das teste ich aber besser noch mal
+\subsection{2D Integration}\label{2dint}
 
+Ebenso wie die 1D-Integration wird die 2D-Integration als sogenanntes \textit{Functor-Objekt}\ref{sec_functor} Implementiert. 
+Im Konstruktor werden die invarianten Parameter übergeben und in dem \textit{\(\)-Operator} werden die Dreiecksparameter, der Blickpunkt $r$ und der Richtungsvektor $\theta$ übergeben.
+
+\begin{center}
+    \lstinputlisting[language=C++,style=cpp,mathescape=true]{2d_integral.cpp}
+    \captionof{figure}{Berechnung des 2D-Integrals}
+    \label{2d_integral}
+\end{center}
+
+Die Funktion \textit{get\_partial\_integral} ist im Grunde genommen eine Kopie des eindimenisionalen Falles. Dieser wird allerdings aus Performanzgründen als lokale Funkion implementiert.
+Die Kosten eines indirekten Aufrufs des eindimenisionalen Falls haben sich in den Benchmarks sehr negativ dargestellt.
 

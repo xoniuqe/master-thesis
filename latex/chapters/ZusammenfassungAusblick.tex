@@ -1,20 +1,34 @@
 \chapter{Zusammenfassung und Ausblick}
 
-\section{Schwierigkeiten}
+Insgesamt hat diese Arbeit die geforderten Anforderungen erfüllt. Die Implementierung ist hinsichtlich der Performanz besser als die zu Grunde liegende Matlab-Implementierung.
+Durch das Python-Modul und die Matlab-Funktionen ist es relativ einfach möglich die Bibliothek zu verwenden. 
+Die Implementierung hat sich als komplizierter als erwartet gezeigt, denn einige Details werden in der Arbeit \cite[1] nicht näher beschrieben, die in der Implementierung nicht trivial sind.
 
-Komplizierte Mathematik dahinter, 
-speziell die Auswahl der Punkte um die Splitting Points konnte ich nicht nachvollziehen. (Keine explizierte Erklärung im Paper, dafür aber im MatlabCode)
+So ist beispielsweise die Berechnung der im Programmcode \textit{Splitting-point} genannten Punkte nicht weiter beschrieben und war nur mithilfe des Matlab-Codes nachvollziehbar.
+
+Hinsichtlich der Perfomanz bestehen noch einige Möglichkeiten die in dieser Arbeit nicht ausgeschöpft wurden. Insbesondere könnte eine Beschleunigung der Verfahren mithilfe der GPU enorme Laufzeit-Verbesserungen mit sich bringen.
+%Des weiteren könnte eine andere Herangehensweise hinsichtlich der gewählten Architektur womöglich weitere Lücken schließen. Die hier gewählte Lösung folg hinsichtlich der einzelnen Berechnungsschritte des Verfahrens der mathematischen Formulierung.
+%Dahingegen könnte eine Architektur die auf größere Mengen von Eingabeparemetern 
+
+%\section{Schwierigkeiten}
+
+%Komplizierte Mathematik dahinter, 
+%speziell die Auswahl der Punkte um die Splitting Points konnte ich nicht nachvollziehen. (Keine explizierte Erklärung im Paper, dafür aber im MatlabCode)
 
 
-\section{Weitere Möglichkeiten das Verfahren zu beschleunigen}
-mögliche beschlenigungen die nicht bearbeitet wurden:
-\begin{itemize}
-    \item Detailliertes Auseinandersetzen mit verschiedenen Complier und Linker optionen
-    \item Tooling angepasst an Zielarchitektur (?)
-    \item Pipelinebasierte Architektur (siehe TBB dokumente!)
-    \item GPU beschleunigung: steht und fällt mit numerischer Integration auf GPU (Eigene implementierung von Numerischer Integration würde viele Möglichkeiten bieten)
-    \item Templated/Constexpression zeug: Je nach Szenario könnte eine Compiletime optimierte Anwendung bereitgestellt werden. So könnten zum einen Parameter wie die Wellenfrequenz $k$ bereits in das Programm kompliiert werden un so zu einer enomren beschleunigugn beitragen.
-    \item Templated/Constexpression 2: Für fixe Node größen der Laguerre Implementeirung könnt eine gezielte festgelegte Implementierung durch eine fixe FUnktion zur Kompilezeit ausgetauscht werden und so für eine weitere beschleunigung sorgen?
-\end{itemize}
+%\section{Weitere Möglichkeiten das Verfahren zu beschleunigen}
+%mögliche beschlenigungen die nicht bearbeitet wurden:
+%\begin{itemize}
+ %   \item Detailliertes Auseinandersetzen mit verschiedenen Complier und Linker optionen
+ %   \item Tooling angepasst an Zielarchitektur (?)
+ %   \item Pipelinebasierte Architektur (siehe TBB dokumente!)
+ %   \item GPU beschleunigung: steht und fällt mit numerischer Integration auf GPU (Eigene implementierung von Numerischer Integration würde viele Möglichkeiten bieten)
+ %   \item Templated/Constexpression zeug: Je nach Szenario könnte eine Compiletime optimierte Anwendung bereitgestellt werden. So könnten zum einen Parameter wie die Wellenfrequenz $k$ bereits in das Programm kompliiert werden un so zu einer enomren beschleunigugn beitragen.
+ %   \item Templated/Constexpression 2: Für fixe Node größen der Laguerre Implementeirung könnt eine gezielte festgelegte Implementierung durch eine fixe FUnktion zur Kompilezeit ausgetauscht werden und so für eine weitere beschleunigung sorgen?
+%\end{itemize}
 
-In diesem Kapitel soll die Arbeit noch einmal kurz zusammengefasst werden. Insbesondere sollen die wesentlichen Ergebnisse Ihrer Arbeit herausgehoben werden. Erfahrungen, die z.B. Benutzer mit der Mensch-Maschine-Schnittstelle gemacht haben oder Ergebnisse von Leistungsmessungen sollen an dieser Stelle präsentiert werden. Sie können in diesem Kapitel auch die Ergebnisse oder das Arbeitsumfeld Ihrer Arbeit kritisch bewerten. Wünschenswerte Erweiterungen sollen als Hinweise auf weiterführende Arbeiten erwähnt werden.
+
+%\secion{Fazit}
+
+
+%In diesem Kapitel soll die Arbeit noch einmal kurz zusammengefasst werden. Insbesondere sollen die wesentlichen Ergebnisse Ihrer Arbeit herausgehoben werden. Erfahrungen, die z.B. Benutzer mit der Mensch-Maschine-Schnittstelle gemacht haben oder Ergebnisse von Leistungsmessungen sollen an dieser Stelle präsentiert werden. Sie können in diesem Kapitel auch die Ergebnisse oder das Arbeitsumfeld Ihrer Arbeit kritisch bewerten. Wünschenswerte Erweiterungen sollen als Hinweise auf weiterführende Arbeiten erwähnt werden.

@@ -1,4 +1,4 @@
-\chapter{Vorgehensweise zur Optimierung}
+\chapter{Vorgehensweise}
 
 In diesem Kapitel wird darauf eingegangen wie die in Kapitel \ref{Performance} definierten Ziele erreicht werden.
 
@@ -7,8 +7,9 @@ In diesem Kapitel wird darauf eingegangen wie die in Kapitel \ref{Performance} d
 
 Damit das Ziel der schnellen Performance erreicht werden wird die folgende Vorgehensweise genutzt.
 
-Zu Beginn wird der Algorithmus möglichst simpel Implementiert mit einem Fokus auf Korrektheit. 
-Das Korrekteverhalten wird durch Unittests sichergestellt. Die korrekten Eregbnisse einzelner Tests können mithilfe der vorliegenden Matlab Implementierung verifiziert werden.
+Zu Beginn wird der Algorithmus ohne Rücksicht auf Perfomanzkriterien implementiert.
+Dabei wird mithilfe von Unittests sichergestellt, dass sich die Implementierung korrekt verhält. 
+Die korrekten Eregbnisse einzelner Tests können mithilfe der vorliegenden Matlab Implementierung verifiziert werden.
 
 Nachdem in diesem ersten Schritt ein korrekter Algorithmus vorliegt kann mit der Optimierung begonnen werden.
 Dazu werden folgende Methoden verwendet, welche in den jeweiligen Unterkapiteln eingegangen wird.
@@ -16,7 +17,7 @@ Dazu werden folgende Methoden verwendet, welche in den jeweiligen Unterkapiteln 
 \begin{itemize}
     \item Profiling
     \item Hotpath-Analyse
-    \item Manuelle Tests
+    \item Benchmarking
     \item Parallelisierung isolierter Bereiche
 \end{itemize}
 
@@ -33,26 +34,29 @@ Das Ziel dieser Betrachtung ist es die Funktion(en) zu finden welche am größte
 Die so gefundenen Funktion sind die besten Kandidaten für Optimierungsmaßnahmen, da jede andere Funkion weniger zu der Laufzeit beiträgt.
 
 
-\section{Benchmarks}
+\section{Benchmarking}
 
-Automatische Benchmarks mit Googlebenchmark => genereller Überblick
+%Mithilfe der Google Bibliothek \textit{Benchmark} werden 
 
-Implementiertes Matlab Plugin kann im direkten Verlgeich mit der origniallen Matlab Implementierung ausgeführt werden
+Um die Laufzeit der Implementierung beurteilen zu können wird auf zweierlei Arten von Benchmarks gesetzt.
 
+Zum einen automatisierte Benchmarks, welche vorallem die API-Endpunkte mit verschiedenen Testdaten ausführen und das Laufzeitverhalten messen.
+Diese Ergebnisse werden genutzt um während der Entwicklung schnelle Rückmeldung über einzelne Maßnahmen zu erhalten.
 
-\section{Manuelle Tests}
+Die zweite Variante der Benchmarks ist das manuelle Ausführen von API-Aufrufen welche mithilfe von Timingfunktionen gemessen werden.
+Diese werden für Tests genutzt bei denen eine Automatisierung mit erheblichem Mehraufwand verbunden wäre.
+Diese Vorgehensweise wird beispielsweise beim Vergleich der Matlabimplementierung mit den Matlab-Modulen angewandt. 
 
-Manuelle TEsts + PRofiling haben gezeig,t dass in den TEsts der Hotpath wie erwartet der Fall ohne Singularität ist.
-D.h. die Optimierung lohnt sich am meisten auf dem Hotpath! (Ambehls law oder wie hießt das?)
+\section{Parallelisieren isolierter Bereiche}
 
-\section{Nicht berücksichtigte Optimierungen}
+Einige mögliche Parallesierungen lassen sich direkt aus der Problemstellung ablesen. 
+So ist beispielsweise die Berechnung des zweidimensionalen Falls von zwei Dreiecken $\Delta_1$ und $\Delta_2$ abgesehen von 
+der Wellenzahl $k$, des Beobachtungspunktes $\theta$ und der Anzahl der Gauss-Laguerre-Knoten unabhängig voneinander.
+Diese Berechnungen lassen sich Dementsprechend relativ unproblematisch Parallelisieren da keine klassischen Threading-Konflikte auftreten können.
+Da der Zugriff auf diese invarianten Parameter lediglich lesend ist können die Zugriffe auf diese Ressourcen sogar ohne Synchronisierungen durchgeführt werden.
 
-Einige mögliche Optimierungen werden in dieser Arbeit nicht betrachtet
+Ähnliches gilt für das Berechnen der einzelene Schichten im zweidimensionalen Fall. Die Ergebnisse einzelner Schichten beeinflussen sich gegenseitig nicht.
 
-\begin{itemize}
-    \item Verschiedene Compiler
-    \item GPU beschleunigung: Numerische integrationsverfahren nicht auf GPU implementiert
-\end{itemize}
+\section{Sonstige}
 
-%\section{Architekturmodelle}
-
+Des weiteren werden mithilfe von Compiler und Linker-Flags einige Optimierungen hinsichtlich der Laufzeit ausgewählt.

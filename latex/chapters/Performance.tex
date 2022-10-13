@@ -1,11 +1,18 @@
-\chapter{Analyse und Bewertung}
+\chapter{Analyse und Auswertung}
 
+
+\section{Testsystem}
+
+Die Performanztests wurden auf folgendem System durchgeführt:
 
 
 \section{Analyse mit Valgrind}
 
-
+In diesem Abschnit wird auf die Analyse des Projektes mit Valgrind eingegangen. Zunächst werden Valgrind und die daraus benutzten Tools vorgestellt und dann werden einige Ergebnisse präsentiert.
 \subsection{Valgrind}
+
+Valgrind ist einerseits ein Framework zum Erzeugen von dynamsichen Analyse Werkzeugen und andereseits eine Sammlung ebensolcher Werkzeuge. 
+Valgrind ist offene Software und wird unter der GNU GPL-2 Lizenz veröffentlicht\cite{valgrind}.
 
 Valgrind is an instrumentation framework for building dynamic analysis tools. There are Valgrind tools that can automatically detect many memory management and threading bugs, and profile your programs in detail. You can also use Valgrind to build new tools.
 
@@ -52,18 +59,43 @@ direkterer Aufruf der Gauss-Laguerre-Quadratur einen Laufzeitgewinn von fast 50 
 
 \subsection{Vermeiden von Funktionsaufrufen}
 
-In den Tests hat sich gezeigt, dass Funktionsaufrufe häufig 
-
-\section{Laufzeitmessugen}
-
-Die folgenen Laufzeitvergleiche wurden aus einer Matlab Umgebung heraus ausgeführt, d.h. es werden die ursprüngliche Implementierung sowie das Matlab-Modul der C++ Implementierung verglichen.
-
-\subsection{Iteration über Wellenzahl}
+Bei der Implementierung des zweidimensionalen Falls\ref{2dint} hat sich gezeigt, dass das Nutzen der eindimenisionalen Implementierung zu erhöhten Laufzeiten geführt hat.
 
 Samples: 50
 Laguerre Punkte: 600
 Auflösung: 0.1
-Die daten sind noch nich final!
+
+Veränderung: läuft über resoltuion nicht K!s
+
+Diese Messungen werden in der Abbildung \ref{abb_perf_indirect} dargestellt.
+
+\begin{center}
+  
+\end{center}
+
+Grafik folgt noch
+
+\section{Auswertung der Laufzeitmessugen}
+
+Die folgenen Laufzeitvergleiche wurden aus einer Matlab Umgebung heraus ausgeführt, d.h. es werden die ursprüngliche Implementierung sowie das Matlab-Modul der C++ Implementierung verglichen.
+
+
+\subsection{Iteration über Wellenzahl}
+
+
+In diesem Test wird die Laufzeit hinsichtlich veränderter Wellenzahl $k \in \{ 100, 500, 1000, 3000, 5000 \}$ gemessen.
+Für jedes $k$ werden 50 zufällige Richtungsvektoren $r$ berechnet mit 600 Gauss-Laguerre-Knoten berechnet.
+
+\begin{equation}
+  A = \begin{pmatrix}
+      0 & 0 \\
+      1 & 0 \\
+      0 & 1 \\
+  \end{pmatrix}, b = \begin{pmatrix}
+      0 \\ 0\\ 0
+  \end{pmatrix},
+\end{equation}
+
 \begin{center}
     \begin{tikzpicture}
         \begin{axis}[
@@ -128,7 +160,20 @@ Die daten sind noch nich final!
 
 
 \subsection{Laufzeitvergleich bei steigender Auflösung}
-    
+
+
+In diesem Test wird die Laufzeit hinsichtlich veränderter Auflösung $res \in \{ 0.1, 0.01, 0.001, 0.0001 \}$ gemessen.
+Für jedes $k$ werden 50 zufällige Richtungsvektoren $r$ berechnet mit 600 Gauss-Laguerre-Knoten berechnet.
+
+\begin{equation}
+  A = \begin{pmatrix}
+      0 & 0 \\
+      1 & 0 \\
+      0 & 1 \\
+  \end{pmatrix}, b = \begin{pmatrix}
+      0 \\ 0\\ 0
+  \end{pmatrix},
+\end{equation}
     
 \begin{center}
     \begin{tikzpicture}
@@ -185,9 +230,7 @@ Die daten sind noch nich final!
     \end{tikzpicture}%
     \captionof{figure}{Laufzeitvergleich über verschiedene Auflösungen, logarithmische Skalen}
 \end{center}
-tesat
+
+
 \section{Vergleiche der relativen Genauigkeit}
- tesateswt
 
-
-asetasd
