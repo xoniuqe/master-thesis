@@ -1,4 +1,4 @@
-\chapter{Implementierung}
+\chapter{Implementierung}\label{impl}
 
 In diesem Kapitel wird dargelegt wie der Algorithmus implementiert wird. Zu Beginn wird erläutert warum welche Technologie zum Einsatz kommt und welche Alternativen es gibt.
 \section{Verwendete Technologien}
@@ -211,15 +211,43 @@ hat, mithilfe eines Aufruf des GSL-Integrators berechnet (Analog zum 2D Fall, si
 
 \subsection{2D Integration}\label{2dint}
 
-Ebenso wie die 1D-Integration wird die 2D-Integration als sogenanntes \textit{Functor-Objekt}\ref{sec_functor} Implementiert. 
+Ebenso wie die 1D-Integration wird die 2D-Integration als sogenanntes \textit{Functor-Objekt}\ref{sec_functor} implementiert (siehe Abbildung \ref{2d_integral_functor}). 
 Im Konstruktor werden die invarianten Parameter übergeben und in dem \textit{\(\)-Operator} werden die Dreiecksparameter, der Blickpunkt $r$ und der Richtungsvektor $\theta$ übergeben.
 
+In diesem Abschnitt wird primär auf die Berechnung eines einzelnen Schicht $n$ eingangen. Die Anzahl der zu berechnenden Schichten wird aus der Konfiguration(siehe Abbildung \ref{configuration}) abgeleitet. 
+Die Menge der Schichten wird mithilfe der oneTBB Funktion \texttt{parallel\_reduce} parallelisiert.
+
 \begin{center}
-    \lstinputlisting[language=C++,style=cpp,mathescape=true]{2d_integral.cpp}
-    \captionof{figure}{Berechnung des 2D-Integrals}
-    \label{2d_integral}
+    \lstinputlisting[language=C++,style=cpp,mathescape=true]{integral_2d_reduce.cpp}
+    \captionof{figure}{Parallelisierung des 2D-Integrals}
+    \label{2d_integral_parallel}
 \end{center}
+
+Dabei hat sich gezeigt, dass eine Blockgröße von 1 zu den besten Ergebnissen führt.
+Die zu Berechnende Schicht kann nun in zwei Fälle unterteilt werden: Mit Singularität und ohne.
+
+\subsubsection*{Fall 1: Keine Singularität in Schich $n$}
+
+Dabei ist der Fall ohne Singularität der trivialere Fall:
+
+\begin{center}
+    \lstinputlisting[language=C++,style=cpp,mathescape=true]{integral_2d_trivial.cpp}
+    \captionof{figure}{Schicht $n$ ohne Singularität}
+    \label{2d_integral_trivial}
+\end{center}
+
 
 Die Funktion \textit{get\_partial\_integral} ist im Grunde genommen eine Kopie des eindimenisionalen Falles. Dieser wird allerdings aus Performanzgründen als lokale Funkion implementiert.
 Die Kosten eines indirekten Aufrufs des eindimenisionalen Falls haben sich in den Benchmarks sehr negativ dargestellt.
 
+
+\subsubsection*{Fall 2: Singularität in Schicht $n$}
+
+Diesem Fall gehen die Berechnungen des ersten Falles vorraus. 
+Allerdings muss in dieser Situation 
+
+\begin{center}
+    \lstinputlisting[language=C++,style=cpp,mathescape=true]{integral_2d_singularity.cpp}
+    \captionof{figure}{Schicht $n$ mit Singularität}
+    \label{2d_integral_sing}
+\end{center}

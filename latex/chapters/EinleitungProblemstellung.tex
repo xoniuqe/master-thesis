@@ -3,13 +3,21 @@
 %Begonnen werden soll mit einer Einleitung zum Thema, also Hintergrund und Ziel erläutert werden.
 
 %Weiterhin wird das vorliegende Problem diskutiert: Was ist zu lösen, warum ist es wichtig, dass man dieses Problem löst und welche Lösungsansätze gibt es bereits. Der Bezug auf vorhandene oder eben bisher fehlende Lösungen begründet auch die Intention und Bedeutung dieser Arbeit. Dies können allgemeine Gesichtspunkte sein: Man liefert einen Beitrag für ein generelles Problem oder man hat eine spezielle Systemumgebung oder ein spezielles Produkt (z.B. in einem Unternehmen), woraus sich dieses noch zu lösende Problem ergibt.
-
-Basierend auf der Arbeit \citetitle{gasperini:hal-03209144} von \citeauthor{gasperini:hal-03209144} 
-
-Im weiteren Verlauf wird die Problemstellung konkret dargestellt: Was ist spezifisch zu lösen? Welche Randbedingungen sind gegeben und was ist die Zielsetzung? Letztere soll das beschreiben, was man mit dieser Arbeit (mindestens) erreichen möchte.
-
-
-
 \section{Zielsetzung}
 
+Basierend auf der Arbeit \citetitle{gasperini:hal-03209144}\cite{gasperini:hal-03209144} soll in dieser Arbeit das daraus resulttierende Verfahren neu implementiert werden.
+Die ursprüngliche Implementierung in Matlab funktioniert zwar, weißt aber Unzulänglichkeiten hinsichtlich der Benutzbarkeit und auch der Performanz auf.
+So kann diese Lösung lediglich in Matlab verwendet werden und bietet keine Schnittstelle für Nutzer an. Des weiteren wurden keine Maßnahmen zur Optimierung der implementierten Lösung egriffen.
+
+In dieser Arbeit sollen beide dieser Aspekte gelöst werden. Zum einen wird eine Implementierung angestrebt welche Paralellisierungstechniken verwendet um das Laufzeitverhalten zu verbessern, sowie eine API anbietet welche einfach verwendet werden kann.
+Darüber hinaus soll die Benutzbarkeit mithilfe eines Matlab-Plugins und eines Python-Moduls erleichtert werden.
+Wichtig dabei ist, dass die Implementierung keinen Verlust hinsichtlich der Genauigkeit der berechneten Integrale auftritt.
+
+
+
 \section{Aufbau der Arbeit}
+
+In Kapitel \ref{algo} dieser Arbeit wird zunächst das in \cite{gasperini:hal-03209144} entwickelte Verfahren vorgestellt und einige wesentliche Teilaspekte erläutert.
+Danach werden in Kapitel \ref{desgin} die Entwurfsbedingungen erläutert und auf die konkreten Anforderungen sowie die geplante Architektur der Umsetzung eingegangen.
+In \ref{plan} wird die Planung hinsichtlihc der Optimierung erläutert, welche im Kapitel \ref{analysis} ausgewertet und präsentiert werden.
+Im Kapitel \ref{impl} werden einige Details der Implementierung hervorgehoben, sowie die verwendeten Technologien vorgestellt.

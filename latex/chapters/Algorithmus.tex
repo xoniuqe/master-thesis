@@ -1,76 +1,76 @@
-\chapter{Das Verfahren}
+\chapter{Das Verfahren}\label{algo}
 
 \section{Accoustic single-layer integral operator}
 
-In der Arbeit \citetitle{gasperini:hal-03209144} wird ein Verfahren zum lösen von Problemen der folgenden Art
+In der Arbeit \citetitle{gasperini:hal-03209144} wird ein Verfahren zum lösen von Integralen der Form
 \begin{equation}
     \Delta
     I_{r,\Delta}(k) = \int_{\Delta}^{}  \frac{e^{ik(\left\lVert r-r'\right\rVert + \theta \cdot r')}}{\left\lVert r-r'\right\rVert} \,dr'
 \end{equation}
-vorgestellt.
+vorgestellt. Das Integral $\I_{r,\Delta}(k)$ ist das Integral eines Dreicks $\delta$ mit Beobachtungspunkt $r \in \mathbb{R}^3$ für die Wellenzahl $k$. $\theta \in \mathbb{R}^3$ ist ein Richtungsvektor.
+Dieses Integral wird auch als \textit{accoustic single-layer Integral-operator} bezeichnet.
+Mit größer werdender Wellenzahl $k$ wird dieses Problem als im \textit{high frequency regime} liegend beschrieben und die Berechnung dieser ist mit einer hohen Laufzeit verbunden.
+Die Autoren füren aus, dass sich das Integral so berechnen lässt, dass das Integral mithilfe des Cauchy-Integral-Theorems gezielt an solchen Pfaden berechnen lässt, die nicht mit $k$ oszilieren.
+Dies ermöglicht es diese Pfade mit einem \textit{steepest-descent}-Verfahren effizient zu berechnen.
 
-Die Autoren zeigen, dass sich das Problem wie folgt umformulieren lässt:
-
+Sie führen weiter aus wie diese Pfade gefunden werden können damit das Integral wie folgt umgestellt werden kann \footnote{\cite[Kaptiel 1, Gleichung 4]{gasperini:hal-03209144}}:
 \begin{equation}
-    I(k,a,b) = \int_{0}^{\infty} h'_a(t)f(h_a(t))e^{ikg(h_a(t))} \,dt - \int_{0}^{\infty} h'_b(t)f(h_b(t))e^{ikg(h_b(t))} \,dt
+    \begin{aligned}
+        I(k,y,b) = & \int_{h_a}^{} f(z) e^{ikg(z)} \,dz  \int_{h_b}^{} f(z) e^{ikg(z)} \,dz \\
+         = & \int_{0}^{\infty} h'_a(t)f(h_a(t))e^{ikg(h_a(t))} \,dt -\int_{0}^{\infty} h'_b(t)f(h_b(t))e^{ikg(h_b(t))} \,dt 
+    \end{aligned}
 \end{equation}
 
+Dabei sind $h_a$ und $h_b$ die Pfade gemäßt des Cauchy-Integral-Theorems. %Ein Teilintegral $\int_{0}^{\infty} h'_a(t)f(h_a(t))e^{ikg(h_a(t))} \,dt$ kann dann mithilfe des Gauss-Laguerre-Verfahrens 
 
-Und dann auf die relevanten Mathematischen "Grundlagen" eingehen die verwendet werden um das Verfahren implementieren:
+Die Autoren teilen dieses Problem in zwei Fälle auf, einen eindimensinalen Fall und einen zweidimensionalen Fall der die Berechnung eines Integrals über ein Dreiecks abdeckt.
 
-Idee: Die einzelnen "teile" des Algorithmuses getrennt erklären:
-Fall mit und ohne Singularität und dann in der Implementierung darauf referenzieren und die jeweiligen Teile verlinken.
 
-\subsection{Das 1D-Verfahren}
+\subsection{Fall1: Das 1D-Verfahren}
+
+In der Arbeit \cite{gasperini:hal-03209144} wird zunächst beschrieben wie sich das Problem auf Pfaden in der komplexen Ebene berechnen lässt auf denen $e^{ikg(x)}$ nicht oszilliert.
+Es wird gezeigt wie sogenannte \textit{Splitting-points} berechnet werden, welche als Endpunkte für diese Pfade dienen.
+Liegt einer dieser Punkte auf einem komplexen Pfad, so kann das \textit{steepest-descent}-Verfahren nicht angewandt werden und es muss auf ein klassisches Integrationsverfahren zurückgegriffen werden, welches diese Singulariäten berechnen kann.
+
+Der eindimenisionale Fall wird in Kapitel 5.1 von \cite{gasperini:hal-03209144} beschrieben: 
+
+\begin{equation}
+    I(k,y,a,b,) = I(k,y,a,a_1) + I(k,y,a_1, b_1) + I(k,y,b_1,b)
+\end{equation}
+
+Dabei enthält das Intervall $[a_1,b_1]$ einen sogenannten Splitting-point und das Integral $I(k,y,a_1,b_1)$ muss mit einem klassischen Verfahren berechnet werden.
+
+
 \subsection{Das Verfahren über Dreiecksoberflächen}
 
 In Kapitel 5.2 von \cite*{gasperini:hal-03209144} wird gezeigt wie das Verfahren auf das ursprüngliche Ziel erweitert wird.
 Dazu wird das zu berechnende Integral für ein Dreieck in mehrere parallele Schichten aufgeteilt, welche jeweils mit dem eindimenisionalen Verfahren angehnähert werden können.
 
+
 \begin{equation}
-    \resizebox{.9\hsize}{!}{$\hat{I}_{\Delta_1,n_y}(k) = \sum_{j = 1}^{n_y} \left[ \Lambda_0(y_{m_j}) \int_{y_{j-1}}^{y_j}  e^{ik(\sqrt(P(0,y))+q_yy+s)}\,dy - \Lambda_{1-y_{m_j}}(y_{m_j}) \int_{y_{j-1}}^{y_j}  e^{ik(\sqrt(P(1-y,y))+q_x(1-y)+q_yy+s)}\,dy  \right]$}
+    \begin{aligned}
+        \hat{I}_{\Delta_1,n_y}(k) = & \sum_{j = 1}^{n_y} \left[ \Lambda_0(y_{m_j}) \int_{y_{j-1}}^{y_j}  e^{ik(\sqrt(P(0,y))+q_yy+s)}\,dy \right.\\
+        & \left.  - \Lambda_{1-y_{m_j}}(y_{m_j}) \int_{y_{j-1}}^{y_j}  e^{ik(\sqrt(P(1-y,y))+q_x(1-y)+q_yy+s)}\,dy  \right] \\
+    \end{aligned}
 \end{equation}
 
-Die Anzahl $n_y$ dieser Schichten wird als Parameter der zu implementierenden Lösung angesehen.
-
+Kjaldkfj
 
 
 
 \section{Mathematische Grundlagen}
-\subsection{Cauchy-Integral-Theorem}
+
+
+\subsection{Cauchyscher Integralsatz}
 
 
 
 
 \subsection{Gauss-Laguerre Quadratur}
 
-Die Gauss-Laguerre Quadratur ist eine Aproxmiation zur Auswertung von Integralen:
+Die Gauss-Laguerre Quadratur ist eine Approxmiation zur Auswertung von Integralen:
 \begin{equation}
     \int_{0}^{\inf } f(t) e^-t  \,dt  \approx \sum_{i = 1}^{n} w_if(x_i) 
 \end{equation}
 
 Diese wird in dem steepest-descent Verfahren in Kombination mit dem Cauchy-Integral-Theorem genutzt um das Integral "LINK AUF FORMEL" zu berechnen.
-
-\subsection{Steepest Descent Method}
-
-In der Arbeit von \cite{gasperini:hal-03209144} wird das Integral \ref{eq:2} aus Formel 1 für ein Dreieck $\Delta \in \mathbb{R}^3$ und einen Einheitsvektor $\theta \in \mathbb{R}^3$ wie folgt definiert:
-\begin{equation}
-    I_{\Delta}(k) = | A_1 \times A_2 | \int_{0}^{1} \int_{0}^{1-y} \frac{e^{ik(\left\lVert Ax + b - r\right\rVert+\theta \cdot(Ax +b))}}{\left\lVert Ax + b - r\right\rVert }  \,dx \,dy 
-\end{equation}
-Dabei wird das Dreieck $\Delta$ als parametrisierties Einheitsdreieck mit der affinen Abbildung $x \mapsto Ax + $ mit $x = (x, y)^T, A \in \mathbb{R}^3$ und $b \in \mathbb{R}^3$ beschrieben.
-
-Zusammen mit der Wellenzahl $k$ sind $A$, $b$, $r$ und $\theta$ die Eingabegrößen des zu implementierenden Algorithmus.
-In Kapitel 2 von \cite*{gasperini:hal-03209144} wird hergeleitet wie die Gleichung \ref{2} in Abhängigkeit von diesen Eingabegrößen
-definieren lässt.
-Die Funktion $g$ in Gleichung \ref{2} lässt sich mithilfe der Funktion $P(x)$: 
-\begin{equation}
-    P(x) = c_0 x^2 + c_0|c|^2-2c_0xRe(c)
-\end{equation}
-wie folgt beschreiben:
-\begin{equation}
-    g(x) = \sqrt{P(x)} + qx + s
-\end{equation}
-
- Worauf will ich hinaus?
-
-
