@@ -6,9 +6,6 @@
 #include <armadillo>
 
 namespace integral {
-	using namespace std::complex_literals;
-
-
 	struct integral_1d {
 		integral_1d(const config::configuration config, integrator::gsl_integrator* integrator);
 		integral_1d(const config::configuration config, integrator::gsl_integrator* integrator, const std::vector<double> nodes, const std::vector<double> weights);

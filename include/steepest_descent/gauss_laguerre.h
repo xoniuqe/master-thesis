@@ -10,13 +10,9 @@
 #include <numeric>
 #include <algorithm> 
 
-#ifdef _WIN32
 #include <tbb/parallel_reduce.h>
 #include <tbb/blocked_range.h>
-#else
-#include <oneapi/tbb/parallel_reduce.h>
-#include <oneapi/tbb/blocked_range.h>
-#endif
+
 
 namespace gauss_laguerre {
 	using namespace std::literals::complex_literals;

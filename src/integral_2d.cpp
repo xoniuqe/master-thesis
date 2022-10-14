@@ -13,13 +13,9 @@
 #include <cmath>
 #include <complex>
 #include <mutex>
-#ifdef _WIN32
 #include <tbb/parallel_reduce.h>
 #include <tbb/blocked_range.h>
-#else
-#include <oneapi/tbb/parallel_reduce.h>
-#include <oneapi/tbb/blocked_range.h>
-#endif
+
 
 
 #ifdef _WIN32
@@ -156,7 +152,7 @@ namespace integral {
 				auto Iin =  steepest_desc(0);
 				auto Ifin = steepest_desc(1 - u);
 #endif
-				//Rausgezogen, da es später sowieso berechnet wird (4.10)
+				//Rausgezogen, da es spï¿½ter sowieso berechnet wird (4.10)
 				integral += Iin * integration_y - Ifin * integration_1_minus_y;
 
 				if (!is_spec && !is_sing) {
