@@ -38,14 +38,14 @@ build:
      - git submodule sync --recursive
      - git submodule update --init --recursive
      - apt-get update --yes
-     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev python3-dev libeigen3-dev libtbb2-dev
+     - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev python3-dev libeigen3-dev libtbb-dev
      # We will install latest CMake, even though Ubuntu has a recent one
      - mkdir -p $HOME/.local
      - curl -s "https://cmake.org/files/v3.23/cmake-3.23.1-linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C $HOME/.local
      - export PATH=$HOME/.local/bin:$PATH
 
     script:
-     - cmake -S . -B build -DTBB_TEST=FALSE
+     - cmake -S . -B build -DTBB_TEST=FALSE -DSTEDEPY_EXTERN_TBB=TRUE
      - cmake --build build -v 
 
     artifacts:
