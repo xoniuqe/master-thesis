@@ -1,5 +1,79 @@
 # Master thesis
 
+## How to build
+
+To run this project, first the repository has to be cloned.
+
+
+### Prerequisits
+
+* git
+* cmake (>3.15)
+* C++ compiler (MSVC, GCC, CLANG)
+
+### Windows
+Easiest setup on windows is to have Visual Studio 2022 installed with the options for CMake and Crossplattform projects.
+
+Install  oneAPI oneTBB:  https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#onetbb
+
+CD to the root folder of the repo
+Update the submodules:
+git submodule sync --recursive
+git submodule update --init --recursive
+
+Bootstrap VCPKG
+cd vcpkg
+bootstrap-vcpkg.bat
+
+Install GSL Eigen3 with VCPKG
+vcpkg install gsl gsl:x64-windows  Eigen3:x64-windows
+vcpkg integrate install
+
+To compile either use VS2022 or run the CMAKE build
+
+### Ubuntu
+CD to the root folder of the repo
+
+Update the submodules:
+git submodule sync --recursive
+git submodule update --init --recursive
+
+Install the libraries to compile (Armadillo, OpenBLA, LApack, GSL, python3, eigen, tbb)
+- apt-get update --yes
+- apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev python3-dev libeigen3-dev libtbb-dev
+
+
+### Macos
+    
+### Build with CMAKE
+
+build the project
+Build wiht -DSTEDEPY_BUILD_MATLAB=TRUE to build the matlab plugin. This requires Matlab versions >= R2018a
+
+- cmake -S . -B build -DTBB_TEST=FALSE
+- cmake --build build -v 
+
+This build the project into out/build/
+
+## How to run
+
+### From Visual Studio 2022
+
+On Windows the project and some tests can be run from Visual Studio. If the WSL2 Subsystem with UBUNTU is installed the ubuntu setup can also be debugged.
+In the fodler SteepestDescent are some test files.
+
+
+### Matlab
+
+After the project was build with cmake (and -DSTEDEPY_BUILD_MATLAB=TRUE ), the output folder should contain some compiled mexfiles (build/out/<Target>/api/matlab).
+This file has to loaded in the matlab environment and then the functions can be run by the name of the file (begins with StedepyMatlab)
+
+### Python
+After the project was build with cmake , the output folder should contain the compiled  python module (build/out/<Target>/api/python).
+Python3 can load this if it is in its search path, or in the current working directory.
+
+
+
 
 ## Setting up my project:
 needs to be updated!
@@ -36,6 +110,11 @@ on windows:
 * write benchmarks
 * write python api
 * write more tests
+
+
+## Folder structure
+
+Explain that !
 
 ## Thoughts
 
