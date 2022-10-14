@@ -13,13 +13,14 @@
 #include <cmath>
 #include <complex>
 #include <mutex>
-//#ifdef _WIN32
+#ifdef _WIN32
 #include <tbb/parallel_reduce.h>
 #include <tbb/blocked_range.h>
-//#else
-//#include <oneapi/tbb/parallel_reduce.h>
-//#include <oneapi/tbb/blocked_range.h>
-//#endif
+#else
+#include <oneapi/tbb/parallel_reduce.h>
+#include <oneapi/tbb/blocked_range.h>
+#endif
+
 
 #ifdef _WIN32
 //#include <corecrt_math_defines.h>
@@ -125,8 +126,8 @@ namespace integral {
 
 				
 #ifdef USE_1D
-				auto integration_y = partial_integral(create_green_fun, A1, b, r, q1, sx1, 0., c1, c1_0, y, y + config.y_resolution);
-				auto integration_1_minus_y = partial_integral(create_green_fun, A2, b, r, q2, sx2, 1., c2, c2_0, y, y + config.y_resolution);
+				auto integration_y = partial_integral(A1, b, r, q1, sx1, 0., c1, c1_0, y, y + config.y_resolution);
+				auto integration_1_minus_y = partial_integral(A2, b, r, q2, sx2, 1., c2, c2_0, y, y + config.y_resolution);
 #else
 				auto integration_y =  get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
 				auto integration_1_minus_y =  get_partial_integral(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
@@ -199,17 +200,16 @@ namespace integral {
 
 				// Integration over these two segments.
 #ifdef USE_1D				
-				auto intYintern1 = partial_integral(create_green_fun, A1, b, r, q1, sx_intern_1, split_point1, cIntern1, c_0Intern1, y, y + config.y_resolution);
-				auto intYintern2 = partial_integral(create_green_fun, A1, b, r, q1, sx_intern_2, split_point2, cIntern2, c_0Intern2, y, y + config.y_resolution);
+				auto intYintern1 = partial_integral( A1, b, r, q1, sx_intern_1, split_point1, cIntern1, c_0Intern1, y, y + config.y_resolution);
+				auto intYintern2 = partial_integral( A1, b, r, q1, sx_intern_2, split_point2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 #else
 				auto intYintern1 = get_partial_integral(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + config.y_resolution);
 				auto intYintern2 = get_partial_integral(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 #endif
 				/*% Final formula for the integral(considering each layer) in case of singularity on the
 				% layer.*/
-
-				auto integral2_res = integrator.operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
-				//auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
+				//auto integral2_res = integrator.operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
+				auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
 
 				auto integration_result = integral2_res + Iin2 * intYintern2  - Ifin1 * intYintern1;
 				integral += integration_result;
