@@ -13,13 +13,8 @@
 #include <cmath>
 #include <complex>
 #include <mutex>
-#ifdef _WIN32
 #include <tbb/parallel_reduce.h>
 #include <tbb/blocked_range.h>
-#else
-#include <oneapi/tbb/parallel_reduce.h>
-#include <oneapi/tbb/blocked_range.h>
-#endif
 
 
 #ifdef _WIN32
@@ -59,21 +54,11 @@ namespace integral {
 
 		auto prod = arma::dot(theta, b);
 		
-		//berechnet die grenzen der kommenden partiellen integration (von x=0 -> x=1)
-		//warum wird die matrix geswapt, bzw wieso wird eine rotation?
-
 		auto A1 = arma::mat(A);
 		A1.swap_cols(0, 1);
 		auto q1 = arma::dot(A1.col(0), theta);
-		//sx1 = (mu(1) * A1(1, 2) + mu(2) * A1(2, 2) + mu(3) * A1(3, 2)) * 0 + prod;
 		auto sx1 = arma::dot(A1.col(1), theta) * 0. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
 		auto [c1, c1_0] = math_utils::get_complex_roots(0, A1, b, r);
-		//auto sing_point1 = math_utils::get_singularity_for_ODE(q1, { c1, c1_0 });
-		//auto spec_point1 = math_utils::get_spec_point(q1, { c1, c1_0 });
-
-		// render singularities exact
-		//sing_point1 = abs_singularity(sing_point1, c1);
-		//spec_point1 = abs_singularity(spec_point1, c1);
 
 		arma::mat rotation{ {-1, 1}, {1, 0} };
 		arma::mat A2 = A * rotation;
@@ -107,10 +92,8 @@ namespace integral {
 			};
 		};
 #endif
-
 		integration_result = tbb::parallel_reduce(tbb::blocked_range(0, number_of_steps, 1), 0. + 0.i, [&](tbb::blocked_range<int> range, std::complex<double> integral) {
 			integrator::gsl_integrator_2d integrator;
-			
 			for (int i = range.begin(); i < range.end(); ++i)
 			{
 				auto y = config.y_resolution * (double)i;// steps[i];
@@ -124,16 +107,15 @@ namespace integral {
 				auto is_spec = math_utils::is_singularity_in_layer(config.tolerance, spec_point, 0, 1 - u);
 				auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, 0, 1 - u);
 
-				
+
 #ifdef USE_1D
 				auto integration_y = partial_integral(A1, b, r, q1, sx1, 0., c1, c1_0, y, y + config.y_resolution);
 				auto integration_1_minus_y = partial_integral(A2, b, r, q2, sx2, 1., c2, c2_0, y, y + config.y_resolution);
 #else
-				auto integration_y =  get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
-				auto integration_1_minus_y =  get_partial_integral(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
+				auto integration_y = get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
+				auto integration_1_minus_y = get_partial_integral(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
 #endif
-
-
+		
 #ifdef USE_PATH_GEN
 				auto path_generator = path_utils::get_weighted_path_generator_2d(u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
 				steepest_descent::steepest_descend_2d_path steepest_desc(path_generator, nodes, weights);
@@ -173,8 +155,6 @@ namespace integral {
 	
 			
 				//singularity
-				/* %Since there is a singularity on the horizontal layer, compute 4 integrals from 0 to infty along the paths at different
-				%starting points: 0, splitPt1, splitPt2 and 1-u on the horizontal layer.*/
 #ifdef USE_DIRECT
 				auto path3 = path_utils::get_weighted_path_2d(split_point1, u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
 				auto Ifin1 = gauss_laguerre::calculate_integral_cauchy_tbb(path3, nodes, weights);
@@ -206,10 +186,8 @@ namespace integral {
 				auto intYintern1 = get_partial_integral(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + config.y_resolution);
 				auto intYintern2 = get_partial_integral(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 #endif
-				/*% Final formula for the integral(considering each layer) in case of singularity on the
-				% layer.*/
-				//auto integral2_res = integrator.operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
-				auto integral2_res = integrator_2d->operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
+
+				auto integral2_res = integrator.operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
 
 				auto integration_result = integral2_res + Iin2 * intYintern2  - Ifin1 * intYintern1;
 				integral += integration_result;
@@ -249,7 +227,7 @@ namespace integral {
 			//no singularity
 			return left - right;
 
-		}
+		}       
 
 		auto& [sp1, sp2] = split_points;
 
@@ -258,8 +236,8 @@ namespace integral {
 
 		auto I2 = std::abs(sp2 - right_split) <= std::numeric_limits<double>::epsilon() ? 0. :  steepest_desc(sp2) - steepest_desc(right_split);
 
-		auto green_fun = [k = config.wavenumber_k, y = sPx, &A, &b, &r, q, s](const double x) -> auto {
-			auto Px = math_utils::calculate_P_x(x, y, A, b, r);
+		auto green_fun = [k = config.wavenumber_k, &sPx, &A, &b, &r, q, s](const double x) -> auto {
+			auto Px = math_utils::calculate_P_x(x, sPx, A, b, r);
 			auto sqrtPx = std::sqrt(Px);
 			auto res = std::exp(1.i * k * (sqrtPx + q * x + s)); //this formular differs because equation 28 in PAPERHIFE!
 			return res;
