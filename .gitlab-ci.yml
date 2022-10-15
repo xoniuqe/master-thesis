@@ -35,9 +35,9 @@ build:
     stage: build
     image: gcc
     before_script:
+     - apt-get update --yes
      - git submodule sync --recursive
      - git submodule update --init --recursive
-     - apt-get update --yes
      - apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev python3-dev libeigen3-dev libtbb-dev
      # We will install latest CMake, even though Ubuntu has a recent one
      - mkdir -p $HOME/.local
@@ -45,7 +45,7 @@ build:
      - export PATH=$HOME/.local/bin:$PATH
 
     script:
-     - cmake -S . -B build -DTBB_TEST=FALSE
+     - cmake -S . -B build -DTBB_TEST=FALSE -DSTEDEPY_BUILD_PYTHON_MODULE=FALSE
      - cmake --build build -v 
 
     artifacts:

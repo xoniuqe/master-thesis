@@ -128,7 +128,7 @@ namespace integral {
 				auto Iin =  steepest_desc(0);
 				auto Ifin = steepest_desc(1 - u);
 #endif
-				//Rausgezogen, da es später sowieso berechnet wird (4.10)
+				//Rausgezogen, da es spï¿½ter sowieso berechnet wird (4.10)
 				integral += Iin * integration_y - Ifin * integration_1_minus_y;
 
 				if (!is_spec && !is_sing) {
