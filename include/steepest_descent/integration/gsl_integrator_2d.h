@@ -27,6 +27,15 @@ namespace integrator {
 
 		gsl_integrator_2d(gsl_integrator_2d& other) = delete;
 
+		gsl_integrator_2d(gsl_integrator_2d&& other)
+		{
+			std::lock_guard<std::mutex> guard(other.integration_mutex);
+			inner_workspace = other.inner_workspace;
+			workspace = other.workspace;
+			other.inner_workspace = nullptr;
+			other.workspace = nullptr;
+		}
+
 		~gsl_integrator_2d() {
 			gsl_integration_cquad_workspace_free(inner_workspace);
 			gsl_integration_cquad_workspace_free(workspace);
@@ -47,13 +56,9 @@ namespace integrator {
 				gsl_integration_cquad(&inner, y_start, y_end, 1e-16, 1e-6, inner_workspace, &inner_result, NULL, NULL);
 				return inner_result;
 				});
-			
+			gsl_integration_cquad(&f_real, std::real(x_start), std::real(x_end), 1e-16, 1e-6, workspace, &result_real, NULL, NULL);
 
-			auto status = gsl_integration_cquad(&f_real, std::real(x_start), std::real(x_end), 1e-16, 1e-6, workspace, &result_real, NULL, NULL);
 
-			if (status > 0) {
-				std::cout << "error" << std::endl;
-			}
 			auto f_imag = make_gsl_function([&](double x) {
 				double inner_result;
 				auto inner = make_gsl_function([&](double y) {
@@ -63,13 +68,7 @@ namespace integrator {
 				return inner_result;
 				});
 
-
-			auto status2 = gsl_integration_cquad(&f_imag, std::real(x_start), std::real(x_end), 1e-16, 1e-6, workspace, &result_imag, NULL, NULL);
-
-
-			if (status2 > 0) {
-				std::cout << "error2" << std::endl;
-			}
+			gsl_integration_cquad(&f_imag, std::real(x_start), std::real(x_end), 1e-16, 1e-6, workspace, &result_imag, NULL, NULL);
 			return std::complex<double>(result_real, result_imag);
 		}
 	private:
