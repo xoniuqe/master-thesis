@@ -17,11 +17,9 @@
 #include <tbb/blocked_range.h>
 
 
-#ifdef _WIN32
-//#include <corecrt_math_defines.h>
-#endif
-//#define USE_1D
-#define USE_DIRECT
+#define STEDEPY_USE_DIRECT_STEEPEST_DESC
+
+
 namespace integral {
 	using namespace std::complex_literals;
 
@@ -77,20 +75,12 @@ namespace integral {
 		//std::mutex write_mutex;
 		auto integration_result = 0. + 0.i;
 		int number_of_steps = (int) 1. / config.y_resolution;
-#ifdef USE_1D
+#ifdef STEDEPY_1D_INSTEAD_OF_PARTIAL
 		integrator::gsl_integrator integrator_1d;
 		config::configuration config1d;
 		config1d.wavenumber_k = config.wavenumber_k;
 		config1d.tolerance = config.tolerance;
 		integral_1d_test partial_integral(config1d, &integrator_1d, nodes, weights);
-		auto create_green_fun = [k = config.wavenumber_k](const arma::mat& A, const arma::vec& b, const arma::vec& r, const std::complex<double> sPx, const double q, const std::complex<double> s) -> auto {
-			return [&k, y = sPx, &A, &b, &r, q, s](const double x) -> auto {
-				auto Px = math_utils::calculate_P_x(x, y, A, b, r);
-				auto sqrtPx = std::sqrt(Px);
-				auto res = std::exp(1.i * k * (sqrtPx + q * x + s)); //this formular differs because equation 28 in PAPERHIFE!
-				return res;
-			};
-		};
 #endif
 		integration_result = tbb::parallel_reduce(tbb::blocked_range(0, number_of_steps, 1), 0. + 0.i, [&](tbb::blocked_range<int> range, std::complex<double> integral) {
 			integrator::gsl_integrator_2d integrator;
@@ -108,7 +98,7 @@ namespace integral {
 				auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, 0, 1 - u);
 
 
-#ifdef USE_1D
+#ifdef STEDEPY_1D_INSTEAD_OF_PARTIAL
 				auto integration_y = partial_integral(A1, b, r, q1, sx1, 0., c1, c1_0, y, y + config.y_resolution);
 				auto integration_1_minus_y = partial_integral(A2, b, r, q2, sx2, 1., c2, c2_0, y, y + config.y_resolution);
 #else
@@ -122,12 +112,12 @@ namespace integral {
 #else
 				//steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, config.wavenumber_k, u, A, b, r, q, s, { c, c_0 }, sing_point);
 #endif
-#ifndef USE_DIRECT
+#ifndef STEDEPY_USE_DIRECT_STEEPEST_DESC
 				steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, config.wavenumber_k, u, A, b, r, q, s, { c, c_0 }, sing_point);
 #endif
 				//usage of steepest_descent_2d seems to be slower?
 				std::tuple<std::complex<double>, std::complex<double>> split_points;
-#ifdef USE_DIRECT
+#ifdef STEDEPY_USE_DIRECT_STEEPEST_DESC
 				auto path = path_utils::get_weighted_path_2d(0, u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
 				auto Iin = gauss_laguerre::calculate_integral_cauchy_tbb(path, nodes, weights);
 
@@ -155,7 +145,7 @@ namespace integral {
 	
 			
 				//singularity
-#ifdef USE_DIRECT
+#ifdef STEDEPY_USE_DIRECT_STEEPEST_DESC
 				auto path3 = path_utils::get_weighted_path_2d(split_point1, u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
 				auto Ifin1 = gauss_laguerre::calculate_integral_cauchy_tbb(path3, nodes, weights);
 
@@ -179,7 +169,7 @@ namespace integral {
 				
 
 				// Integration over these two segments.
-#ifdef USE_1D				
+#ifdef STEDEPY_1D_INSTEAD_OF_PARTIAL				
 				auto intYintern1 = partial_integral( A1, b, r, q1, sx_intern_1, split_point1, cIntern1, c_0Intern1, y, y + config.y_resolution);
 				auto intYintern2 = partial_integral( A1, b, r, q1, sx_intern_2, split_point2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 #else

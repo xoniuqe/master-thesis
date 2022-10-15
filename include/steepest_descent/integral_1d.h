@@ -25,7 +25,7 @@ namespace integral {
 
 		
 	};
-
+	
 	struct integral_1d_test {
 
 		integral_1d_test(const config::configuration& config, integrator::gsl_integrator* integrator, const std::vector<double> nodes, const std::vector<double> weights) : config(config), integrator(integrator), nodes(nodes), weights(weights) {
