@@ -1,0 +1,10 @@
+ stedepyMatlab_1d Running the steepest-descent method for the integral.
+    I = stedepyMatlab_2d(A, b, r, theta, k, y, left_split, right_split, nodes, weights) approximates the 
+    univariate integral other the triangle defined by A and b, with fixed y,  for wavelength k, observation point r and direction theta.
+    For the given split points left_split and right_split.
+
+    I = stedepyMatlab_2d(A, b, r, q, s, k, y, left_split, right_split, nodes, weights) approximates the 
+    univariate integral other the triangle defined by A and b, with fixed y,  for wavelength k, observation point and the values q and s.
+    q and s are derived from theta: q  = dot(A(1), theta) and s = dot(A(2), theta) * y + dot(theta, b).
+    For the given split points left_split and right_split.
+    The parameters nodes and weights are the gauss-laguerre nodes and weights to use.
