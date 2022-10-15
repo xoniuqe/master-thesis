@@ -1,6 +1,6 @@
 \chapter{Implementierung}\label{impl}
 
-In diesem Kapitel wird dargelegt wie der Algorithmus implementiert wird. Zu Beginn wird erläutert warum welche Technologie zum Einsatz kommt und welche Alternativen es gibt.
+In diesem Kapitel wird dargelegt wie der Algorithmus implementiert wird. Zu Beginn wird erläutert warum welche Technologien zum Einsatz kommen und wie diese verwendet werden.
 \section{Verwendete Technologien}
 
 In diesem Abschnit werden die verwendeten Technologien vorgestellt. 
@@ -10,17 +10,14 @@ In diesem Abschnit werden die verwendeten Technologien vorgestellt.
 
 Die GNU Scientific Library (GSL) ist eine Sammlung von numerischen Funktionen\cite{gsl}. Die GSL wird unter der GNU General Public License veröffentlicht und ist in der Programmiersprache C geschrieben.
 
-Die GSL bietet unter anderem Funktionen für \textit{BAsic linear Algebrar Subprograms}(BLAS), verschiedene Interpolationsalgorihtmen, Monte-Carlo-Algorithmen, Implementierung für Fast Forier Tranformationen und die für diese 
+Die GSL bietet unter anderem Funktionen für \textit{Basic linear Algebrar Subprograms}(BLAS), verschiedene Interpolationsalgorihtmen, Monte-Carlo-Algorithmen, Implementierung für Fast Forier Tranformationen und die für diese 
 Arbeit benötigten Algorithmen für die numerische Integration.
 GSL bietet eine Reimplementierung des QUADPACK\cite{quadpack}, eine Fortran Bibiliothek für numerische Integration.
 Diese umfasst eine mehrere verschiedene Verfahren die ihren Namen einer Buchstaben Kodierung verdanken.
 %QAG noch gegne CQUAD testn erseres müsste schneller sein
 \\
 In dieser Arbeit wird das sogenannte \textit{CQUAD}-Integrationsverfahren verwendet.
-Im Handbuch der GSL wird dieses Verfahren als
-\begin{quotation}
-    [...]CQUAD is a new doubly-adaptive general-purpose quadrature routine[...]
-\end{quotation} \cite*[Kapitel 17.11]{gsl} beschrieben.
+Im Handbuch der GSL wird dieses Verfahren als ein neues \textit{doubly-adaptive general-purpose}-Qaudartur-Verfahren \cite*[Kapitel 17.11]{gsl} beschrieben.
 \\
 Dieses Verfahren kann nicht direkt genutzt werden um die benötigten Integrationen aus \cite*{gasperini:hal-03209144} zu berechnen, da 
 der \textit{CQUAD}-Algorithmus zum einen nur für eindimensionale Integrale und nur für den reellen Zahlenraum definiert ist.
@@ -243,8 +240,13 @@ Die Kosten eines indirekten Aufrufs des eindimenisionalen Falls haben sich in de
 
 \subsubsection*{Fall 2: Singularität in Schicht $n$}
 
-Diesem Fall gehen die Berechnungen des ersten Falles vorraus. 
-Allerdings muss in dieser Situation 
+Diesem Fall gehen die Berechnungen des ersten Falles vorraus (angedeutet in Abbildung \ref{2d_integral_sing})
+In Schicht $n$ liegt eine Singularität vor. Für diese werden die \textit{Splitting-points} berechnet. Mithilfe dieser wird der Teilpfad für das klassische Integrationsverfahren bestimmt.
+(Berechnung des Integrals in Zeile 32 Abbildung \ref{2d_integral_sing}).
+Die Implementierung dieser Funktion ergibt sich nicht komplett aus der Arbeit \cite{gasperini:hal-03209144}, denn in der zugrundeliegenden Matlab-Implementierung wird ersichtlich, dass für den Fall der Singularität 
+eine weitere Sache berücksichtigt werden muss: Eine von den Autoren der Implementierung genannte \textit{Integrationsbox}, welche eine Ungenauigkeit bei der Berücksichtigung der Singularität darstellt.
+Diese lässt sich wie folgt erklären: Durch das Aufteilen der zu integrierenden Dreiecksoberfäche in Schichten ist wird die Position der Singularität, bedingt durch die \"Höhe\" der Schicht, ggf. zu stark gewichtet.
+Dies wird mit einer partiellen Integration an dieser Stelle über die vertikale Dimension ausgeglichen (Zeilen 26-29).
 
 \begin{center}
     \lstinputlisting[language=C++,style=cpp,mathescape=true]{integral_2d_singularity.cpp}

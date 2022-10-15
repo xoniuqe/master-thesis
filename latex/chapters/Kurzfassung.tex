@@ -1,9 +1,20 @@
 \kurzfassung
 
-In der Kurzfassung soll in kurzer und prägnanter Weise der wesentliche Inhalt der Arbeit beschrieben werden. Dazu zählen vor allem eine kurze Aufgabenbeschreibung, der Lösungsansatz sowie die wesentlichen Ergebnisse der Arbeit. Ein häufiger Fehler für die Kurzfassung ist, dass lediglich die Aufgabenbeschreibung (d.h. das Problem) in Kurzform vorgelegt wird. Die Kurzfassung soll aber die gesamte Arbeit widerspiegeln. Deshalb sind vor allem die erzielten Ergebnisse darzustellen. Die Kurzfassung soll etwa eine halbe bis ganze DIN-A4-Seite umfassen.
+%In der Kurzfassung soll in kurzer und prägnanter Weise der wesentliche Inhalt der Arbeit beschrieben werden. Dazu zählen vor allem eine kurze Aufgabenbeschreibung, der Lösungsansatz sowie die wesentlichen Ergebnisse der Arbeit. Ein häufiger Fehler für die Kurzfassung ist, dass lediglich die Aufgabenbeschreibung (d.h. das Problem) in Kurzform vorgelegt wird. Die Kurzfassung soll aber die gesamte Arbeit widerspiegeln. Deshalb sind vor allem die erzielten Ergebnisse darzustellen. Die Kurzfassung soll etwa eine halbe bis ganze DIN-A4-Seite umfassen.
 
-Hinweis: Schreiben Sie die Kurzfassung am Ende der Arbeit, denn eventuell ist Ihnen beim Schreiben erst vollends klar geworden, was das Wesentliche der Arbeit ist bzw. welche Schwerpunkte Sie bei der Arbeit gesetzt haben. Andernfalls laufen Sie Gefahr, dass die Kurzfassung nicht zum Rest der Arbeit passt.
+%Hinweis: Schreiben Sie die Kurzfassung am Ende der Arbeit, denn eventuell ist Ihnen beim Schreiben erst vollends klar geworden, was das Wesentliche der Arbeit ist bzw. welche Schwerpunkte Sie bei der Arbeit gesetzt haben. Andernfalls laufen Sie Gefahr, dass die Kurzfassung nicht zum Rest der Arbeit passt.
+
+In dieser Arbeit wird das in \citetitle{gasperini:hal-03209144} vorgestellte Verfahren implementiert. Basierend auf der Matlab-Implementierung der Autoren wurde eine hinsichtlich der Benutzbarkeit und Laufzeit eine verbesserte C++Implementierung umgesetzt.
+Die Laufzeit der neuen Implementierung konnte im Vergleich nahezu halbiert werden und bei gleicher Genauigkeit der berechneten Integrale.  
+Diese Verbesserungen wurden mithilfe von CPU-Parallelisierungen erreicht. 
+Um die Implementierung einsetzen zu können werden ein Python-Modul sowie eine Matlab-Anbindung bereitgestellt.
+
 
 \kurzfassungEN
 
-The same in English.
+In this paper, the method described in "An analysis of the steepest descent method to efficiently compute the 3D acoustic single-layer operator in the high-frequency regime".
+is implemented. Based on the Matlab implementation of the
+authors, an improved C++ implementation with respect to usability and runtime was implemented. The runtime of the new implementation has been
+almost halved in comparison and with the same accuracy of the calculated
+integrals. In order to be able to use this in a meaningful way, a Python module as well as a
+a Matlab mex-file are provided.

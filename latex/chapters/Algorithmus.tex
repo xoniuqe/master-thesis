@@ -1,6 +1,6 @@
 \chapter{Das Verfahren}\label{algo}
 
-\section{Accoustic single-layer integral operator}
+%\section{Accoustic single-layer integral operator}
 
 In der Arbeit \citetitle{gasperini:hal-03209144} wird ein Verfahren zum lösen von Integralen der Form
 \begin{equation}
@@ -10,7 +10,7 @@ In der Arbeit \citetitle{gasperini:hal-03209144} wird ein Verfahren zum lösen v
 vorgestellt. Das Integral $\I_{r,\Delta}(k)$ ist das Integral eines Dreicks $\delta$ mit Beobachtungspunkt $r \in \mathbb{R}^3$ für die Wellenzahl $k$. $\theta \in \mathbb{R}^3$ ist ein Richtungsvektor.
 Dieses Integral wird auch als \textit{accoustic single-layer Integral-operator} bezeichnet.
 Mit größer werdender Wellenzahl $k$ wird dieses Problem als im \textit{high frequency regime} liegend beschrieben und die Berechnung dieser ist mit einer hohen Laufzeit verbunden.
-Die Autoren füren aus, dass sich das Integral so berechnen lässt, dass das Integral mithilfe des Cauchy-Integral-Theorems gezielt an solchen Pfaden berechnen lässt, die nicht mit $k$ oszilieren.
+Die Autoren füren aus, dass sich das Integral so berechnen lässt, dass das Integral mithilfe des Cauchysche Integralsatzes gezielt an solchen Pfaden berechnen lässt, die nicht mit $k$ oszilieren.
 Dies ermöglicht es diese Pfade mit einem \textit{steepest-descent}-Verfahren effizient zu berechnen.
 
 Sie führen weiter aus wie diese Pfade gefunden werden können damit das Integral wie folgt umgestellt werden kann \footnote{\cite[Kaptiel 1, Gleichung 4]{gasperini:hal-03209144}}:
@@ -21,12 +21,12 @@ Sie führen weiter aus wie diese Pfade gefunden werden können damit das Integra
     \end{aligned}
 \end{equation}
 
-Dabei sind $h_a$ und $h_b$ die Pfade gemäßt des Cauchy-Integral-Theorems. %Ein Teilintegral $\int_{0}^{\infty} h'_a(t)f(h_a(t))e^{ikg(h_a(t))} \,dt$ kann dann mithilfe des Gauss-Laguerre-Verfahrens 
+Dabei sind $h_a$ und $h_b$ die Pfade gemäßt des Cauchysche Integralsatzes. %Ein Teilintegral $\int_{0}^{\infty} h'_a(t)f(h_a(t))e^{ikg(h_a(t))} \,dt$ kann dann mithilfe des Gauss-Laguerre-Verfahrens 
 
 Die Autoren teilen dieses Problem in zwei Fälle auf, einen eindimensinalen Fall und einen zweidimensionalen Fall der die Berechnung eines Integrals über ein Dreiecks abdeckt.
 
 
-\subsection{Fall1: Das 1D-Verfahren}
+\section{Fall1: Das 1D-Verfahren}
 
 In der Arbeit \cite{gasperini:hal-03209144} wird zunächst beschrieben wie sich das Problem auf Pfaden in der komplexen Ebene berechnen lässt auf denen $e^{ikg(x)}$ nicht oszilliert.
 Es wird gezeigt wie sogenannte \textit{Splitting-points} berechnet werden, welche als Endpunkte für diese Pfade dienen.
@@ -41,10 +41,10 @@ Der eindimenisionale Fall wird in Kapitel 5.1 von \cite{gasperini:hal-03209144} 
 Dabei enthält das Intervall $[a_1,b_1]$ einen sogenannten Splitting-point und das Integral $I(k,y,a_1,b_1)$ muss mit einem klassischen Verfahren berechnet werden.
 
 
-\subsection{Das Verfahren über Dreiecksoberflächen}
+\section{Das Verfahren über Dreiecksoberflächen}
 
 In Kapitel 5.2 von \cite*{gasperini:hal-03209144} wird gezeigt wie das Verfahren auf das ursprüngliche Ziel erweitert wird.
-Dazu wird das zu berechnende Integral für ein Dreieck in mehrere parallele Schichten aufgeteilt, welche jeweils mit dem eindimenisionalen Verfahren angehnähert werden können.
+Dazu wird das zu berechnende Integral für ein Dreieck in mehrere parallele Schichten aufgeteilt, welche jeweils mit dem eindimenisionalen Verfahren berechnet werden können.
 
 
 \begin{equation}
@@ -54,23 +54,26 @@ Dazu wird das zu berechnende Integral für ein Dreieck in mehrere parallele Schi
     \end{aligned}
 \end{equation}
 
-Kjaldkfj
+Das Integral $\hat{I}$ für das Dreieck $\Delta_1$ mit der Wellenzahl $k$ wird über die Summer der Schichten $n_y$ summiert. Für jede dieser Schichten 
+werden $\Lambda_0(y_{m_j})$ und $\Lambda_{1-y_{m_j}}(y_{m_j})$ mithilfe es eindimenisionalen Verfahrens berechnet und die verbleibenden Integrale können mithilfe des \textit{Steepest-descent}-Verfahrens
+berechnet werden.
 
 
 
-\section{Mathematische Grundlagen}
+%\section{Mathematische Grundlagen}
 
 
-\subsection{Cauchyscher Integralsatz}
+%\subsection{Cauchyscher Integralsatz}
+
+%Der Cauchysche Integralsatz ist ein Satz der Funktionentheorie.
 
 
 
+%\subsection{Gauss-Laguerre Quadratur}
 
-\subsection{Gauss-Laguerre Quadratur}
+%Die Gauss-Laguerre Quadratur ist eine Approxmiation zur Auswertung von Integralen:
+%\begin{equation}
+    %\int_{0}^{\inf } f(t) e^-t  \,dt  \approx \sum_{i = 1}^{n} w_if(x_i) 
+%\end{equation}
 
-Die Gauss-Laguerre Quadratur ist eine Approxmiation zur Auswertung von Integralen:
-\begin{equation}
-    \int_{0}^{\inf } f(t) e^-t  \,dt  \approx \sum_{i = 1}^{n} w_if(x_i) 
-\end{equation}
-
-Diese wird in dem steepest-descent Verfahren in Kombination mit dem Cauchy-Integral-Theorem genutzt um das Integral "LINK AUF FORMEL" zu berechnen.
+%Diese wird in dem steepest-descent Verfahren in Kombination mit dem Cauchysche Integralsatz genutzt um das Integral "LINK AUF FORMEL" zu berechnen.

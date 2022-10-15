@@ -78,7 +78,21 @@ Diese API-Endpunkte dienen den Python- und Matlab-Wrappern die nötigen Anknüpf
 Das Python-Modul \texttt{stedepy}welches die in der Hauptbibliothek API-Endpunkte bereitstellt, sowie eine Möglichkeit die benötigten Gauss-Laguerre-Knoten vorab zu berechnen.
 Das Matlab-Modul, welches sich aus mehreren Mex-Funktionen zusammen setzt welche die Funkionen der API bereitstellen.
 \\
-Abgesehen von dieser Aufteilung wird keine Architektur vorab definiert und es wird ein iteratives Vorgehen durchgeführt.
+\subsection{Klassendiagram}
+
+In Abbildung \ref{uml} wird eine vereinfachter Überblick über die implementierten Klassen und ihr zusammenwirken gegeben.
+Die Klassen \texttt{integral\_1d} und \texttt{integral\_2d} sind dabei die Schnittstellen für das Python und das Matlab Modul.
+Die dargestellten Klassen sind verkürzt und die Funktionsparameter wurden ausgelassen um die Lesbarkeit zu erhalten.
+
+\begin{figure}
+    \includegraphics[width=\textwidth]{images/uml.png}
+    \caption{Vereinfachtes UML Diagramm der Implementierung}\label{uml}
+\end{figure}
+
+\pagebreak
+
+\subsection{Parameter der Integration}
+
 Die einzelnen API-Aufrufe teilen nur wenige gemeinsame Daten:
 \begin{itemize}
     \item Die Wellenzahl $k$,
@@ -86,14 +100,13 @@ Die einzelnen API-Aufrufe teilen nur wenige gemeinsame Daten:
     \item die Anzahl an Knoten für das Gauss-Laguerre-Verfahren,
     \item sowie die gewünschte Auflösung im zweidimensionalen Fall
 \end{itemize}
-Diese werden, abgesehen von dem Beobachtungspunkt $r$, in eine Konfigurationsklasse zusammengefasst.
+Diese werden, abgesehen von dem Beobachtungspunkt $r$, in eine Konfigurationsklasse zusammengefasst:
 
-\subsection{Klassendiagram}
+\begin{center}
+    \lstinputlisting[language=C++,style=cpp]{configuration2d.cpp}
+    \captionof{figure}{Die Konfigurationen}\label{configuration}
+\end{center}
 
-Einfaches Klassendiagram einfügen!
-\pagebreak
-
-\subsection{Parameter der Integration}
 
 Die Parameter einer Integration eines Dreiecks teilen sich wie folgt auf:
 
@@ -104,11 +117,6 @@ Die Parameter einer Integration eines Dreiecks teilen sich wie folgt auf:
 \end{itemize}
 
 Zusätzlich wird noch der Beobachtungspunkt als Parameter mitgereicht, dies ermöglicht eine vollständige Kompabilität mit der Matlab-Implementierung.
-\begin{center}
-    \lstinputlisting[language=C++,style=cpp]{configuration2d.cpp}
-    \captionof{figure}{Die Konfigurationen}\label{configuration}
-\end{center}
-
 
 \subsection{Functor-Objekte}\label{sec_functor}
 
