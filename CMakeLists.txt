@@ -24,6 +24,7 @@ option(STEDEPY_TEST "Enable testing" ON)
 option(STEDEPY_BENCHMARK "Enable benchmarks" ON)
 option(STEDEPY_BUILD_MATLAB "Builds the mex functions" OFF)
 option(STEDEPY_BUILD_PYTHON_MODULE "Builds the python module" ON)
+option(STEDEPY_EXTERN_TBB "IF ON THE oneTBB submodule is not build/ loaded" OFF)
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -37,11 +38,14 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
 endif()
 
+if(STEDEPY_EXTERN_TBB)
+else()
 add_subdirectory(extern/oneTBB)
+endif()
+unset(STEDEPY_EXTERN_TBB CACHE)
 add_subdirectory(src)
 add_subdirectory(api)
 add_subdirectory (SteepestDescent)
-
 
 # Testing only available if this is the main app
 # Emergency override MODERN_CMAKE_BUILD_TESTING provided as well
