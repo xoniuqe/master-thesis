@@ -30,8 +30,8 @@ IF(MSVC)
 	  #/BUILD_STATIC_LIBS
 	  #/GS
 	  #/O2
-	  #$<$<CONFIG:DEBUG>:/g3>
-	  #$<$<CONFIG:RELEASE>:/O2>
+	  $<$<CONFIG:DEBUG>:/g3>
+	  $<$<CONFIG:RELEASE>:/O2>
 	)
 ELSEIF(GCC)
 	target_compile_options(SteepestDescent PRIVATE

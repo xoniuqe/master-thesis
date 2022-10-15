@@ -175,6 +175,32 @@ auto eval_2d_article(int k)
 	//std::cout << "Partialintegration details: \nnumber of partial integrations: " << integral2d.partial_integrations << "\nno singularity paths: " << integral2d.partial_no_singularities << "\nfirst resets: " << integral2d.partial_first_reset << "\nsecond resets: " << integral2d.partial_second_reset << std::endl;
 }
 
+auto check_accuracy() {
+	arma::mat  A{ {0, 0}, {2, 0}, {0, 2} };
+
+	arma::vec b{ 0,-0.5,0 };
+
+	arma::vec r{ 0.0618, 1.1413, 0 };
+
+	arma::vec mu{ 1,0, 0 };
+
+
+	config::configuration_2d config;
+	config.wavenumber_k = 5000;
+	config.tolerance = 0.1;
+	config.y_resolution = 0.01;
+	config.gauss_laguerre_nodes = 1000;
+
+
+	integrator::gsl_integrator gslintegrator;
+	integrator::gsl_integrator_2d gsl_integrator_2d;
+	integral::integral_2d integral2d(config, &gslintegrator, &gsl_integrator_2d);
+
+
+	auto result = integral2d(A, b, r, mu);
+	std::cout << "reuslt: " << result << std::endl;
+}
+
 
 auto integral_test_2d_multiple() {
 	arma::mat  A{ {0, 0}, {2, 0}, {0, 2} };
@@ -337,11 +363,13 @@ int main()
 		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
 	}*/
 
-	eval_2d_article(100);
+	/*eval_2d_article(100);
 	eval_2d_article(500);
 	eval_2d_article(1000);
 	eval_2d_article(3000);
-	eval_2d_article(5000);
+	eval_2d_article(5000);*/
+
+	check_accuracy();
 	
 	//integral_test_2d_multiple();
 	//integral_test_2d(1);
