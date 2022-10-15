@@ -10,13 +10,8 @@
 #include <numeric>
 #include <algorithm> 
 
-#ifdef _WIN32
 #include <tbb/parallel_reduce.h>
 #include <tbb/blocked_range.h>
-#else
-#include <oneapi/tbb/parallel_reduce.h>
-#include <oneapi/tbb/blocked_range.h>
-#endif
 
 namespace gauss_laguerre {
 	using namespace std::literals::complex_literals;
@@ -31,13 +26,9 @@ namespace gauss_laguerre {
 #else
 	inline auto calculate_integral_cauchy(const path_utils::path_function & path, const std::vector<double>&nodes, const std::vector<double>&weights)->std::complex<double> {
 #endif
-		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), 0. + 0.i, std::plus<std::complex<double>>(), [&](const auto& left, const auto& right) -> auto {
-			//slower: return right * (first_path(left) - second_path(left));
-			return (right * path(left));
+		return std::transform_reduce(nodes.begin(), nodes.end(), weights.begin(), 0. + 0.i, std::plus<std::complex<double>>(), [&](const auto& left, const auto& right) -> auto {			return (right * path(left));
 			});
 	}
-
-	//inline oder in cpp schieben!
 	inline auto calculate_integral_cauchy_tbb(const path_utils::path_function& path, const std::vector<double>& nodes, const std::vector<double>& weights)->std::complex<double>
 	{
 		auto size = (int)nodes.size();
