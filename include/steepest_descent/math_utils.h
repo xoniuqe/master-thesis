@@ -15,12 +15,12 @@ namespace math_utils {
 
 	using namespace complex_comparison;
 
-	constexpr auto floor(std::complex<double> && value) -> std::complex<double> {
+	inline auto floor(std::complex<double> && value) -> std::complex<double> {
 		return  std::floor(std::real(value)) + std::floor(std::imag(value)) * 1.i;
 	}
 
 	template<typename T>
-	constexpr auto get_q(const arma::subview_col<T>& A, const arma::vec3& theta) -> double {
+	inline auto get_q(const arma::subview_col<T>& A, const arma::vec3& theta) -> double {
 		return arma::dot(A, theta);
 	}
 
