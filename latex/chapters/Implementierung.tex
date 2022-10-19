@@ -1,6 +1,6 @@
 \chapter{Implementierung}\label{impl}
 
-In diesem Kapitel wird dargelegt wie der Algorithmus implementiert wird. Zu Beginn wird erläutert warum welche Technologien zum Einsatz kommen und wie diese verwendet werden.
+In diesem Kapitel wird dargelegt, wie der Algorithmus implementiert wird. Zu Beginn wird erläutert warum, welche Technologien zum Einsatz kommen und wie diese verwendet werden.
 \section{Verwendete Technologien}
 
 In diesem Abschnit werden die verwendeten Technologien vorgestellt. 
@@ -13,19 +13,33 @@ Die GNU Scientific Library (GSL) ist eine Sammlung von numerischen Funktionen\ci
 Die GSL bietet unter anderem Funktionen für \textit{Basic linear Algebrar Subprograms}(BLAS), verschiedene Interpolationsalgorihtmen, Monte-Carlo-Algorithmen, Implementierung für Fast Forier Tranformationen und die für diese 
 Arbeit benötigten Algorithmen für die numerische Integration.
 GSL bietet eine Reimplementierung des QUADPACK\cite{quadpack}, eine Fortran Bibiliothek für numerische Integration.
-Diese umfasst eine mehrere verschiedene Verfahren die ihren Namen einer Buchstaben Kodierung verdanken.
-%QAG noch gegne CQUAD testn erseres müsste schneller sein
-\\
+Diese bietet verschiedene Algorithmen an welche ein Integral der Form
+
+\begin{equation*}
+    I = \int_{a}^{b} f(x) w(x) \,dx
+\end{equation*}
+lösen, wobei $w(x)$ eine Gewichtungsfunktion ist. Um die Genauigkeit festzulgen müssen die Grenzen $epsabs$ und $epsrel$ für die absoluten und relativen Fehler angegeben werden.
+Die Genauigkeit ist über die Ungleichung 
+\begin{equation*}
+    |RESULT - I| \leq \max{(epsabs, epsrel |I|)}
+\end{equation*}
+definiert, wobei $RESULT$ die Apprixmation des Algorithmus darstellt. Die Algorithmen liefern das erste Ergebnis dessen absoluter Fehler kleiner als $epsabs$ bzw. dessen relativer Fehler kleiner als $epsrel$ ist.
+
+
+%The algorithms in QUADPACK use a naming convention based on the following letters:
+
+%The algorithms are built on pairs of quadrature rules, a higher order rule and a lower order rule. The higher order rule is used to compute the best approximation to an integral over a small range. The difference between the results of the higher order rule and the lower order rule gives an estimate of the error in the approximation.
+
 In dieser Arbeit wird das sogenannte \textit{CQUAD}-Integrationsverfahren verwendet.
 Im Handbuch der GSL wird dieses Verfahren als ein neues \textit{doubly-adaptive general-purpose}-Qaudartur-Verfahren \cite*[Kapitel 17.11]{gsl} beschrieben.
 \\
-Dieses Verfahren kann nicht direkt genutzt werden um die benötigten Integrationen aus \cite*{gasperini:hal-03209144} zu berechnen, da 
+Dieses Verfahren kann nicht direkt genutzt werden, um die benötigten Integrationen aus \cite*{gasperini:hal-03209144} zu berechnen, da 
 der \textit{CQUAD}-Algorithmus zum einen nur für eindimensionale Integrale und nur für den reellen Zahlenraum definiert ist.
 
-Um dies zu ermöglichen sind zwei Anpassungen nötig:
+Um dies zu ermöglichen, sind zwei Anpassungen nötig:
 \begin{enumerate}
-    \item Das Verschachteln von zwei \textit{CQUAD} Aufrufen, und
-    \item das auftrennen in zwei getrennte Aufrufe, jeweils für den Real- und Imaginär-teil der Integranden
+    \item Das Verschachteln von zwei \textit{CQUAD} Aufrufen
+    \item Das Auftrennen in zwei getrennte Aufrufe, jeweils für den Real- und Imaginär-teil der Integranden
 \end{enumerate}
 
 Die Implementierung für den Realteil ist in \ref{integration_2d} zu sehen.
@@ -90,8 +104,8 @@ In dieser Arbeit wurden lediglich die einfacheren Konzepte von parallelen Schlei
 zur Verfügung. Diese arbeiten auf sogenannten \textit{Ranges}, welche eine Abstraktion der zu bearbeitenden Daten sind.
 
 Ranges können die zu verarbeitende Datenmenge in kleinere Bereiche aufteilen. Diese Teilbereiche werden von oneTBB dann parallelisiert. Die Daten innerhalb einer Range werden sequenziell verarbeitet. 
-Wie groß diese Teilbereiche werden und welcher Art die Aufteilung ist kann mithilfe von Parametern gesteuert werden. In diser Arbeit werden dies mit der sogenannten Blocked-Ranges (\texttt{blocked\_range}) realisiert, welche die Datenmenge in kontinuierliche Blöcke aufteilt. Die größe der jeweiligen Blöcke wird mit der sogenannten \textit{Grainsize} gesteuert.
-oneTBB bietet verschiedene Arten von Blocked-Ranges für bis zu 3 dimensionen. Die Grainsize muss dem zu lösenden Problem entsprechend groß gewählt werden.
+Wie groß diese Teilbereiche werden und welcher Art die Aufteilung ist, kann mithilfe von Parametern gesteuert werden. In diser Arbeit werden dies mit der sogenannten Blocked-Ranges (\texttt{blocked\_range}) realisiert, welche die Datenmenge in kontinuierliche Blöcke aufteilt. Die größe der jeweiligen Blöcke wird mit der sogenannten \textit{Grainsize} gesteuert.
+oneTBB bietet verschiedene Arten von Blocked-Ranges für bis zu 3 Dimensionen. Die Grainsize muss dem zu lösenden Problem entsprechend groß gewählt werden.
 
 \begin{center}
     \lstinputlisting[language=C++,style=cpp]{tbb_example.cpp}
@@ -101,16 +115,16 @@ oneTBB bietet verschiedene Arten von Blocked-Ranges für bis zu 3 dimensionen. D
 In dieser Arbeit werden ausschließlich Parallelisierungen mithilfe von \texttt{parallel\_recude} umgesetzt.
 Dieses bietet die Möglichkeit für jedes Datum eine Transformation durchzuführen und anschließend die tranformierten Daten zu vereinigen. 
 So wird beispielsweise in der Implementierung (siehe Abschnitt \ref{gauss_laguerre_section}) des Gauss-Laguerrre Verfahrens ein zu integrierender Pfad parallel an den einzelnen Gauss-Laguerre-Knotenpunkten ausgewertet und entsprechend gewichtet.
-Die so berechneten Teilwerte werden nur noch addiert und ergeben so das komplexe (Teil-)Integral des Pfades. 
+Die so berechneten Teilwerte werden nun noch addiert und ergeben so das komplexe (Teil-)Integral des Pfades. 
 
 \subsection{Pybind11}
 
 Das Python-Modul wird mithilfe der Bibliothek \textit{pybind11} umgesetzt.
 Pybind11 ist eine sogenannte Header-only Bibliothek mit dem Ziel eine leichtgewichtige Alternative zu bestehenden Bibliotheken zur Erstellung  von
-Python-bindings für C++ Bibliotheken anzubieten.
+Python-bindings für C++-Bibliotheken anzubieten.
 Pybind11\cite{pybind} ist ein Opensource-Projekt und wird unter einer BSD-artigen Lizenz veröffentlicht. 
 
-Folgendes Beispiel\footnote{Beispielcode stammt von \url{https://pybind11.readthedocs.io/en/latest/basics.html} aus der pybind-Dokumenation\cite{pybind}.} stellt die C++Funktion \textit{add} als Python Modul bereit:
+Folgendes Beispiel\footnote{Beispielcode stammt von \url{https://pybind11.readthedocs.io/en/latest/basics.html} aus der pybind-Dokumenation\cite{pybind}.} stellt die C++-Funktion \textit{add} als Python-Modul bereit:
 \begin{center}
 \lstinputlisting[language=C++,style=cpp]{pybind11_example.cpp}
 \end{center}
@@ -127,21 +141,21 @@ example.add(1, 2);
 
 \subsection{Matlab Mex-Funktion}
 
-Um eine C++-Funktion in Matlab zur Verfügung zu Stellen gibt es mehrere Ansätze.
+Um eine C++-Funktion in Matlab zur Verfügung zu stellen, gibt es mehrere Ansätze.
 Zum einen kann mithilfe von Matlab C++-Code kompiliert und anschließend genutzt werden. 
-Die für den Endnutzer einfacherer Variante ist das Bereitstellen von sogenannten Mex-Funktionen.
+Die für den Endnutzer einfachere Variante ist das Bereitstellen von sogenannten Mex-Funktionen.
 
 Um eine Mex-Funktion zu implementieren müssen die Header-Dateien \texttt{mex.hpp} und \texttt{mexAdapter.hpp} inkludiert werden
 und eine Funktion mit dem Namen \textit{MexFunction} implementiert werden. 
 
-In Abbildung \ref{mexfunction} ist eine Beispiel-Implementierung zu sehen 
+In Abbildung \ref{mexfunction} ist eine Beispiel-Implementierung zu sehen.
 \begin{center}
     \lstinputlisting[language=C++,style=cpp]{mex_function.cpp}
     \captionof{figure}{Eine einfache Mex-Funktion ohne Logik}
     \label{mexfunction}
 \end{center}
 
-Nachdem diese kompiliert wurde lässt sie sich aus Matlab heraus aufrufen.
+Nachdem diese kompiliert wurde, lässt sie sich aus Matlab heraus aufrufen.
 
 
 \subsection{Sonstige}
@@ -168,8 +182,9 @@ In diesem Abschnitt werden Details der Implementierung näher beleuchtet. Es wer
 \subsection{Gauss laguerre integration und Cauchy Integral Theoerem}\label{gauss_laguerre_section}
 
 Die Berechnung der Pfadintegrale wird mithilfe des Gauss-Laguerre-Verfahrens realisiert.
-Da die Auswertung der Pfadfunktion an den Gauss-Laguerre-Knoten unabhängig voneinander ist wird diese Berechnung mithilfe der Funktion \texttt{parallel\_determinictic\_reduce} der oneTBB API parallisiert.
-Diese Funktion verhält sich ähnlich wie \texttt{parallel\_reduce} hat jedoch ein anderes Verhalten hinsichtlich des sogenannten \textit{splittings} der Ranges. 
+Da die Auswertung der Pfadfunktion an den Gauss-Laguerre-Knoten unabhängig voneinander ist,
+ wird diese Berechnung mithilfe der Funktion \linebreak \texttt{parallel\_determinictic\_reduce} der oneTBB API parallisiert.
+Diese Funktion verhält sich ähnlich wie \texttt{parallel\_reduce}, hat jedoch ein anderes Verhalten hinsichtlich des sogenannten \textit{splittings} der Ranges. 
 Die \textit{Grainsize} ist auf 100 Elemente festgelegt, kleinere Blockgrößen haben in Performanztests keine signifikante Beschleunigung ermöglicht und größere haben die Laufzeit negativ beeinflusst.
 
 \begin{center}

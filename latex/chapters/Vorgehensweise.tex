@@ -1,18 +1,18 @@
 \chapter{Vorgehensweise}\label{plan}
 
-In diesem Kapitel wird darauf eingegangen wie die in Kapitel \ref{Performance} definierten Ziele erreicht werden.
+In diesem Kapitel wird darauf eingegangen, wie die in Kapitel \ref{Performance} definierten Ziele erreicht werden.
 
 
 \section{Grober Plan}
 
-Damit das Ziel der schnellen Performance erreicht werden wird die folgende Vorgehensweise genutzt.
+Damit das Ziel der schnellen Performance erreicht wird, wird die folgende Vorgehensweise genutzt.
 
 Zu Beginn wird der Algorithmus ohne Rücksicht auf Perfomanzkriterien implementiert.
 Dabei wird mithilfe von Unittests sichergestellt, dass sich die Implementierung korrekt verhält. 
-Die korrekten Eregbnisse einzelner Tests können mithilfe der vorliegenden Matlab Implementierung verifiziert werden.
+Die korrekten Eregbnisse einzelner Tests können mithilfe der vorliegenden Matlab-Implementierung verifiziert werden.
 
 Nachdem in diesem ersten Schritt ein korrekter Algorithmus vorliegt kann mit der Optimierung begonnen werden.
-Dazu werden folgende Methoden verwendet, welche in den jeweiligen Unterkapiteln eingegangen wird.
+Dazu werden folgende Methoden verwendet, auf welche in den jeweiligen Unterkapiteln eingegangen wird.
 
 \begin{itemize}
     \item Profiling
@@ -29,22 +29,22 @@ In dieser Arbeit wird dabei das Messen der Geschwindigkeit als primäre Metrik g
 
 \section{Hotpath-Analyse}
 
-Die Ergebnisse des Profilings ermöglichen es den sogenannten Hotpath (häufig auch Critical-Path genannt) eines Algorithmus zu finden.
-Das Ziel dieser Betrachtung ist es die Funktion(en) zu finden welche am größten zu der gemessenen Laufzeit beitragen. 
-Die so gefundenen Funktion sind die besten Kandidaten für Optimierungsmaßnahmen, da jede andere Funkion weniger zu der Laufzeit beiträgt.
+Die Ergebnisse des Profilings ermöglichen es, den sogenannten Hotpath (häufig auch Critical-Path genannt) eines Algorithmus zu finden.
+Das Ziel dieser Betrachtung ist es, die Funktion(en) zu finden, welche den größten Beitrag zu der gemessenen Laufzeit hat. 
+Die so gefundenen Funktionen sind die besten Kandidaten für Optimierungsmaßnahmen, da jede andere Funkion weniger zu der Laufzeit beiträgt.
 
 
 \section{Benchmarking}
 
 %Mithilfe der Google Bibliothek \textit{Benchmark} werden 
 
-Um die Laufzeit der Implementierung beurteilen zu können wird auf zweierlei Arten von Benchmarks gesetzt.
+Um die Laufzeit der Implementierung beurteilen zu können, wird auf zweierlei Arten von Benchmarks gesetzt.
 
 Zum einen automatisierte Benchmarks, welche vorallem die API-Endpunkte mit verschiedenen Testdaten ausführen und das Laufzeitverhalten messen.
 Diese Ergebnisse werden genutzt um während der Entwicklung schnelle Rückmeldung über einzelne Maßnahmen zu erhalten.
 
-Die zweite Variante der Benchmarks ist das manuelle Ausführen von API-Aufrufen welche mithilfe von Timingfunktionen gemessen werden.
-Diese werden für Tests genutzt bei denen eine Automatisierung mit erheblichem Mehraufwand verbunden wäre.
+Die zweite Variante der Benchmarks ist das manuelle Ausführen von API-Aufrufen, welche mithilfe von Timingfunktionen gemessen werden.
+Diese werden für Tests genutzt, bei denen eine Automatisierung mit erheblichem Mehraufwand verbunden wäre.
 Diese Vorgehensweise wird beispielsweise beim Vergleich der Matlabimplementierung mit den Matlab-Modulen angewandt. 
 
 \section{Parallelisieren isolierter Bereiche}
@@ -53,10 +53,10 @@ Einige mögliche Parallesierungen lassen sich direkt aus der Problemstellung abl
 So ist beispielsweise die Berechnung des zweidimensionalen Falls von zwei Dreiecken $\Delta_1$ und $\Delta_2$ abgesehen von 
 der Wellenzahl $k$, des Beobachtungspunktes $\theta$ und der Anzahl der Gauss-Laguerre-Knoten unabhängig voneinander.
 Diese Berechnungen lassen sich Dementsprechend relativ unproblematisch Parallelisieren da keine klassischen Threading-Konflikte auftreten können.
-Da der Zugriff auf diese invarianten Parameter lediglich lesend ist können die Zugriffe auf diese Ressourcen sogar ohne Synchronisierungen durchgeführt werden.
+Da der Zugriff auf diese invarianten Parameter lediglich lesend ist, können die Zugriffe auf diese Ressourcen sogar ohne Synchronisierungen durchgeführt werden.
 
 Ähnliches gilt für das Berechnen der einzelene Schichten im zweidimensionalen Fall. Die Ergebnisse einzelner Schichten beeinflussen sich gegenseitig nicht.
 
 \section{Sonstige}
 
-Des weiteren werden mithilfe von Compiler und Linker-Flags einige Optimierungen hinsichtlich der Laufzeit ausgewählt.
+Desweiteren werden mithilfe von Compiler- und Linker-Flags einige Optimierungen hinsichtlich der Laufzeit ausgewählt.
