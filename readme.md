@@ -44,6 +44,31 @@ Install the libraries to compile (Armadillo, OpenBLA, LApack, GSL, python3, eige
 
 
 ### Macos
+
+
+Needs homebrew to build, and the clang compiler
+
+Install cmake 
+brew install cmake
+
+Install ninja
+brew install ninja
+
+Install gsl
+brew install gsl
+
+Install tbb
+brew install tbb
+
+Install armadillo
+brew install armadillo
+
+
+clone the repo
+git submodule sync --recursive
+git submodule update --init --recursive 
+
+
     
 ### Build with CMAKE
 
@@ -66,7 +91,12 @@ In the fodler SteepestDescent are some test files.
 ### Matlab
 
 After the project was build with cmake (and -DSTEDEPY_BUILD_MATLAB=TRUE ), the output folder should contain some compiled mexfiles (build/out/<Target>/api/matlab).
-This file has to loaded in the matlab environment and then the functions can be run by the name of the files (StedepyMatlab_2d and StedepyMatlab_1d)
+
+It may be necessary to set add -DMatlab_ROOT_DIR=<root_dir_of_matlab> (example: MACOS -DMatlab_ROOT_DIR=/Application/MATLAB_R2022b.app/)
+
+This files have to loaded in the matlab environment and then the functions can be run by the name of the files (StedepyMatlab_2d and StedepyMatlab_1d)
+
+
 
 ### Python
 After the project was build with cmake , the output folder should contain the compiled  python module (build/out/<Target>/api/python).
@@ -133,7 +163,7 @@ This is done in the function lagpts. It takes the order n and calculates n weigh
 ### (2) Steepest Descent
 Function GetSteepDec1
 
-Uses the function f returned by WeightFunPerPath (3) to calculate the actual integral by using the gauß-laguerre quadrature rule. We construct paths along the spitting points Sp_1 and Sp_2.
+Uses the function f returned by WeightFunPerPath (3) to calculate the actual integral by using the gauï¿½-laguerre quadrature rule. We construct paths along the spitting points Sp_1 and Sp_2.
 
 With f we evaluate the complex function at the nodes calculated by (1) and weigh the results by the matching weights. The result is summed up and is the
 wanted integral for the path.
@@ -197,7 +227,7 @@ I will use OneTBB (Intel threading building blocks) and try to use OpenCl
 
 ## Considerations for perfomance 
 
-Compile-time evaluation of Gauß-Laguerre stuff. => pretty hard and no critical path
+Compile-time evaluation of Gauï¿½-Laguerre stuff. => pretty hard and no critical path
 
 ### Running Matlab on Gitlab
 
@@ -220,7 +250,7 @@ https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/index.html
 About constexpr
 https://www.boost.org/doc/libs/1_78_0/libs/multiprecision/doc/html/boost_multiprecision/tut/lits.html
 
-Gauß-laguerre Quadrature with Boost.Multiprecision
+Gauï¿½-laguerre Quadrature with Boost.Multiprecision
 https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/fp_eg/gauss_lagerre_quadrature.html
 
 https://stackoverflow.com/questions/37296481/integration-with-quadrature-and-multiprecision-boost-libraries-in-c
@@ -273,9 +303,9 @@ https://cliutils.gitlab.io/modern-cmake/chapters/intro/running.html
 ### Google results
 https://www.google.com/search?channel=trow5&client=firefox-b-d&q=c%2B%2B+library+gauss+laguerre
 
-### Gauß-laguerre implementations
+### Gauï¿½-laguerre implementations
 
 http://www.mymathlib.com/quadrature/gauss_laguerre.html
 
-Gauß-laguerre Quadrature with Boost.Multiprecision
+Gauï¿½-laguerre Quadrature with Boost.Multiprecision
 https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/fp_eg/gauss_lagerre_quadrature.html

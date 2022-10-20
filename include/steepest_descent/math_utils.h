@@ -18,12 +18,12 @@ namespace math_utils {
 	typedef std::function<std::complex<double>(double)> green_fun;
 	typedef std::function<green_fun(const double& k, const std::complex<double>& y, const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const double& q, const std::complex<double>& s)> green_fun_generator;
 
-	constexpr auto floor(std::complex<double> && value) -> std::complex<double> {
+	inline auto floor(std::complex<double> && value) -> std::complex<double> {
 		return  std::floor(std::real(value)) + std::floor(std::imag(value)) * 1.i;
 	}
 
 	template<typename T>
-	constexpr auto get_q(const arma::subview_col<T>& A, const arma::vec3& theta) -> double {
+	inline auto get_q(const arma::subview_col<T>& A, const arma::vec3& theta) -> double {
 		return arma::dot(A, theta);
 	}
 

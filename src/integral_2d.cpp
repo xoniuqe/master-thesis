@@ -56,14 +56,16 @@ namespace integral {
 		A1.swap_cols(0, 1);
 		auto q1 = arma::dot(A1.col(0), theta);
 		auto sx1 = arma::dot(A1.col(1), theta) * 0. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
-		auto [c1, c1_0] = math_utils::get_complex_roots(0, A1, b, r);
-
+		auto croots1= math_utils::get_complex_roots(0, A1, b, r);
+		auto c1 = std::get<0>(croots1);
+		auto c1_0 = std::get<1>(croots1);
 		arma::mat rotation{ {-1, 1}, {1, 0} };
 		arma::mat A2 = A * rotation;
 		auto q2 = arma::dot(A2.col(0), theta);
 		auto sx2 = arma::dot(A2.col(1), theta) * 1. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
-		auto [c2, c2_0] = math_utils::get_complex_roots(1, A2, b, r);
-
+		auto croots2 = math_utils::get_complex_roots(1, A2, b, r);
+		auto c2 = std::get<0>(croots2);
+		auto c2_0 = std::get<1>(croots2);
 
 		auto local_k = config.wavenumber_k;
 		auto green_fun_2d = [k = local_k, &A, &b, &r, qx, qy, prod](const double x, const double y) -> auto {
