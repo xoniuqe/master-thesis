@@ -12,9 +12,9 @@ auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
 auto is_spec = math_utils::is_singularity_in_layer(config.tolerance, spec_point, 0, 1 - u);
 auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, 0, 1 - u);
 
-// Berechnung der Terme $\Lambda_0(y_{m_j})$ und $\Lambda_{1-y_{m_j}}(y_{m_j})$
-auto integration_y =  get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
-auto integration_1_minus_y =  get_partial_integral(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
+// Berechnung der $\Lambda$-Terme mithilfe des 1D-Verfahrens			
+auto integration_y = partial_integral(A1, b, r, q1, sx1, 0., c1, c1_0, y, y + config.y_resolution);
+auto integration_1_minus_y = partial_integral(A2, b, r, q2, sx2, 1., c2, c2_0, y, y + config.y_resolution);
 
 // Berechnung der Pfade mithilfe der Gauss-Laguerre-Quadratur 
 auto s = arma::dot(A.col(0), theta) * u + prod;
@@ -26,3 +26,4 @@ auto Ifin = gauss_laguerre::calculate_integral_cauchy_tbb(path2, nodes, weights)
 
 //Ergebniss für den Layer
 integral += Iin * integration_y - Ifin * integration_1_minus_y;
+//[...] Abhandlung der Singularitäten
