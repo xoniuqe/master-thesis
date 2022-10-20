@@ -40,7 +40,7 @@ void Benchmark_1DIntegration_Varying_K(benchmark::State& state, int k) {
 			timings[i] = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 		}
 		auto average = std::accumulate(timings.begin(), timings.end(), 0.) / 40.;
-		state.counters["Single time"] = benchmark::Counter(average, benchmark::Counter::kIsRate | benchmark::Counter::kInvert);
+		state.counters["Single time"] = benchmark::Counter(average * 1000., benchmark::Counter::kAvgIterations);
 	}
 }
 BENCHMARK_CAPTURE(Benchmark_1DIntegration_Varying_K, K_100, 100)->Unit(benchmark::kMillisecond)->MeasureProcessCPUTime()->UseRealTime();

@@ -41,7 +41,7 @@ void Benchmark_2DIntegration_Varying_K(benchmark::State& state, int k) {
 			timings[i] = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 		}
 		auto average = std::accumulate(timings.begin(), timings.end(), 0.) / 40.;
-		state.counters["Single time"] = benchmark::Counter(average, benchmark::Counter::kIsRate | benchmark::Counter::kInvert);
+		state.counters["Single time"] = benchmark::Counter(average * 1000., benchmark::Counter::kAvgIterations);
     }
 }
 BENCHMARK_CAPTURE(Benchmark_2DIntegration_Varying_K, K_100, 100)->Unit(benchmark::kMillisecond)->MeasureProcessCPUTime()->UseRealTime();
@@ -87,8 +87,8 @@ void Benchmark_2DIntegration_Varying_resolution(benchmark::State& state, double 
 			return (timing - average) * (timing - average);
 			}) / 40.);
 		state.counters["bla"] += 1;
-		state.counters["Single time"] = average * 1000.;// benchmark::Counter(average, benchmark::Counter::kIsRate | benchmark::Counter::kInvert);
-		state.counters["time std"] = std * 1000.;// benchmark::Counter(std, benchmark::Counter::kIsRate | benchmark::Counter::kInvert);
+		state.counters["Single time"] = benchmark::Counter(average * 1000., benchmark::Counter::kAvgIterations);
+		state.counters["time std"] = benchmark::Counter(std * 1000., benchmark::Counter::kAvgIterations);
 	}
 }
 BENCHMARK_CAPTURE(Benchmark_2DIntegration_Varying_resolution, RES_0_1, 0.1)->Unit(benchmark::kMillisecond)->MeasureProcessCPUTime()->UseRealTime();
