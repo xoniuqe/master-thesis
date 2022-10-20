@@ -106,23 +106,18 @@ Da der Realteil von $g$ entlang dieses Pfades konstant ist, wegen $g(h_x(t)) = \
 Es wird gezeigt, dass sich mithilfe einer Fallunterscheidung 6 verschiedene Konfigurationen für die Berechnungen von $c_s$ bzw. $c_r$  unterscheiden lassen.
 \begin{table}
     \centering
-    \begin{tabular}{|c|c|c|c|}
-        \hline
-        \multicolumn{2}{|c|}{Fall} & $c_s$ & $c_r$ \\
-        \hline
-        \multicolumn{2}{|c|}{$|q|=\infty$} & ${c, \overline{c}}$ & $Re(c)$ \\
-        \hline
-        \multicolumn{2}{|c|}{$|q|=0$} & $Re(c)$  & ${c, \overline{c}}$\\
-        \hline
-        \multicolumn{2}{|c|}{$|q|=\sqrt{c_0}$} & $|c_s| = \infty$ & $|c_r| = \infty$ \\
-        \hline
-        \multirow{2}*{$|q|<\sqrt{c_0}$} & $q < 0$ & $Re(c) + K_{c_s}$ & $Re(c) + K_{c_r}$ \\
-        \cline{2-3} & $q > 0$ & $Re(c) - K_{c_s}$ & $Re(c) - K_{c_r}$ \\
-        \hline
-        \multirow{2}*{$|q|>\sqrt{c_0}$} & $q < 0$ & $Re(c) + K_{c_s}$ & $Re(c) + K_{c_r}$ \\
-        \cline{2-3} & $q > 0$ & $Re(c) - K_{c_s}$ & $Re(c) - K_{c_r}$ \\
-        \hline
-    \end{tabular}
+    \begin{tblr}{hlines,
+        vlines,
+        colspec={M{2cm}M{2cm}M{3cm}M{3cm}},row{2-8}={6ex}}
+        \SetCell[c=2]{} Fall & & $c_s$ & $c_r$ \\
+        \SetCell[c=2]{} $|q|=\infty$ & & ${c, \overline{c}}$ & $Re(c)$ \\
+        \SetCell[c=2]{} $|q|=0$ & & $Re(c)$  & ${c, \overline{c}}$\\
+        \SetCell[c=2]{} $|q|=\sqrt{c_0}$ & & $|c_s| = \infty$ & $|c_r| = \infty$ \\
+        \SetCell[r=2]{} $|q|<\sqrt{c_0}$ & $q < 0$ & $Re(c) + K_{c_s}$ & $Re(c) + K_{c_r}$ \\
+        & $q > 0$ & $Re(c) - K_{c_s}$ & $Re(c) - K_{c_r}$ \\
+        \SetCell[r=2]{} $|q|>\sqrt{c_0}$ & $q < 0$ & $Re(c) + K_{c_s}$ & $Re(c) + K_{c_r}$ \\
+        & $q > 0$ & $Re(c) - K_{c_s}$ & $Re(c) - K_{c_r}$ \\
+    \end{tblr}
     \caption{Berechnung der \textit{Splitting-points}}
 \end{table}
 
@@ -137,6 +132,47 @@ Dabei werden $K_{c_s}$ und $K_{c_r}$ wie folgt berechnet:
 
 Da diese Punkte nicht mit dem \textit{Steepest-descent}-Verfahren berechnet werden können muss der Interval bestimmt werden in welchem sich die \textit{Splitting-points} befinden.
 Dieses Interval wird im Algorithmus durch die nächsten Nullstellen um diese Singularitäten bestimmt.
+
+\section{Berechnung von zulässigen Pfade}
+
+Die Pfade welche auf denen \textit{Steepest-descent}-Verfahren werden darf, werden in der Arbeit \textit{zulässige}(engl. \textit{admissible}) Pfade genannt.
+Ein Pfad ist genau dann \textit{zulässig} wenn sein Anfangspunkt zu $\mathbb{R} \backslash {c_r,c_s}$ gehört (siehe Definition 3, Kapitel 4.1 in \cite{gasperini:hal-03209144}).
+
+Für einen Pfad $h_x$ mit Anfangspunkt $x$ wird die Funktion $K_x(t)$ als 
+\begin{equation}
+    K_x(t) = \sqrt{P(x)} + qx + it
+\end{equation}
+definiert und mithilfe dieser die beiden Funktionen $K^1_{h_x}$ und $K^2_{h_x}$ als
+\begin{equation}
+    \begin{aligned}
+        K^1_{h_x} :=& \frac{c_0Re(c)-qK_x(t)}{c_0-q^2} \\
+        K^2_{h_x} :=&\sqrt{\frac{K_x(t)^2-c_0|c|^2}{c_0-q^2}-(\frac{qK_x(t)-c_0Re(c)}{c_0-q^2})^2}
+    \end{aligned}
+\end{equation}
+ definiert. Mithilfe dieser lassen sich wieder mit einer Fallunterscheidung über $q$ die Pfade berechnen.
+
+\begin{table}
+    \centering
+    \begin{tblr}{hlines,
+        vlines,
+        colspec={M{2cm}M{2cm}M{5cm}},row{2-6}={7ex}}
+        \SetCell[c=2]{} Fall & & $h_x$ \\
+        \SetCell[c=2]{} $|q|=\pm \sqrt{c_0}$ & & $\dfrac{K_x(t)^2-c_o|c|^2}{\pm2(K_x(t)\sqrt{c_0}\mp c_0 Re(c))}$\\
+        \SetCell[r=2]{} $|q|<\sqrt{c_0}$ & $x < c_s$ & $K^1_{h_x} - K^2_{h_x}$ \\
+        & $x > c_s$ & $K^1_{h_x} + K^2_{h_x}$\\
+        \SetCell[r=2]{} $|q|>\sqrt{c_0}$ & $q < 0$ & $K^1_{h_x} + K^2_{h_x}$ \\
+         & $q > 0$ & $K^1_{h_x} - K^2_{h_x}$ \\
+    \end{tblr}
+    \caption{Berechnung der von $h_x$}
+\end{table}
+
+Zur Berechnung des Verfahrens wird neben dem Pfad $h_x$ auch die Ableitung $h'_x$ benötigt.
+Diese lässt sich, wie in Kapitel 4.2 von \cite{gasperini:hal-03209144} gezeigt, mithilfe von $h_x$ berechnen:
+
+\begin{equation}
+    h'_x(t) = \frac{i\sqrt{P(h_x(t))}}{c_0(h_x(t)-Re(c))+q\sqrt{P(h_x(t))}}
+\end{equation}
+
 
 \section{Fall1: Das 1D-Verfahren}
 

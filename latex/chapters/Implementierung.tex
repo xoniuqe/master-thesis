@@ -112,7 +112,7 @@ oneTBB bietet verschiedene Arten von Blocked-Ranges für bis zu 3 Dimensionen. D
     \captionof{figure}{Minimalbeispiel von \texttt{paralell\_reduce}}
 \end{center}
 
-In dieser Arbeit werden ausschließlich Parallelisierungen mithilfe von \texttt{parallel\_recude} umgesetzt.
+In dieser Arbeit werden ausschließlich Parallelisierungen mithilfe von \linebreak \texttt{parallel\_recude} bzw. \texttt{parallel\_deterministic\_reduce} umgesetzt.
 Dieses bietet die Möglichkeit für jedes Datum eine Transformation durchzuführen und anschließend die tranformierten Daten zu vereinigen. 
 So wird beispielsweise in der Implementierung (siehe Abschnitt \ref{gauss_laguerre_section}) des Gauss-Laguerrre Verfahrens ein zu integrierender Pfad parallel an den einzelnen Gauss-Laguerre-Knotenpunkten ausgewertet und entsprechend gewichtet.
 Die so berechneten Teilwerte werden nun noch addiert und ergeben so das komplexe (Teil-)Integral des Pfades. 
@@ -193,8 +193,35 @@ Die \textit{Grainsize} ist auf 100 Elemente festgelegt, kleinere Blockgrößen h
     \label{gauss_laguerre_impl}
 \end{center}
 
+\subsection{Gewichtung der Pfade}
 
-\subsection{1D Integration Berechnung der Singularität}
+In der Datei \textit{path\_utils.cpp} werden Funktionen zur Berechnung der gewichteten Pfade bereitgestellt.
+Diese werden dann wie im Abschnitt \ref{gauss_laguerre_section} beschrieben verwendet um die \textit{zulässigen} Pfade zu berechnen.
+Es werden drei verschiedene Gewichtungen vorgenommen:
+\begin{itemize}
+    \item Für den eindimenisionalen Fall
+    \item Für den $\Lambda$-Term im zweidimensionalen
+    \item Für die Pfade im zweidimensionalen
+\end{itemize}
+
+Die Implementierung ist in Abbilung \ref{path_utils} zu sehen.
+
+\begin{center}
+    \lstinputlisting[language=C++,style=cpp,mathescape=true]{path_utils.cpp}
+    \captionof{figure}{Funktionen zur Berechnung gewichteter Pfade}
+    \label{path_utils}
+\end{center}
+
+\subsection{1D Integration}
+
+Die 1D-Integration ist als sogenanntes \textit{Functor-Objekt} implementiert. 
+
+\begin{center}
+    \lstinputlisting[language=C++,style=cpp,mathescape=true]{1d_integral.hpp}
+    \captionof{figure}{}
+\end{center}
+
+\subsubsection*{Berechung der Singularität}
 
 In Kapitel 5.1 \cite[12]{gasperini:hal-03209144} (Formel 16) wird die Formel für den eindimenisionalen Fall, im Fall einer Singularität im Interval $[a_1, b_1]$ wie folgt beschrieben:
 
@@ -223,7 +250,7 @@ hat, mithilfe eines Aufruf des GSL-Integrators berechnet (Analog zum 2D Fall, si
 
 \subsection{2D Integration}\label{2dint}
 
-Ebenso wie die 1D-Integration wird die 2D-Integration als sogenanntes \textit{Functor-Objekt}\ref{sec_functor} implementiert (siehe Abbildung \ref{2d_integral_functor}). 
+Ebenso wie die 1D-Integration wird die 2D-Integration als sogenanntes \textit{Functor-Objekt} implementiert (siehe Abbildung \ref{2d_integral_functor}). 
 Im Konstruktor werden die invarianten Parameter übergeben und in dem \textit{\(\)-Operator} werden die Dreiecksparameter, der Blickpunkt $r$ und der Richtungsvektor $\theta$ übergeben.
 
 In diesem Abschnitt wird primär auf die Berechnung eines einzelnen Schicht $n$ eingangen. Die Anzahl der zu berechnenden Schichten wird aus der Konfiguration(siehe Abbildung \ref{configuration}) abgeleitet. 
@@ -238,6 +265,17 @@ Die Menge der Schichten wird mithilfe der oneTBB Funktion \texttt{parallel\_redu
 Dabei hat sich gezeigt, dass eine Blockgröße von 1 zu den besten Ergebnissen führt.
 Die zu Berechnende Schicht kann nun in zwei Fälle unterteilt werden: Mit Singularität und ohne.
 
+\subsubsection*{Berechnung von $\Lambda_a$}
+
+Die $\Lambda_a$-Terme werden mithilfe des eindimenisionalen Verfahrens berechnet.
+Dabei wird dieser mit angepassten Funktionen für die Pfadgewichtung sowie angepasstem Integranden für die klassische Integration.
+
+\begin{center}
+    \lstinputlisting[language=C++,style=cpp]{integral_2d_partial.cpp}
+\end{center}
+
+Im Quellcode werden Aufrufe dieser Instanz mit \textit{partial\_integral} ausgeführt.
+
 \subsubsection*{Fall 1: Keine Singularität in Schich $n$}
 
 Dabei ist der Fall ohne Singularität der trivialere Fall:
@@ -247,10 +285,6 @@ Dabei ist der Fall ohne Singularität der trivialere Fall:
     \captionof{figure}{Schicht $n$ ohne Singularität}
     \label{2d_integral_trivial}
 \end{center}
-
-
-Die Funktion \textit{get\_partial\_integral} ist im Grunde genommen eine Kopie des eindimenisionalen Falles. Dieser wird allerdings aus Performanzgründen als lokale Funkion implementiert.
-Die Kosten eines indirekten Aufrufs des eindimenisionalen Falls haben sich in den Benchmarks sehr negativ dargestellt.
 
 
 \subsubsection*{Fall 2: Singularität in Schicht $n$}

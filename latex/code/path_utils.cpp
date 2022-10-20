@@ -1,0 +1,32 @@
+//Für den 1D-Fall
+auto get_weighted_path(const std::complex<double> split_point, const std::complex<double> y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r, const double q, const double k, const std::complex<double> s, const datatypes::complex_root complex_root, const std::complex<double> sing_point)->path_function {
+    auto Px = math_utils::calculate_P_x(split_point, y, A, b, r);
+    auto path = get_complex_path(split_point, Px, q, complex_root, sing_point);
+    auto derivative = get_path_derivative(path, y, A, b, r, q, complex_root);
+    
+    return [=](const double t) -> auto {
+        return derivative(t / k) * std::exp(1i * k * (std::sqrt(math_utils::calculate_P_x(split_point, y, A, b, r)) + q * split_point + s)) * (1. / k) * (1. / std::sqrt(math_utils::calculate_P_x(path(t / k), y, A, b, r)));
+    };
+}
+
+// Für den 2D-Fall
+auto get_weighted_path_2d(const std::complex<double> split_point, const std::complex<double> y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r, const double q, const double k, const std::complex<double> s, const datatypes::complex_root complex_root, const std::complex<double> sing_point)->path_function {
+    auto Px = math_utils::calculate_P_x(split_point, y, A, b, r);
+    auto path = get_complex_path(split_point, Px, q, complex_root, sing_point);
+    auto derivative = get_path_derivative(path, y, A, b, r, q, complex_root);
+    
+    return [=](const double t) -> auto {
+        return derivative(t / k) * (1. / k) * (1. / std::sqrt(math_utils::calculate_P_x(path(t / k), y, A, b, r)));
+    }; /
+}
+
+// Für die Berechnung von $\Lambda_a$
+auto get_weighted_path_y(const std::complex<double> split_point, const std::complex<double> y, const datatypes::matrix& A, const  arma::vec3& b, const  arma::vec3& r, const double q, const double k, const std::complex<double> s, const datatypes::complex_root complex_root, const std::complex<double> sing_point)->path_function {
+    auto Px = math_utils::calculate_P_x(split_point, y, A, b, r);
+    auto path = get_complex_path(split_point, Px, q, complex_root, sing_point);
+    auto derivative = get_path_derivative(path, y, A, b, r, q, complex_root);
+
+    return [=](const double t) -> auto {
+        return derivative(t / k) * (1. / k) * std::exp(1.i * k * (std::sqrt(Px) + q * split_point + s));
+    };
+}
