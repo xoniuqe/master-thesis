@@ -18,7 +18,7 @@
 
 
 #define STEDEPY_USE_DIRECT_STEEPEST_DESC
-
+#define STEDEPY_1D_INSTEAD_OF_PARTIAL
 
 namespace integral {
 	using namespace std::complex_literals;
@@ -45,13 +45,13 @@ namespace integral {
 
 	auto integral_2d::operator()(const arma::mat& A, const arma::vec& b, const arma::vec& r, const arma::vec& theta) const -> std::complex<double> {
 
- 
+
 		auto q = arma::dot(A.col(0), theta);
 		auto qx = arma::dot(A.col(0), theta);
 		auto qy = arma::dot(A.col(1), theta);
 
 		auto prod = arma::dot(theta, b);
-		
+
 		auto A1 = arma::mat(A);
 		A1.swap_cols(0, 1);
 		auto q1 = arma::dot(A1.col(0), theta);
@@ -72,15 +72,24 @@ namespace integral {
 			auto res = std::exp(1.i * k * (sqrtPx + qx * x + qy * y + prod)) * (1. / sqrtPx);
 			return res;
 		};
-		//std::mutex write_mutex;
+		//std::mutex write_mutex;j
 		auto integration_result = 0. + 0.i;
-		int number_of_steps = (int) 1. / config.y_resolution;
+		int number_of_steps = (int)1. / config.y_resolution;
 #ifdef STEDEPY_1D_INSTEAD_OF_PARTIAL
 		integrator::gsl_integrator integrator_1d;
 		config::configuration config1d;
 		config1d.wavenumber_k = config.wavenumber_k;
 		config1d.tolerance = config.tolerance;
-		integral_1d_test partial_integral(config1d, &integrator_1d, nodes, weights);
+		math_utils::green_fun_generator fun_gen = [](const double& k, const std::complex<double>& y, const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const double& q, const std::complex<double>& s) -> math_utils::green_fun
+		{
+				return [&](const double x) -> auto {
+					auto Px = math_utils::calculate_P_x(x, y, A, b, r);
+					auto sqrtPx = std::sqrt(Px);
+					auto res = std::exp(1.i * k * (sqrtPx + q * x + s));
+					return res;
+				};
+		};
+		integral_1d partial_integral(config1d, &integrator_1d, nodes, weights, path_utils::get_weighted_path_y, fun_gen);
 #endif
 		integration_result = tbb::parallel_reduce(tbb::blocked_range(0, number_of_steps, 1), 0. + 0.i, [&](tbb::blocked_range<int> range, std::complex<double> integral) {
 			integrator::gsl_integrator_2d integrator;
@@ -102,8 +111,8 @@ namespace integral {
 				auto integration_y = partial_integral(A1, b, r, q1, sx1, 0., c1, c1_0, y, y + config.y_resolution);
 				auto integration_1_minus_y = partial_integral(A2, b, r, q2, sx2, 1., c2, c2_0, y, y + config.y_resolution);
 #else
-				auto integration_y = get_partial_integral(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
-				auto integration_1_minus_y = get_partial_integral(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
+				auto integration_y = integrate_lambda(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
+				auto integration_1_minus_y = integrate_lambda(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
 #endif
 		
 #ifdef USE_PATH_GEN
@@ -173,8 +182,8 @@ namespace integral {
 				auto intYintern1 = partial_integral( A1, b, r, q1, sx_intern_1, split_point1, cIntern1, c_0Intern1, y, y + config.y_resolution);
 				auto intYintern2 = partial_integral( A1, b, r, q1, sx_intern_2, split_point2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 #else
-				auto intYintern1 = get_partial_integral(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + config.y_resolution);
-				auto intYintern2 = get_partial_integral(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + config.y_resolution);
+				auto intYintern1 = integrate_lambda(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + config.y_resolution);
+				auto intYintern2 = integrate_lambda(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 #endif
 
 				auto integral2_res = integrator.operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
@@ -188,7 +197,7 @@ namespace integral {
 	}
 
 
-	auto integral_2d::get_partial_integral(const arma::mat& A, const arma::vec& b, const arma::vec& r, const std::complex<double> sPx, const double q, const std::complex<double> s, const std::complex<double> c, const double c_0, const double left_split, const double right_split) const -> std::complex<double> {
+	auto integral_2d::integrate_lambda(const arma::mat& A, const arma::vec& b, const arma::vec& r, const std::complex<double> sPx, const double q, const std::complex<double> s, const std::complex<double> c, const double c_0, const double left_split, const double right_split) const -> std::complex<double> {
 		auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
 		auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
 
@@ -201,7 +210,6 @@ namespace integral {
 		}
 
 		steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_y, nodes, weights, config.wavenumber_k, sPx, A, b, r, q, s, { c, c_0 }, sing_point);
-
 
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
 		if (math_utils::is_singularity_in_layer(config.tolerance, spec_point, left_split, right_split)) {

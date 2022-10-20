@@ -51,12 +51,15 @@ private:
         std::vector<double> nodes(nodesInput.begin(), nodesInput.end());
         std::vector<double> weights(weightsInput.begin(), weightsInput.end());
 
+
+        auto [c, c_0] = math_utils::get_complex_roots(y, A, b, r);
+
         config::configuration config;
         config.wavenumber_k = k;
 
         integrator::gsl_integrator gslintegrator;
         integral::integral_1d integral1d(config, &gslintegrator, nodes, weights);
-        return integral1d(A, b, r, q, s, y, left_split, right_split);
+        return integral1d(A, b, r, q, s, y, c, c_0, left_split, right_split);
     }
 
     void displayOnMATLAB(std::ostringstream& stream) {
