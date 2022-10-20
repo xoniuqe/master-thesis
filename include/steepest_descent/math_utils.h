@@ -15,6 +15,9 @@ namespace math_utils {
 
 	using namespace complex_comparison;
 
+	typedef std::function<std::complex<double>(double)> green_fun;
+	typedef std::function<green_fun(const double& k, const std::complex<double>& y, const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const double& q, const std::complex<double>& s)> green_fun_generator;
+
 	constexpr auto floor(std::complex<double> && value) -> std::complex<double> {
 		return  std::floor(std::real(value)) + std::floor(std::imag(value)) * 1.i;
 	}

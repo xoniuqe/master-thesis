@@ -29,8 +29,8 @@ namespace math_utils {
 	}
 
 	auto get_complex_roots(const std::complex<double> y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r) -> std::tuple<std::complex<double>, double> {
-		auto A_1 = A.col(0);
-		auto A_2 = A.col(1);
+		arma::vec3 A_1 = A.col(0);
+		arma::vec3 A_2 = A.col(1);
 
 		
 		auto A2_imaginary = arma::vec3();
@@ -68,11 +68,11 @@ namespace math_utils {
 	}
 
 	auto get_complex_roots(const double y, const datatypes::matrix& A, const arma::vec3& b, const arma::vec3& r) -> std::tuple<std::complex<double>, double> {
-		auto A_1 = A.col(0);
-		auto A_2 = A.col(1);
+		arma::vec3 A_1 = A.col(0);
+		arma::vec3 A_2 = A.col(1);
 
 
-		auto A_2copy = arma::vec3(A_2);
+		auto A_2copy = arma::vec3{ A_2[0], A_2[1], A_2[2] };
 		A_2copy *= y;
 		A_2copy += b - r;
 
