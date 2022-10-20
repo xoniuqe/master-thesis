@@ -66,7 +66,7 @@ In the fodler SteepestDescent are some test files.
 ### Matlab
 
 After the project was build with cmake (and -DSTEDEPY_BUILD_MATLAB=TRUE ), the output folder should contain some compiled mexfiles (build/out/<Target>/api/matlab).
-This file has to loaded in the matlab environment and then the functions can be run by the name of the file (begins with StedepyMatlab)
+This file has to loaded in the matlab environment and then the functions can be run by the name of the files (StedepyMatlab_2d and StedepyMatlab_1d)
 
 ### Python
 After the project was build with cmake , the output folder should contain the compiled  python module (build/out/<Target>/api/python).
