@@ -126,7 +126,6 @@ namespace integral {
 				auto path2 = path_utils::get_weighted_path_2d(1 - u, u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
 				auto Ifin = gauss_laguerre::calculate_integral_cauchy_tbb(path2, nodes, weights);
 #else
-				// null check bringt hier scheinbar nicht viel/*std::abs(integration_y) <= std::numeric_limits<double>::epsilon() ? 0. :*/
 				auto Iin =  steepest_desc(0);
 				auto Ifin = steepest_desc(1 - u);
 #endif
