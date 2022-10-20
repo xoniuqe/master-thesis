@@ -42,14 +42,14 @@ CD to the root folder of the repo
 
 Update the submodules:
 ```
-  git submodule sync --recursive
-  git submodule update --init --recursive
+git submodule sync --recursive
+git submodule update --init --recursive
 ```
 
 Install the libraries to compile (Armadillo, OpenBLA, LApack, GSL, python3, eigen, tbb)
 ```
-  apt-get update --yes
-  apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev python3-dev libeigen3-dev libtbb-dev
+apt-get update --yes
+apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev python3-dev libeigen3-dev libtbb-dev
 ```
 
 ### Macos
@@ -65,19 +65,19 @@ Install ninja
 ```
 brew install ninja
 ```
-```
 Install gsl
+```
 brew install gsl
 ```
-```
 Install tbb
+```
 brew install tbb
 ```
-```
 Install armadillo
+```
 brew install armadillo
 ```
- upate the submodules
+upate the submodules
 ```
 git submodule sync --recursive
 git submodule update --init --recursive 
@@ -90,8 +90,8 @@ build the project
 Build wiht -DSTEDEPY_BUILD_MATLAB=TRUE to build the matlab plugin. This requires Matlab versions >= R2018a
 
 ```
-  cmake -S . -B build -DTBB_TEST=FALSE
-  cmake --build build -v 
+cmake -S . -B build -DTBB_TEST=FALSE
+cmake --build build -v 
 ```
 
 This build the project into out/build/
