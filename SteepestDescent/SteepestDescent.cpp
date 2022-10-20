@@ -229,11 +229,11 @@ auto check_accuracy() {
 	integral::integral_2d integral2d(config, &gslintegrator, &gsl_integrator_2d);
 
 
-	auto integration_y = integral2d.integrate_lambda(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
-	auto integration_1_minus_y = integral2d.integrate_lambda(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
+	//auto integration_y = integral2d.integrate_lambda(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
+	//auto integration_1_minus_y = integral2d.integrate_lambda(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
 
-	std::cout << "intY " << integration_y << "\n";
-	std::cout << "intY-1 " << integration_1_minus_y << "\n";
+	//std::cout << "intY " << integration_y << "\n";
+	//std::cout << "intY-1 " << integration_1_minus_y << "\n";
 
 
 
