@@ -56,9 +56,8 @@
       <file>biblatex.def</file>
       <file>blx-natbib.def</file>
       <file>standard.bbx</file>
-      <file>authoryear.bbx</file>
-      <file>authoryear-icomp.bbx</file>
-      <file>authoryear-icomp.cbx</file>
+      <file>numeric.bbx</file>
+      <file>numeric.cbx</file>
       <file>biblatex.cfg</file>
       <file>german.lbx</file>
       <file>ngerman.lbx</file>
