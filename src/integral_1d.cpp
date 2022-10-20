@@ -54,7 +54,9 @@ namespace integral {
 	}
 
     auto integral_1d::operator()(const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const arma::vec3& theta, const double y, const double left_split, const double right_split) const -> std::complex<double> {
-		auto [c, c_0] = math_utils::get_complex_roots(y, A, b, r);
+		auto croots = math_utils::get_complex_roots(y, A, b, r);
+		auto c = std::get<0>(croots);
+		auto c_0 = std::get<1>(croots);
 		return integral_1d::operator()(A, b, r, arma::dot(A.col(0), theta), arma::dot(A.col(1), theta) * y + arma::dot(theta, b), y, c, c_0, left_split,right_split);
 	}
 

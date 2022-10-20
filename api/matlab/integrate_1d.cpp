@@ -52,7 +52,9 @@ private:
         std::vector<double> weights(weightsInput.begin(), weightsInput.end());
 
 
-        auto [c, c_0] = math_utils::get_complex_roots(y, A, b, r);
+        auto croots = math_utils::get_complex_roots(y, A, b, r);
+        auto c = std::get<0>(croots);
+        auto c_0 = std::get<1>(croots);
 
         config::configuration config;
         config.wavenumber_k = k;
