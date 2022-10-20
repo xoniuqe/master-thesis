@@ -17,9 +17,6 @@
 #include <tbb/blocked_range.h>
 
 
-#define STEDEPY_USE_DIRECT_STEEPEST_DESC
-#define STEDEPY_1D_INSTEAD_OF_PARTIAL
-
 namespace integral {
 	using namespace std::complex_literals;
 
@@ -117,12 +114,6 @@ namespace integral {
 				auto integration_1_minus_y = integrate_lambda(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
 #endif
 		
-#ifdef USE_PATH_GEN
-				auto path_generator = path_utils::get_weighted_path_generator_2d(u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
-				steepest_descent::steepest_descend_2d_path steepest_desc(path_generator, nodes, weights);
-#else
-				//steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, config.wavenumber_k, u, A, b, r, q, s, { c, c_0 }, sing_point);
-#endif
 #ifndef STEDEPY_USE_DIRECT_STEEPEST_DESC
 				steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, config.wavenumber_k, u, A, b, r, q, s, { c, c_0 }, sing_point);
 #endif

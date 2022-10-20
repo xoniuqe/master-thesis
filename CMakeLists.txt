@@ -25,8 +25,10 @@ option(STEDEPY_BENCHMARK "Enable benchmarks" ON)
 option(STEDEPY_BUILD_MATLAB "Builds the mex functions" OFF)
 option(STEDEPY_BUILD_PYTHON_MODULE "Builds the python module" ON)
 option(STEDEPY_EXTERN_TBB "IF ON THE oneTBB submodule is not build/ loaded" OFF)
-#option(STEDEPY_1D_INSTEAD_OF_PARTIAL "Uses the 1d case instead of a local function (for testing)" OFF)
-#option(STEDEPY_USE_DIRECT_STEEPEST_DESC "IF turned off the 2d case uses the stepest_descent class instead of calculating it directly " ON)
+option(STEDEPY_1D_INSTEAD_OF_PARTIAL "Uses the 1d case instead of a local function" ON)
+option(STEDEPY_USE_DIRECT_STEEPEST_DESC "IF turned off the 2d case uses the stepest_descent class instead of calculating it directly " ON)
+
+
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

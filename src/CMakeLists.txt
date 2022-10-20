@@ -43,8 +43,17 @@ set(TBB_TEST FALSE)
 set(TBB_USE_DEBUG FALSE)
 find_package(TBB REQUIRED)
 
-add_compile_definitions(HAVE_INLINE)
-add_compile_definitions(GSL_DISABLE_DEPRECATED)
+if(STEDEPY_1D_INSTEAD_OF_PARTIAL) 
+    message("1d instead of partial")
+	target_compile_definitions(SteepestDescentLib PRIVATE STEDEPY_1D_INSTEAD_OF_PARTIAL)
+endif()
+if(STEDEPY_USE_DIRECT_STEEPEST_DESC) 
+    message("direct steepest desc")
+	target_compile_definitions(SteepestDescentLib PRIVATE STEDEPY_USE_DIRECT_STEEPEST_DESC)
+endif()
+
+target_compile_definitions(SteepestDescentLib PRIVATE HAVE_INLINE)
+target_compile_definitions(SteepestDescentLib PRIVATE GSL_DISABLE_DEPRECATED)
 
 set_property(TARGET SteepestDescentLib PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 
