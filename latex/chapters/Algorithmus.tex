@@ -4,22 +4,24 @@
 
 In der Arbeit \citetitle{gasperini:hal-03209144} wird ein Verfahren zum Lösen von Integralen der Form
 \begin{equation}
+    \label{main_int}
     \Delta
     I_{r,\Delta}(k) = \int_{\Delta}^{}  \frac{e^{ik(\left\lVert r-r'\right\rVert + \theta \cdot r')}}{\left\lVert r-r'\right\rVert} \,dr'
-\end{equation}\label{main_int}
-vorgestellt. Das Integral $\I_{r,\Delta}(k)$ ist das Integral eines Dreicks $\delta$ mit Beobachtungspunkt $r \in \mathbb{R}^3$ für die Wellenzahl $k$. $\theta \in \mathbb{R}^3$ ist ein Richtungsvektor.
+\end{equation}
+vorgestellt. Das Integral $\I_{r,\Delta}(k)$ ist das Integral eines Dreicks $\Delta$ mit Beobachtungspunkt $r \in \mathbb{R}^3$ für die Wellenzahl $k$. $\theta \in \mathbb{R}^3$ ist ein Richtungsvektor.
 Dieses Integral wird auch als \textit{accoustic single-layer Integral-operator} bezeichnet.
 Mit größer werdender Wellenzahl $k$ wird dieses Problem als im \textit{high frequency regime} liegend beschrieben und die Berechnung dieser ist mit einer hohen Laufzeit verbunden.
-Die Autoren führen aus wie das Integral sich mithilfe des Cauchysche Integralsatzes gezielt an nicht mit $k$ oszillierenden Pfaden berechnen lässt.
+Die Autoren führen aus wie das Integral sich mithilfe des Cauchysche Integralsatzes gezielt an nicht mit $k$ oszillierenden Pfaden berechnen lässt (siehe Gleichung \ref{main_cauchy_algo}).
 Dies ermöglicht es diese Pfade mit einem \textit{Steepest-descent}-Verfahren effizient zu berechnen.
 
 Die Autoren von \cite{gasperini:hal-03209144} führen weiter aus, wie Pfade $h_a$ und $h_b$ bestimmt werden können und
- wie damit das Integral \ref{main_int} umgestellt werden kann \footnote{\cite[Kaptiel 1, Gleichung 4]{gasperini:hal-03209144}}.
+ wie damit das Integral \ref{main_int} umgestellt werden kann \footnote{\cite[Kaptiel 1, Gleichung 4]{gasperini:hal-03209144}}:
 
 \begin{equation}
+    \label{main_cauchy_algo}
     \begin{aligned}
         I(k,y,a,b) = & \int_{h_a}^{} f(z) e^{ikg(z)} \,dz  \int_{h_b}^{} f(z) e^{ikg(z)} \,dz \\
-         = & \int_{0}^{\infty} h'_a(t)f(h_a(t))e^{ikg(h_a(t))} \,dt -\int_{0}^{\infty} h'_b(t)f(h_b(t))e^{ikg(h_b(t))} \,dt 
+        = & \int_{0}^{\infty} h'_a(t)f(h_a(t))e^{ikg(h_a(t))} \,dt -\int_{0}^{\infty} h'_b(t)f(h_b(t))e^{ikg(h_b(t))} \,dt 
     \end{aligned}
 \end{equation}
 
@@ -27,17 +29,17 @@ Die Autoren von \cite{gasperini:hal-03209144} führen weiter aus, wie Pfade $h_a
 
 Um das Verfahren nachvollziehbar darzustellen sind einige Definitionen notwendig.
 Zunächst wird in Kapitel 2 von \cite{gasperini:hal-03209144} das Integral aus Gleichung \ref{main_int} hinsichtlich eines Dreiecks $\Delta \in \mathbb{R}^3$ und eines Richtungsvektors $\theta \in \mathbb{R}^3$ betrachtet.
-Das Dreieck wird als parametrisiertes Einheitsdreieck $\Lambda_1$ mit folgender Abbildung definiert: $x \rightarrow Ax + b$, mit $x = (x,y)^T$, $A:= (A_l)_{1\leq l \leq 2} \in \mathbb{R}^{3\times 2}$, $A_l \in \mathbb{R}^3$ und $b \in \mathbb{R}^3$ 
+Das Dreieck wird als parametrisiertes Einheitsdreieck $\Delta_1$ mit folgender Abbildung definiert: $x \rightarrow Ax + b$, mit $x = (x,y)^T$, $A:= (A_l)_{1\leq l \leq 2} \in \mathbb{R}^{3\times 2}$, $A_l \in \mathbb{R}^3$ und $b \in \mathbb{R}^3$ 
 
 Mit diesen lässt sich das Integral als
 \begin{equation}
     I_{\Delta}(k) = |A_1 \times A_2 | \int_{0}^{1} \int_{0}^{1-y}  \frac{e^{ik(||Ax + b - r|| +\theta \cdot (Ax +b))}}{||Ax + b - r ||}\,dx  \,dy  =: |A_1 \times A_2 | I_{\Delta_1}^1(k)
 \end{equation}\label{main_def_int}
 
-umformulieren. Die Autoren stellen definieren nun $P(x,y) := ||Ax+b-r||^2$ und $P(x)$, welches $P(x,y)$ für ein fixes $y$ berechnet.
-Dieses lässt sich mithilfe der komplexen Wurzeln $c$ und $\underline{c}$ von P und $c_0 \in [0,\infty[$ unter der Bedingung, dass $r$ nicht auf der Dreiecksfläche liegt, als 
+umformulieren. Die Autoren stellen definieren nun $P(x,y) := ||Ax+b-r||^2$ und $P(x)$, welches $P(x,y)$ für ein festes $y$ berechnet.
+Dieses lässt sich mithilfe der komplexen Wurzeln $c$ und $\overline{c}$ von P und $c_0 \in [0,\infty[$ unter der Bedingung, dass $r$ nicht auf der Dreiecksfläche liegt, als 
 \begin{equation}
-    P(x) = c_0x^2+c_0|c|^2-2c_0Re(c)
+    P(x) = c_0(x-c)(x-\overline(c))= c_0x^2+c_0|c|^2-2c_0Re(c)
 \end{equation}
 umformulieren (vgl. Formel 6, Kapitel 2 \cite{gasperini:hal-03209144}).
 
@@ -55,7 +57,7 @@ Die Autoren teilen dieses Problem in zwei Fälle auf, einen eindimensinalen Fall
 
 In der Arbeit \cite{gasperini:hal-03209144} wird zunächst beschrieben wie sich das Problem auf Pfaden in der komplexen Ebene berechnen lässt auf denen $e^{ikg(x)}$ nicht oszilliert.
 Es wird gezeigt wie sogenannte \textit{Splitting-points} berechnet werden, welche als Endpunkte für diese Pfade dienen.
-Liegt einer dieser Punkte auf einem komplexen Pfad, so kann das \textit{steepest-descent}-Verfahren nicht angewandt werden und es muss auf ein klassisches Integrationsverfahren zurückgegriffen werden, welches diese Singulariäten berechnen kann.
+Liegt einer dieser Punkte auf einem komplexen Pfad, so kann das \textit{Steepest-descent}-Verfahren nicht angewandt werden und es muss auf ein klassisches Integrationsverfahren zurückgegriffen werden, welches diese Singulariäten berechnen kann.
 
 
 \section{Cauchyscher Integralsatz}
@@ -136,7 +138,7 @@ Dieses Interval wird im Algorithmus durch die nächsten Nullstellen um diese Sin
 \section{Berechnung von zulässigen Pfade}
 
 Die Pfade welche auf denen \textit{Steepest-descent}-Verfahren werden darf, werden in der Arbeit \textit{zulässige}(engl. \textit{admissible}) Pfade genannt.
-Ein Pfad ist genau dann \textit{zulässig} wenn sein Anfangspunkt zu $\mathbb{R} \backslash {c_r,c_s}$ gehört (siehe Definition 3, Kapitel 4.1 in \cite{gasperini:hal-03209144}).
+Ein Pfad ist genau dann \textit{zulässig} wenn sein Anfangspunkt zu $\mathbb{R} \backslash \{c_r,c_s\}$ gehört (siehe Definition 3, Kapitel 4.1 in \cite{gasperini:hal-03209144}).
 
 Für einen Pfad $h_x$ mit Anfangspunkt $x$ wird die Funktion $K_x(t)$ als 
 \begin{equation}
@@ -149,9 +151,9 @@ definiert und mithilfe dieser die beiden Funktionen $K^1_{h_x}$ und $K^2_{h_x}$ 
         K^2_{h_x} :=&\sqrt{\frac{K_x(t)^2-c_0|c|^2}{c_0-q^2}-(\frac{qK_x(t)-c_0Re(c)}{c_0-q^2})^2}
     \end{aligned}
 \end{equation}
- definiert. Mithilfe dieser lassen sich wieder mit einer Fallunterscheidung über $q$ die Pfade berechnen.
+ definiert. Mithilfe dieser lassen sich wieder mit einer Fallunterscheidung (siehe Abbildung \ref{split_points}) von $q$ die Pfade berechnen.
 
-\begin{table}
+\begin{table}[ht]
     \centering
     \begin{tblr}{hlines,
         vlines,
@@ -163,7 +165,7 @@ definiert und mithilfe dieser die beiden Funktionen $K^1_{h_x}$ und $K^2_{h_x}$ 
         \SetCell[r=2]{} $|q|>\sqrt{c_0}$ & $q < 0$ & $K^1_{h_x} + K^2_{h_x}$ \\
          & $q > 0$ & $K^1_{h_x} - K^2_{h_x}$ \\
     \end{tblr}
-    \caption{Berechnung der von $h_x$}
+    \caption{Berechnung der von $h_x$}\label{split_points}
 \end{table}
 
 Zur Berechnung des Verfahrens wird neben dem Pfad $h_x$ auch die Ableitung $h'_x$ benötigt.
@@ -173,6 +175,7 @@ Diese lässt sich, wie in Kapitel 4.2 von \cite{gasperini:hal-03209144} gezeigt,
     h'_x(t) = \frac{i\sqrt{P(h_x(t))}}{c_0(h_x(t)-Re(c))+q\sqrt{P(h_x(t))}}
 \end{equation}
 
+\pagebreak
 
 \section{Fall1: Das 1D-Verfahren}
 
