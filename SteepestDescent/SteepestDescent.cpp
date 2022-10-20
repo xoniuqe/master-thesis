@@ -180,24 +180,62 @@ auto check_accuracy() {
 
 	arma::vec b{ 0,-0.5,0 };
 
-	arma::vec r{ 0.0618, 1.1413, 0 };
+	arma::vec r{ 0.0618, 0.1902, 0 };
 
-	arma::vec mu{ 1,0, 0 };
+	arma::vec theta{ 1,0, 0 };
 
 
 	config::configuration_2d config;
-	config.wavenumber_k = 5000;
+	config.wavenumber_k = 100;
 	config.tolerance = 0.1;
-	config.y_resolution = 0.01;
+	config.y_resolution = 0.0001;
 	config.gauss_laguerre_nodes = 1000;
 
+	auto q = arma::dot(A.col(0), theta);
+	auto qx = arma::dot(A.col(0), theta);
+	auto qy = arma::dot(A.col(1), theta);
+
+	auto prod = arma::dot(theta, b);
+
+	auto A1 = arma::mat(A);
+	A1.swap_cols(0, 1);
+	auto q1 = arma::dot(A1.col(0), theta);
+	auto sx1 = arma::dot(A1.col(1), theta) * 0. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
+	auto [c1, c1_0] = math_utils::get_complex_roots(0, A1, b, r);
+
+	arma::mat rotation{ {-1, 1}, {1, 0} };
+	arma::mat A2 = A * rotation;
+	auto q2 = arma::dot(A2.col(0), theta);
+	auto sx2 = arma::dot(A2.col(1), theta) * 1. + prod; // macht relativ wenig sinn, mal mit paper abgleichen
+	auto [c2, c2_0] = math_utils::get_complex_roots(1, A2, b, r);
+
+
+	auto y = 0.;//config.y_resolution * (double)i;// steps[i];
+	auto u = y + config.y_resolution * 0.5;
+	auto [c, c_0] = math_utils::get_complex_roots(u, A, b, r);
+	auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
+	auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
+
+	auto s = arma::dot(A.col(0), theta) * u + prod;
+
+	auto is_spec = math_utils::is_singularity_in_layer(config.tolerance, spec_point, 0, 1 - u);
+	auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, 0, 1 - u);
 
 	integrator::gsl_integrator gslintegrator;
 	integrator::gsl_integrator_2d gsl_integrator_2d;
 	integral::integral_2d integral2d(config, &gslintegrator, &gsl_integrator_2d);
 
 
-	auto result = integral2d(A, b, r, mu);
+	auto integration_y = integral2d.integrate_lambda(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
+	auto integration_1_minus_y = integral2d.integrate_lambda(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
+
+	std::cout << "intY " << integration_y << "\n";
+	std::cout << "intY-1 " << integration_1_minus_y << "\n";
+
+
+
+
+	auto result = integral2d(A, b, r, theta);
 	std::cout << "reuslt: " << result << std::endl;
 }
 
