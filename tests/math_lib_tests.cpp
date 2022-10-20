@@ -56,6 +56,20 @@ TEST_CASE("get complex roots", "[math_lib]") {
 		REQUIRE(std::imag(c) == Approx(0.5));
 		REQUIRE(c_0 == Approx(2));
 	}
+	SECTION("Bug 1") {
+
+		arma::mat  A{ {0, 0}, {0, 2}, {2, 0 } };
+
+		arma::vec b{ 0,-0.5,0 };
+
+		arma::vec r{ 0.0618, 0.1902, 0 };
+
+		auto [c, c_0] = math_utils::get_complex_roots(0,  A, b, r);
+		//0.346486400620223i
+		REQUIRE(std::real(c) == Approx(0.));
+		REQUIRE(std::imag(c) == Approx(0.34648));
+		REQUIRE(c_0 == Approx(4));
+	}
 
 	SECTION(" Config 8") {
 
