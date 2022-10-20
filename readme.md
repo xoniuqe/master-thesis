@@ -18,16 +18,28 @@ Install  oneAPI oneTBB:  https://www.intel.com/content/www/us/en/developer/artic
 
 CD to the root folder of the repo
 Update the submodules:
+```
+{
 git submodule sync --recursive
 git submodule update --init --recursive
+}
+```
 
 Bootstrap VCPKG
+```
+{
 cd vcpkg
 bootstrap-vcpkg.bat
+}
+```
 
 Install GSL Eigen3 with VCPKG
+```
+{
 vcpkg install gsl gsl:x64-windows  Eigen3:x64-windows
 vcpkg integrate install
+}
+```
 
 To compile either use VS2022 or run the CMAKE build
 
@@ -35,13 +47,20 @@ To compile either use VS2022 or run the CMAKE build
 CD to the root folder of the repo
 
 Update the submodules:
-git submodule sync --recursive
-git submodule update --init --recursive
+```
+{
+  git submodule sync --recursive
+  git submodule update --init --recursive
+}
+```
 
 Install the libraries to compile (Armadillo, OpenBLA, LApack, GSL, python3, eigen, tbb)
-- apt-get update --yes
-- apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev python3-dev libeigen3-dev libtbb-dev
-
+```
+{
+  apt-get update --yes
+  apt-get install --yes cmake libarmadillo-dev libopenblas-dev liblapack-dev libgsl-dev python3-dev libeigen3-dev libtbb-dev
+}
+```
 
 ### Macos
 
@@ -49,25 +68,42 @@ Install the libraries to compile (Armadillo, OpenBLA, LApack, GSL, python3, eige
 Needs homebrew to build, and the clang compiler
 
 Install cmake 
-brew install cmake
-
+```
+{
+  brew install cmake
+}
+```
 Install ninja
+```
+{
 brew install ninja
-
+}
+```
+```
+{
 Install gsl
 brew install gsl
-
+}
+```
+```
+{
 Install tbb
 brew install tbb
-
+}
+```
+```
+{
 Install armadillo
 brew install armadillo
-
-
-clone the repo
+}
+```
+ upate the submodules
+```
+{
 git submodule sync --recursive
 git submodule update --init --recursive 
-
+}
+```
 
     
 ### Build with CMAKE
@@ -75,8 +111,12 @@ git submodule update --init --recursive
 build the project
 Build wiht -DSTEDEPY_BUILD_MATLAB=TRUE to build the matlab plugin. This requires Matlab versions >= R2018a
 
-- cmake -S . -B build -DTBB_TEST=FALSE
-- cmake --build build -v 
+```
+{
+  cmake -S . -B build -DTBB_TEST=FALSE
+  cmake --build build -v 
+}
+```
 
 This build the project into out/build/
 
