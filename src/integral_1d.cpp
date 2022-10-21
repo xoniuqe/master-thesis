@@ -117,11 +117,11 @@ namespace integral {
 			I1 -= gauss_laguerre::calculate_integral_cauchy_tbb(path_sp1, nodes, weights);
 		}
 	
-		if (std::abs(left_split - sp1) > std::numeric_limits<double>::epsilon()) {
-			auto path_right = path_function_generator(right_split, y, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
-			I1 += gauss_laguerre::calculate_integral_cauchy_tbb(path_right, nodes, weights);
+		if (std::abs(sp2 - right_split) > std::numeric_limits<double>::epsilon()) {
 			auto path_sp2 = path_function_generator(sp2, y, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
-			I1 -= gauss_laguerre::calculate_integral_cauchy_tbb(path_sp2, nodes, weights);
+			I1 += gauss_laguerre::calculate_integral_cauchy_tbb(path_sp2, nodes, weights);
+			auto path_right = path_function_generator(right_split, y, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
+			I1 -= gauss_laguerre::calculate_integral_cauchy_tbb(path_right, nodes, weights);
 		}
 #else
 
