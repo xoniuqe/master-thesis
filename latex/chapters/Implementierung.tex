@@ -1,6 +1,6 @@
 \chapter{Implementierung}\label{impl}
 
-In diesem Kapitel wird dargelegt, wie der Algorithmus implementiert wird. Zu Beginn wird erläutert warum, welche Technologien zum Einsatz kommen und wie diese verwendet werden.
+In diesem Kapitel wird dargelegt, wie der Algorithmus implementiert wird. Zu Beginn wird erläutert welche Technologien zum Einsatz kommen und wie diese verwendet werden.
 \section{Verwendete Technologien}
 
 In diesem Abschnit werden die verwendeten Technologien vorgestellt. 
@@ -18,27 +18,29 @@ Diese bietet verschiedene Algorithmen an welche ein Integral der Form
 \begin{equation*}
     I = \int_{a}^{b} f(x) w(x) \,dx
 \end{equation*}
-lösen, wobei $w(x)$ eine Gewichtungsfunktion ist. Um die Genauigkeit festzulgen müssen die Grenzen $epsabs$ und $epsrel$ für die absoluten und relativen Fehler angegeben werden.
+lösen, wobei $w(x)$ eine Gewichtungsfunktion ist. Um die Genauigkeit festzulegen müssen die Grenzen $epsabs$ und $epsrel$ für die absoluten und relativen Fehler angegeben werden.
 Die Genauigkeit ist über die Ungleichung 
 \begin{equation*}
     |RESULT - I| \leq \max{(epsabs, epsrel |I|)}
 \end{equation*}
-definiert, wobei $RESULT$ die Apprixmation des Algorithmus darstellt. Die Algorithmen liefern das erste Ergebnis dessen absoluter Fehler kleiner als $epsabs$ bzw. dessen relativer Fehler kleiner als $epsrel$ ist.
+definiert, wobei $RESULT$ die Approximation des Algorithmus darstellt. Die Algorithmen liefern das erste Ergebnis, dessen absoluter Fehler kleiner als $epsabs$ bzw. dessen relativer Fehler kleiner als $epsrel$ ist.
 
 
 %The algorithms in QUADPACK use a naming convention based on the following letters:
 
 %The algorithms are built on pairs of quadrature rules, a higher order rule and a lower order rule. The higher order rule is used to compute the best approximation to an integral over a small range. The difference between the results of the higher order rule and the lower order rule gives an estimate of the error in the approximation.
 
-In dieser Arbeit wird das sogenannte \textit{CQUAD}-Integrationsverfahren verwendet.
-Im Handbuch der GSL wird dieses Verfahren als ein neues \textit{doubly-adaptive general-purpose}-Qaudartur-Verfahren \cite*[Kapitel 17.11]{gsl} beschrieben.
-\\
-Dieses Verfahren kann nicht direkt genutzt werden, um die benötigten Integrationen aus \cite*{gasperini:hal-03209144} zu berechnen, da 
-der \textit{CQUAD}-Algorithmus zum einen nur für eindimensionale Integrale und nur für den reellen Zahlenraum definiert ist.
+In dieser Arbeit wird das sogenannte \textit{QUAGS}-Integrationsverfahren verwendet. %Das Kürzel \textit{QUAGS} steht für \textbf{Q}uadrature routine
+Dieses adaptive Verfahren kann Integrale mit Singularitäten berechnen. Bei adaptiven Verfahren wird das zu integrierende Intervall in kleinere Teilintervalle aufgeteilt, die entsprechend ihres Fehlerterms ausgewählt werden.
+Bei dem \textit{QUAGS}-Verfahren werden diese Teilintervalle auf die Singularität konzentriert. (siehe GSL-Handbuch Kapitel 17.11 \cite{gsl})
+Hierbei wird die Gauss-Kronrod 21-Punkt Integrationsregel verwendet.\\
+
+Das Verfahren kann nicht direkt genutzt werden, um die benötigten Integrationen aus \cite*{gasperini:hal-03209144} zu berechnen, da 
+der \textit{QUAGS}-Algorithmus zum einen nur für eindimensionale Integrale und nur für den reellen Zahlenraum definiert ist.
 
 Um dies zu ermöglichen, sind zwei Anpassungen nötig:
 \begin{enumerate}
-    \item Das Verschachteln von zwei \textit{CQUAD} Aufrufen
+    \item Das Verschachteln von zwei \textit{QUAGS}-Aufrufen
     \item Das Auftrennen in zwei getrennte Aufrufe, jeweils für den Real- und Imaginär-teil der Integranden
 \end{enumerate}
 
@@ -46,7 +48,7 @@ Die Implementierung für den Realteil ist in \ref{integration_2d} zu sehen.
 
 \begin{figure}
     \lstinputlisting[language=C++,style=cpp]{gsl_integrator_2d.cpp}
-    \caption{Berechnung von komplexem Integral mit GSL}
+    \caption{Berechnung des komplexen Doppel-Integrals mit GSL (Realteil)}
     \label{integration_2d}
 \end{figure}
 
@@ -54,7 +56,7 @@ Die Implementierung für den Realteil ist in \ref{integration_2d} zu sehen.
 \subsection{Armadillo}
 
 Armadillo ist eine C++-Bibliothek von \citeauthor{armadillo}, welche Datenstrukturen und Algorithmen der linearen Algebra bereitstellt.
-Die Funktionalität uns Syntax ist an die von Matlab angelehnt mit dem Ziel die Umsetzung von \textit{Researchcode} in Produktivcode möglichst einfach zu gestalten \cite{armadillo}.
+Die Funktionalität und Syntax ist an die von Matlab angelehnt mit dem Ziel, die Umsetzung von \textit{Researchcode} in Produktivcode möglichst einfach zu gestalten \cite{armadillo}.
 
 
 \begin{center}
@@ -80,32 +82,22 @@ Die Funktionalität uns Syntax ist an die von Matlab angelehnt mit dem Ziel die 
     \label{gslarma}
 \end{center}
 
-Die GSL bietet zwar auch ein Framework für lineare Algebra, allerdings ist die API von Matlab deutlich moderner und einfacher zu verwenden (siehe Abbildung \ref{gslarma}).
-
-%Warum wurde neben GSL noch Armadilo genutz? => Moderne API von Armadillo
-
-%%Gerade bei der Frage nach dem Framework für Linalg und numerischer Integration lässt sich nicht abschätzen was die beste Lösung ist. Es gibt
-%so viele Frameworks und Bibliotheken, dass es nicht möglich ist alle gegeneinander Abzwuwägen.
-
-%Die Entshceidung GSL und Armadillo basier auf: Aramdillo ist einfach einzubinden und unkompliziert in der Anwendung.
-%GSL hat eine gute Perfomance. Der Verglecih lief mit Boost wobei einfache Tests zeigten das GSL schneller ist und mit weitaus weniger Aufwand in das Projekt integriert werden kann.
-%(Boost integration ist furchtbar!)
+Die GSL bietet zwar auch ein Framework für lineare Algebra, allerdings ist die API von Matlab deutlich moderner und einfacher zu verwenden. (siehe Abbildung \ref{gslarma})
 
 
 \subsection{Intel Threading Building Blocks}
 
 
-Die Intel\textsuperscript{\textcopyright} oneAPI Threading Building BLocks (oneTBB) ist eine Template-basierte Bibliothek zur effizienten Parallelisierung von Anwendungen. 
+Die Intel\textsuperscript{\textcopyright} oneAPI Threading Building Blocks (oneTBB) ist eine Template-basierte Bibliothek zur effizienten Parallelisierung von Anwendungen. 
 Mithilfe von oneTBB ist es möglich mit wenigen Schritten einen Algorithmus auf mehreren Threads auszuführen.
-%Die API bietet Datenstrukturen und Algorithmen um di
 
 oneTBB bietet für diverse Parallelisierungsprobleme  Algorithmen und Datenstrukturen an, von einfachen Schleifen, bis hin zu Graph-Based-Parallel Computing.
-In dieser Arbeit wurden lediglich die einfacheren Konzepte von parallelen Schleifen genutzt. Für diese Anwendungsfälle stellt oneTBB, unter anderem, die Funktionen \texttt{parallel\_for} und \texttt{parallel\_reduce}
+In dieser Arbeit wurden lediglich die einfacheren Konzepte von parallelen Schleifen genutzt. Für diese Anwendungsfälle stellt oneTBB unter anderem die Funktionen \texttt{parallel\_for} und \texttt{parallel\_reduce}
 zur Verfügung. Diese arbeiten auf sogenannten \textit{Ranges}, welche eine Abstraktion der zu bearbeitenden Daten sind.
 
 Ranges können die zu verarbeitende Datenmenge in kleinere Bereiche aufteilen. Diese Teilbereiche werden von oneTBB dann parallelisiert. Die Daten innerhalb einer Range werden sequenziell verarbeitet. 
-Wie groß diese Teilbereiche werden und welcher Art die Aufteilung ist, kann mithilfe von Parametern gesteuert werden. In diser Arbeit werden dies mit der sogenannten Blocked-Ranges (\texttt{blocked\_range}) realisiert, welche die Datenmenge in kontinuierliche Blöcke aufteilt. Die größe der jeweiligen Blöcke wird mit der sogenannten \textit{Grainsize} gesteuert.
-oneTBB bietet verschiedene Arten von Blocked-Ranges für bis zu 3 Dimensionen. Die Grainsize muss dem zu lösenden Problem entsprechend groß gewählt werden.
+Wie groß diese Teilbereiche werden und welcher Art die Aufteilung ist, kann mithilfe von Parametern gesteuert werden. In dieser Arbeit wird dies mit der sogenannten Blocked-Ranges (\texttt{blocked\_range}) realisiert, welche die Datenmenge in kontinuierliche Blöcke aufteilt. Die Größe der jeweiligen Blöcke wird mit der sogenannten \textit{Grainsize} gesteuert.
+oneTBB bietet verschiedene Arten von Blocked-Ranges für bis zu drei Dimensionen. Die Grainsize muss dem zu lösenden Problem entsprechend groß gewählt werden.
 
 \begin{center}
     \lstinputlisting[language=C++,style=cpp]{tbb_example.cpp}
@@ -113,8 +105,8 @@ oneTBB bietet verschiedene Arten von Blocked-Ranges für bis zu 3 Dimensionen. D
 \end{center}
 
 In dieser Arbeit werden ausschließlich Parallelisierungen mithilfe von \linebreak \texttt{parallel\_recude} bzw. \texttt{parallel\_deterministic\_reduce} umgesetzt.
-Dieses bietet die Möglichkeit für jedes Datum eine Transformation durchzuführen und anschließend die tranformierten Daten zu vereinigen. 
-So wird beispielsweise in der Implementierung (siehe Abschnitt \ref{gauss_laguerre_section}) des Gauss-Laguerrre Verfahrens ein zu integrierender Pfad parallel an den einzelnen Gauss-Laguerre-Knotenpunkten ausgewertet und entsprechend gewichtet.
+Diese bieten die Möglichkeit für jedes Datum eine Transformation durchzuführen und anschließend die transformierten Daten zu vereinigen. 
+So wird beispielsweise in der Implementierung (siehe Abschnitt \ref{gauss_laguerre_section}) des Gauss-Laguerrre-Verfahrens ein zu integrierender Pfad parallel an den einzelnen Gauss-Laguerre-Knotenpunkten ausgewertet und entsprechend gewichtet.
 Die so berechneten Teilwerte werden nun noch addiert und ergeben so das komplexe (Teil-)Integral des Pfades. 
 
 \subsection{Pybind11}
@@ -145,7 +137,7 @@ Um eine C++-Funktion in Matlab zur Verfügung zu stellen, gibt es mehrere Ansät
 Zum einen kann mithilfe von Matlab C++-Code kompiliert und anschließend genutzt werden. 
 Die für den Endnutzer einfachere Variante ist das Bereitstellen von sogenannten Mex-Funktionen.
 
-Um eine Mex-Funktion zu implementieren müssen die Header-Dateien \texttt{mex.hpp} und \texttt{mexAdapter.hpp} inkludiert werden
+Um eine Mex-Funktion zu implementieren, müssen die Header-Dateien \texttt{mex.hpp} und \texttt{mexAdapter.hpp} inkludiert werden
 und eine Funktion mit dem Namen \textit{MexFunction} implementiert werden. 
 
 In Abbildung \ref{mexfunction} ist eine Beispiel-Implementierung zu sehen.
@@ -179,7 +171,7 @@ Zum Durchführen der automatisierten Benchmarks wird auf die Bibliothek \textit{
 
 In diesem Abschnitt werden Details der Implementierung näher beleuchtet. Es werden ausgewählte Codestellen vorgestellt, die wesentliche Funktionen implementieren.
 
-\subsection{Gauss laguerre integration und Cauchy Integral Theoerem}\label{gauss_laguerre_section}
+\subsection{Gauss-Laguerre-Verfahren}\label{gauss_laguerre_section}
 
 Die Berechnung der Pfadintegrale wird mithilfe des Gauss-Laguerre-Verfahrens realisiert.
 Da die Auswertung der Pfadfunktion an den Gauss-Laguerre-Knoten unabhängig voneinander ist,
@@ -189,19 +181,19 @@ Die \textit{Grainsize} ist auf 100 Elemente festgelegt, kleinere Blockgrößen h
 
 \begin{center}
     \lstinputlisting[language=C++,style=cpp]{gauss_laguerre.cpp}
-    \captionof{figure}{Implementierung der Gauss-Laguerre Quadratur}
+    \captionof{figure}{Implementierung der Gauss-Laguerre-Quadratur}
     \label{gauss_laguerre_impl}
 \end{center}
 
 \subsection{Gewichtung der Pfade}
 
 In der Datei \textit{path\_utils.cpp} werden Funktionen zur Berechnung der gewichteten Pfade bereitgestellt.
-Diese werden dann wie im Abschnitt \ref{gauss_laguerre_section} beschrieben verwendet um die \textit{zulässigen} Pfade zu berechnen.
+Diese werden dann, wie im Abschnitt \ref{gauss_laguerre_section} beschrieben, verwendet um die \textit{zulässigen} Pfade zu berechnen.
 Es werden drei verschiedene Gewichtungen vorgenommen:
 \begin{itemize}
     \item Für den eindimenisionalen Fall
-    \item Für den $\Lambda$-Term im zweidimensionalen
-    \item Für die Pfade im zweidimensionalen
+    \item Für den $\Lambda$-Term im zweidimensionalen Fall
+    \item Für die Pfade im zweidimensionalen Fall
 \end{itemize}
 
 Die Implementierung ist in Abbilung \ref{path_utils} zu sehen.
@@ -212,7 +204,7 @@ Die Implementierung ist in Abbilung \ref{path_utils} zu sehen.
     \label{path_utils}
 \end{center}
 
-\subsection{1D Integration}
+\subsection{1D-Integration}
 
 Die 1D-Integration ist als sogenanntes \textit{Functor-Objekt} implementiert. 
 
@@ -223,7 +215,7 @@ Die 1D-Integration ist als sogenanntes \textit{Functor-Objekt} implementiert.
 
 \subsubsection*{Berechung der Singularität}
 
-In Kapitel 5.1 \cite[12]{gasperini:hal-03209144} (Formel 16) wird die Formel für den eindimenisionalen Fall, im Fall einer Singularität im Interval $[a_1, b_1]$ wie folgt beschrieben:
+In Kapitel 5.1 \cite[12]{gasperini:hal-03209144} (Formel 16) wird die Formel für den eindimenisionalen Fall, im Fall einer Singularität im Interval $[a_1, b_1]$, wie folgt beschrieben:
 
 \begin{equation}
     I(k,y,a,b,) = I(k,y,a,a_1) + I(k,y,a_1, b_1) + I(k,y,b_1,b)
@@ -231,9 +223,9 @@ In Kapitel 5.1 \cite[12]{gasperini:hal-03209144} (Formel 16) wird die Formel fü
 
 Die partiellen Integrale in den Intervallen $[a,a_1]$ und  $[b_1,b_1]$ können mithilfe des \textit{steepest-descent}-Verfahrens berechnet werden.
 Lediglich das verbleibende Interval muss mit einem klassischen Integrationsverfahren berechnet werden.
-Dieses Verfahren muss also fähig sein Singularitäten in einem Integral zu berechnen. Dies ist nicht bei allen Integrationsverfahren gegeben (z.B. dem sogenannten QAG-Verfahren aus der GSL).
+Dieses Verfahren muss also fähig sein, Singularitäten in einem Integral zu berechnen. Dies ist nicht bei allen Integrationsverfahren gegeben (z.B. dem sogenannten QAG-Verfahren aus der GSL).
 
-und wird in dieser Arbeit wie folgt berechnet:
+Die Implementierung des Integrals auf Pfaden mit Singularität ist in folgender Abbildung enthalten:
 \begin{center}
     \lstinputlisting[language=C++,style=cpp,mathescape=true]{1d_integration_singularity.cpp}
     \captionof{figure}{Implementierung des 1D-Falls (Singularität)}
@@ -248,12 +240,12 @@ hat, mithilfe eines Aufruf des GSL-Integrators berechnet (Analog zum 2D Fall, si
 
 
 
-\subsection{2D Integration}\label{2dint}
+\subsection{2D-Integration}\label{2dint}
 
 Ebenso wie die 1D-Integration wird die 2D-Integration als sogenanntes \textit{Functor-Objekt} implementiert (siehe Abbildung \ref{2d_integral_functor}). 
-Im Konstruktor werden die invarianten Parameter übergeben und in dem \textit{\(\)-Operator} werden die Dreiecksparameter, der Blickpunkt $r$ und der Richtungsvektor $\theta$ übergeben.
+Im Konstruktor werden die invarianten Parameter übergeben und in dem Aufrufoperator werden die Dreiecksparameter, der Blickpunkt $r$ und der Richtungsvektor $\theta$ übergeben.
 
-In diesem Abschnitt wird primär auf die Berechnung eines einzelnen Schicht $n$ eingangen. Die Anzahl der zu berechnenden Schichten wird aus der Konfiguration(siehe Abbildung \ref{configuration}) abgeleitet. 
+In diesem Abschnitt wird primär auf die Berechnung einer einzelnen Schicht $n$ eingangen. Die Anzahl der zu berechnenden Schichten wird aus der Konfiguration (siehe Abbildung \ref{configuration}) abgeleitet. 
 Die Menge der Schichten wird mithilfe der oneTBB Funktion \texttt{parallel\_reduce} parallelisiert.
 
 \begin{center}
@@ -263,19 +255,19 @@ Die Menge der Schichten wird mithilfe der oneTBB Funktion \texttt{parallel\_redu
 \end{center}
 
 Dabei hat sich gezeigt, dass eine Blockgröße von 1 zu den besten Ergebnissen führt.
-Die zu Berechnende Schicht kann nun in zwei Fälle unterteilt werden: Mit Singularität und ohne.
+Die zu berechnende Schicht kann nun in zwei Fälle unterteilt werden: Mit Singularität und ohne.
 
 \subsubsection*{Berechnung von $\Lambda_a$}
 
 Die $\Lambda_a$-Terme werden mithilfe des eindimenisionalen Verfahrens berechnet.
-Dabei wird dieser mit angepassten Funktionen für die Pfadgewichtung sowie angepasstem Integranden für die klassische Integration.
+Dabei wird dieser mit angepassten Funktionen für die Pfadgewichtung sowie angepasstem Integranden für die klassische Integration ausgeführt.
 
 \begin{center}
     \lstinputlisting[language=C++,style=cpp]{integral_2d_partial.cpp}
 \end{center}
 
 Im Quellcode werden Aufrufe dieser Instanz mit \textit{partial\_integral} ausgeführt.
-In den folgenden Abschnitten wird auf die Behandlung der Fälle ohne und mit Singularitäten beschrieben.
+In den folgenden Abschnitten wird auf die Behandlung der Fälle ohne und mit Singularitäten eingegangen.
 Die gezeigten Codestellen zeigen lediglich einen Ausschnitt. Im vollständigen Code ist dies in der Datei \textit{integral.cpp} in einer parallelisierten Schleife
 eingebunden. 
 
@@ -292,12 +284,12 @@ Dabei ist der Fall ohne Singularität der trivialere Fall:
 
 \subsubsection*{Fall 2: Singularität in Schicht $n$}
 
-Diesem Fall gehen die Berechnungen des ersten Falles vorraus (angedeutet in Abbildung \ref{2d_integral_sing})
+Diesem Fall gehen die Berechnungen des ersten Falles vorraus (angedeutet in Abbildung \ref{2d_integral_sing}).
 In Schicht $n$ liegt eine Singularität vor. Für diese werden die \textit{Splitting-points} berechnet. Mithilfe dieser wird der Teilpfad für das klassische Integrationsverfahren bestimmt.
 (Berechnung des Integrals in Zeile 32 Abbildung \ref{2d_integral_sing}).
 Die Implementierung dieser Funktion ergibt sich nicht komplett aus der Arbeit \cite{gasperini:hal-03209144}, denn in der zugrundeliegenden Matlab-Implementierung wird ersichtlich, dass für den Fall der Singularität 
-eine weitere Sache berücksichtigt werden muss: Eine von den Autoren der Implementierung genannte \textit{Integrationsbox}, welche eine Ungenauigkeit bei der Berücksichtigung der Singularität darstellt.
-Diese lässt sich wie folgt erklären: Durch das Aufteilen der zu integrierenden Dreiecksoberfäche in Schichten ist wird die Position der Singularität, bedingt durch die \"Höhe\" der Schicht, ggf. zu stark gewichtet.
+eine weitere Sache berücksichtigt werden muss: eine von den Autoren der Implementierung genannte \textit{Integrationsbox}, welche eine Ungenauigkeit bei der Berücksichtigung der Singularität darstellt.
+Diese lässt sich wie folgt erklären: durch das Aufteilen der zu integrierenden Dreiecksoberfäche in Schichten wird die Position der Singularität, bedingt durch die \glqq Höhe\grqq{} der Schicht, gegebenenfalls zu stark gewichtet.
 Dies wird mit einer partiellen Integration an dieser Stelle über die vertikale Dimension ausgeglichen (Zeilen 26-29).
 
 \begin{center}

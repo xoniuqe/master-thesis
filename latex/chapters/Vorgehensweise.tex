@@ -2,16 +2,13 @@
 
 In diesem Kapitel wird darauf eingegangen, wie die in Kapitel \ref{Performance} definierten Ziele erreicht werden.
 
-
-\section{Grober Plan}
-
-Damit das Ziel der schnellen Performance erreicht wird, wird die folgende Vorgehensweise genutzt.
+Damit das Ziel der schnellen Performanz erreicht wird, wird die folgende Vorgehensweise genutzt.
 
 Zu Beginn wird der Algorithmus ohne Rücksicht auf Perfomanzkriterien implementiert.
 Dabei wird mithilfe von Unittests sichergestellt, dass sich die Implementierung korrekt verhält. 
 Die korrekten Eregbnisse einzelner Tests können mithilfe der vorliegenden Matlab-Implementierung verifiziert werden.
 
-Nachdem in diesem ersten Schritt ein korrekter Algorithmus vorliegt kann mit der Optimierung begonnen werden.
+Nachdem in diesem ersten Schritt ein korrekter Algorithmus vorliegt, kann mit der Optimierung begonnen werden.
 Dazu werden folgende Methoden verwendet, auf welche in den jeweiligen Unterkapiteln eingegangen wird.
 
 \begin{itemize}
@@ -23,7 +20,7 @@ Dazu werden folgende Methoden verwendet, auf welche in den jeweiligen Unterkapit
 
 \section{Profiling}
 
-Mithilfe der Profiling-Werkzeuge der Entwicklungsumgebung Visual Studio lässt sich das Laufzeitverhalten einer Anwendung analysieren.
+Mithilfe der Profiling-Werkzeuge der Entwicklungsumgebung \textit{Visual Studio} lässt sich das Laufzeitverhalten einer Anwendung analysieren.
 In dieser Arbeit wird dabei das Messen der Geschwindigkeit als primäre Metrik genutzt. 
 
 
@@ -41,7 +38,7 @@ Die so gefundenen Funktionen sind die besten Kandidaten für Optimierungsmaßnah
 Um die Laufzeit der Implementierung beurteilen zu können, wird auf zweierlei Arten von Benchmarks gesetzt.
 
 Zum einen automatisierte Benchmarks, welche vorallem die API-Endpunkte mit verschiedenen Testdaten ausführen und das Laufzeitverhalten messen.
-Diese Ergebnisse werden genutzt um während der Entwicklung schnelle Rückmeldung über einzelne Maßnahmen zu erhalten.
+Diese Ergebnisse werden genutzt, um während der Entwicklung schnelle Rückmeldung über einzelne Maßnahmen zu erhalten.
 
 Die zweite Variante der Benchmarks ist das manuelle Ausführen von API-Aufrufen, welche mithilfe von Timingfunktionen gemessen werden.
 Diese werden für Tests genutzt, bei denen eine Automatisierung mit erheblichem Mehraufwand verbunden wäre.
@@ -49,14 +46,14 @@ Diese Vorgehensweise wird beispielsweise beim Vergleich der Matlabimplementierun
 
 \section{Parallelisieren isolierter Bereiche}
 
-Einige mögliche Parallesierungen lassen sich direkt aus der Problemstellung ablesen. 
-So ist beispielsweise die Berechnung des zweidimensionalen Falls von zwei Dreiecken $\Delta_1$ und $\Delta_2$ abgesehen von 
-der Wellenzahl $k$, des Beobachtungspunktes $\theta$ und der Anzahl der Gauss-Laguerre-Knoten unabhängig voneinander.
-Diese Berechnungen lassen sich Dementsprechend relativ unproblematisch Parallelisieren da keine klassischen Threading-Konflikte auftreten können.
+Einige mögliche Parallelisierung lassen sich direkt aus der Problemstellung ablesen. 
+So ist beispielsweise die Berechnung des zweidimensionalen Falls von zwei Dreiecken $\Delta_1$ und $\Delta_2$, abgesehen von 
+der Wellenzahl $k$, des Beobachtungspunktes $\theta$ und der Anzahl der Gauss-Laguerre-Knoten, unabhängig voneinander.
+Diese Berechnungen lassen sich dementsprechend relativ unproblematisch parallelisieren, da keine klassischen Threading-Konflikte auftreten können.
 Da der Zugriff auf diese invarianten Parameter lediglich lesend ist, können die Zugriffe auf diese Ressourcen sogar ohne Synchronisierungen durchgeführt werden.
 
 Ähnliches gilt für das Berechnen der einzelene Schichten im zweidimensionalen Fall. Die Ergebnisse einzelner Schichten beeinflussen sich gegenseitig nicht.
 
-\section{Sonstige}
+\section{Sonstige Maßnahmen}
 
 Desweiteren werden mithilfe von Compiler- und Linker-Flags einige Optimierungen hinsichtlich der Laufzeit ausgewählt.

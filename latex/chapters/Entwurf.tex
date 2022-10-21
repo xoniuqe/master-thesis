@@ -1,6 +1,6 @@
 \chapter{Entwurf}\label{desgin}
 In diesem Kapitel wird auf verschiedene Aspekte der Entwurfsphase eingegangen.
-Zum einen wird dargelegt mit welcher Herangehensweise der Algorithmus umgesetzt wird und zum anderen werden die Entscheidungen über die verwendeten Technologien begründet.
+Zum einen wird dargelegt, mit welcher Herangehensweise der Algorithmus umgesetzt wird und zum anderen werden die Entscheidungen über die verwendeten Technologien begründet.
 
 \section{Anforderungen}
 
@@ -29,7 +29,7 @@ Dort werden in Kapitel 6.1 (Tabelle 3) für die Parameter
     \end{pmatrix}
 \end{equation}
 
-die relativen Fehler des implementierten Verfahrens mit der Matlab $integral$ Funktion für verschiedene Wellenzahlen $k$ verglichen.
+die relativen Fehler des implementierten Verfahrens mit der Matlab \textit{integral}-Funktion für verschiedene Wellenzahlen $k$ verglichen.
 \begin{table}[ht]
     \centering
     \begin{tabular}{|l|l|}
@@ -53,11 +53,11 @@ Die Anforderung der Bedienbarkeit wird im Rahmen dieser Arbeit wie folgt definie
 
 \begin{enumerate}
     \item Es wird eine C++-Bibliothek bereitgstellt, welche mithilfe des Build-System \textit{CMake} eingebunden werden kann. 
-    \item Es wird eine oder mehrere Matlab-Mex Funktionen ausgeliefert, welche den Algorithmus in Matlab benutzbar machen. 
-    \item Es wird ein Python-Modul bereitgesellt, mit dem die 1D und 2D Algorithmen genutzt werden können.
+    \item Es wird eine oder mehrere Matlab Mex-Funktionen ausgeliefert, welche den Algorithmus in Matlab benutzbar machen. 
+    \item Es wird ein Python-Modul bereitgesellt, mit dem die 1D- und 2D-Algorithmen genutzt werden können.
 \end{enumerate}
 
-Dabei ist es nicht das Ziel, die beschriebenen Pakete offiziel auszuliefern. Das eigenhändige Compilieren der Bilbiothek und ggf. der Module ist erforderlich.
+Dabei ist es nicht das Ziel, die beschriebenen Pakete offiziel auszuliefern. Das eigenhändige Compilieren der Bibliothek und gegebenfalls der Module ist erforderlich.
 
 \subsection{Geschwindigkeit}\label{Performance}
 
@@ -70,17 +70,18 @@ Zu diesesm Zweck werden einige Auswertungen mit randomisierten Daten mithilfe vo
 \section{Architektur}
 
 Diese Arbeit wird mit der Programmiersprache C++ umgesetzt.
-Die Anwendung wird in drei Module aufgeteilt. 
-Die Hauptbibliothek \texttt{steepest\_descent}, in welcher der eigentliche Algorithmus implementiert wird.
-Diese API-Endpunkte dienen den Python- und Matlab-Wrappern die nötigen Anknüpfpunkte. 
-\\
-Das Python-Modul \texttt{stedepy} welches die in der Hauptbibliothek API-Endpunkte bereitstellt, sowie eine Möglichkeit, die benötigten Gauss-Laguerre-Knoten vorab zu berechnen.
-Das Matlab-Modul, welches sich aus mehreren Mex-Funktionen zusammensetzt, welche die Funkionen der API bereitstellen.
-\\
+Die Anwendung wird in drei Module aufgeteilt:
+\begin{enumerate}
+    \item Die Hauptbibliothek \texttt{steepest\_descent}, in welcher der eigentliche Algorithmus implementiert wird. Dort werden die \textit{Functor-Objekte} \texttt{integral\_1d} und \texttt{integral\_2d} bereitgestellt,
+    welche den Python- und Matlab-Wrappern als Anknüpfpunkte dienen. 
+    \item Das Python-Modul \texttt{stedepy}, welches diese Funktionalitäten inklusive einer Möglichkeit die für das Gauss-Laguerre benötigten Knoten und Gewichte zu berechnen.
+    \item Das Matlab-Modul, welches sich aus mehreren Mex-Funktionen zusammensetzt, welche die Funkionen der API bereitstellen.
+\end{enumerate}
+
 \subsection{Klassendiagramm}
 
 In Abbildung \ref{uml} wird ein vereinfachter Überblick über die implementierten Klassen und ihr Zusammenwirken gegeben.
-Die Klassen \texttt{integral\_1d} und \texttt{integral\_2d} sind dabei die Schnittstellen für das Python und das Matlab Modul.
+Die Klassen \texttt{integral\_1d} und \texttt{integral\_2d} sind dabei die Schnittstellen für das Python- und das Matlab-Modul.
 Die dargestellten Klassen sind verkürzt und die Funktionsparameter wurden ausgelassen, um die Lesbarkeit zu erhalten.
 
 \begin{figure}
