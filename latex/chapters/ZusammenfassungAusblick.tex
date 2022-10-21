@@ -1,11 +1,15 @@
 \chapter{Zusammenfassung und Ausblick}
 
-Insgesamt hat diese Arbeit die geforderten Anforderungen erfüllt. Die Implementierung ist hinsichtlich der Performanz besser als die zu Grunde liegende Matlab-Implementierung.
+Insgesamt hat diese Arbeit die geforderten Anforderungen hinsichtlich der Laufzeit und Genauigkeit erfüllt. Die Implementierung ist hinsichtlich der Performanz besser als die zugrunde liegende Matlab-Implementierung.
 Durch das Python-Modul und die Matlab-Funktionen ist es relativ einfach möglich die Bibliothek zu verwenden. 
-Die Implementierung hat sich als komplizierter als erwartet gezeigt, denn einige Details werden in der Arbeit \cite[1] nicht näher beschrieben, die in der Implementierung nicht trivial sind.
+Die Implementierung hat sich als komplizierter als erwartet gezeigt, denn einige Details werden in der Arbeit \cite{gasperini:hal-03209144} nicht näher beschrieben, die in der Implementierung nicht trivial sind.
 
 So ist beispielsweise die Berechnung der im Programmcode \textit{Splitting-point} genannten Punkte nicht weiter beschrieben und war nur mithilfe des Matlab-Codes nachvollziehbar.
 
+Beim Auswerten der numerischen Genauigkeiten sind einige Probleme aufgetreten, welche sich später auf Implementierungsfehler zurückführen liessen. Auch ist bei diesen Tests aufgefallen,
+wie rapide die Laufzeit der Berechnung des Integrals über Dreiecksoberflächen mit der Matlab \textit{integral2}-Funktion mit steigender Wellenzahl ansteigt.
+Ein Aufgrund des vorhin erwähnten Implementierungsfehlers ein unbrauchbarer Test über Wellenzahlen $k \in \{1000, 3000, 5000\}$ wurde nach 8 Stunden abgebrochen, ohne dass die Berechnungen abgeschlossen waren.
+Die Berechnung mit dem \textit{Steepest-descent}-Verfahren lief dahingegen innerhalb weniger Minuten durch.
 Hinsichtlich der Perfomanz bestehen noch einige Möglichkeiten die in dieser Arbeit nicht ausgeschöpft wurden. Insbesondere könnte eine Beschleunigung der Verfahren mithilfe der GPU enorme Laufzeit-Verbesserungen mit sich bringen.
 %Des weiteren könnte eine andere Herangehensweise hinsichtlich der gewählten Architektur womöglich weitere Lücken schließen. Die hier gewählte Lösung folg hinsichtlich der einzelnen Berechnungsschritte des Verfahrens der mathematischen Formulierung.
 %Dahingegen könnte eine Architektur die auf größere Mengen von Eingabeparemetern 

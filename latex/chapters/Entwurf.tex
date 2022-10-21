@@ -89,6 +89,12 @@ Die dargestellten Klassen sind verkürzt und die Funktionsparameter wurden ausge
     \caption{Vereinfachtes UML-Diagramm der Implementierung}\label{uml}
 \end{figure}
 
+Anhand der Klasse \texttt{integral\_2d} wird das Zusammenspiel der Komponenten verdeutlicht:
+Per Konstruktor werden Instanzen der Konfiguration, der GSL-Integratoren und die Gauss-Laguerre Knoten \textit{nodes} und Gewichte \textit{weights} übergeben.
+Der Aufrufoperator implementiert die Berechnung des Integrals. Dort werden die partiellen Integrale für die Berechnung der $\Lambda$-Terme mithilfe der Klasse
+\texttt{integral\_1d} berechnet\footnote{Bei anders gewählten Einstellungen zur Kompilierung kann dies auch ein Aufruf der Funktion \textit{partial\_integral} sein.}, welche ähnlich initialisiert wird. Die GSL-Integratoren werden dann zum Berechnen der Singularitäten aufgerufen und die zulässigen Pfade werden mit 
+dem \textit{Steepest-descent}-Verfahren berechnet. 
+
 \pagebreak
 
 \subsection{Parameter der Integration}

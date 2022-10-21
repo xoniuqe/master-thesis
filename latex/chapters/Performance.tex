@@ -244,8 +244,8 @@ Für jedes $k$ werden 50 zufällige Richtungsvektoren $r$ berechnet mit 600 Gaus
 
 \section{Vergleiche der Genauigkeit}
 
-Um die Genauigkeit der implementierten C++-Lösung zu überprüfen, wurde folgendes Szenario getestet.
-
+In diesem Abschnitt werden die numerischen Experimente aus Kapitel 6 von \cite{gasperini:hal-03209144} mit der in dieser Arbeit entwickelten C++-Implementierung durchgeführt.
+Die Konfiguration ist wie folgt:
 
 \begin{equation}
   A = \begin{pmatrix}
@@ -262,12 +262,62 @@ Um die Genauigkeit der implementierten C++-Lösung zu überprüfen, wurde folgen
 \end{pmatrix}, \theta \begin{pmatrix}
    1 \\ 0 \\ 0
 \end{pmatrix}
-\end{equation}
+\end{equation}\label{num_config}
 
-Dies entspricht den Testdaten aus Kapitel 6.1 von \cite{gasperini:hal-03209144} für den eindimensionalen Fall. 
-In diesem Test werden die Daten allerdings zum Vergleich der C++-Lösung und der Funktion \textit{integral2} von Matlab verwendet.
-Dabei wird mit die Funktion \textit{integral2} mit der gleichen Auflösung $res=0.01$ über einzelne Schichten ausgewertet.
-Dies wird in Abbildung \ref{matlab_integral} gezeigt. 
+
+\subsection{Eindimensionaler Fall}
+
+Die Tests im eindimensionalen Fall werden wie in Kapitel 6.1 von \cite{gasperini:hal-03209144} mit 160 Gauss-Laguerre-Knoten durchgeführt.
+Für die Konfiguration (siehe \ref{num_config}) und festgewählte $\alpha = 0$ und $d=0.6$ die relative Genauigkeit verglichen.
+Diese Konfiguration enthält einen \textit{Splitting-point} in der Mitte des zu berechnenden Intervalls. (vgl Kapitel 6.1, Tabelle 3 in \cite{gasperini:hal-03209144})
+In Tabelle \ref{accu} ist die Auswertung dieses Vergleichs zu sehen.
+
+\begin{table}[ht]
+  \centering
+  \begin{tblr}{hlines,
+      vlines,
+      colspec={M{1.5cm}M{5cm}M{5cm}M{3cm}}}
+      $k$ & C++-Implementierung & Matlab \textit{integral}-Funktion & Relativer Fehler \\
+      100 &  $-0.07799217 + 0.13435696i$ &  $-0.07799217 + 0.13435696i$ & $1.12\times10^{-15}$ \\
+      500 &   $0.04810768 + 0.05294844i$	&  $0.04810768 + 0.05294844i$ & $2.12\times10^{-14}$ \\
+      1000 & $-0.03836233 + 0.03374236i$ &  $-0.03836224 + 0.03374733i$	& $9.71\times10^{-5}$ \\
+      3000 & $-0.02377403 + 0.01807411i$	& $-0.02377404 + 0.01807412i$ & $5.11\times10^{-7}$ \\ 
+      5000 & $-0.01930278 + 0.01243698i$	& $-0.01930278 + 0.01243698i$ & $1.31\times10^{-8}$ \\
+  \end{tblr}
+  \caption{Auswertung des Integrals $I(k,0,0,1)$ im Vergleich zu Matlab}\label{accu}
+\end{table}
+
+Im Vergleich des relativen Fehlers in diesem Versuch und Tabelle 3 aus \cite{gasperini:hal-03209144}
+sind die relativen Fehler in ihrer Größenordnung gleichwertig. 
+%In Tabelle \ref{accu_comp} wird der gleiche Versuch im Vergleich mit der 
+
+%\begin{table}[ht]
+%  \centering
+%  \begin{tblr}{hlines,
+%      vlines,
+%      colspec={M{1.5cm}M{5cm}M{5cm}M{3cm}}}
+%      $k$ & C++-Implementierung & Matlab \textit{Steepest-descent} & Relativer Fehler \\
+%      100  & $-0.07799217 + 0.13435696i$ & $-0.07799217 + 0.13435696i$ & $1.44\times10^{-15}$ \\
+%      500  & $ 0.04810768 + 0.05294844i$ & $ 0.04810768 + 0.05294844i$ & $1.06\times10^{-14}$ \\
+%      1000 & $-0.03836233 + 0.03374236i$ & $-0.03836233 + 0.03374236i$ & $2.49\times10^{-15}$ \\
+%      3000 & $-0.02377403 + 0.01807411i$ & $-0.02377403 + 0.01807411i$ & $1.04\times10^{-13}$ \\
+%      5000 & $-0.01930278 + 0.01243698i$ & $-0.01930278 + 0.01243698i$ & $6.26\times10^{-14}$ \\    
+%  \end{tblr}
+%  \caption{Auswertung des Integrals $I(k,0,0,1)$ im Vergleich zur ursprünglichen Implementierung}\label{accu_comp}
+%\end{table}
+
+
+
+\subsection{Zweidimensionaler Fall}
+
+
+Für den Test des zweidimensionalen Falls wird wieder auf festgewählte $\alpha = 0$ und $d=0.6$ zurückgegriffen.
+Die Autoren schreiben in ihrer Auswertung, dass um die Berechnungen möglich sind mit geringeren Wellenzahlen $k$ getestet wird. (Siehe Kapitel 6.2 \cite{gasperini:hal-03209144})
+Dies konnte in eigenen Tests nachvollzogen werden, da die Auswertungen von $k \in \{1000, 3000, 5000\}$ mehrere Stunden in Anspruch genommen haben.
+Aufgrund eines Implementierungsfehler konnten diese Ergebnisse leider nicht verwertet werden, da dort die numerische Ungenauigkeit zu hoch war.
+
+Zum  Vergleich wird die Funktion \textit{integral2} mit der Auflösung $res=0.0001$ über einzelne Schichten ausgewertet. Es wird die Wellenzahl $k=20$ verwendet.
+Die Berechnung des Integrals mithilfe der Matlab Funktion wird in Abbildung \ref{matlab_integral} gezeigt. 
 \begin{center}
   \begin{lstlisting}[language=MATLAB, breaklines]
     Im=0;
@@ -279,12 +329,19 @@ Dies wird in Abbildung \ref{matlab_integral} gezeigt.
   \end{lstlisting}
   \captionof{figure}{Berechnung des 2D-Integrals in Matlab}\label{matlab_integral}
 \end{center}
-%Auf das Fehlerszenarion eingehen.
-%Graph mit dem Fehlervergleich
 
-%Daten des relativen Fehlers messen 
-%=> matlab um die 7-e18 
-%=> gsl um die 1-e18
+Die Ergebnisse dieses Vergleichs sind in Tabelle \ref{accu_2d} zu sehen.
+\begin{table}[ht]
+  \centering
+  \begin{tblr}{hlines,
+      vlines,
+      colspec={M{1.5cm}M{5cm}M{5cm}M{3cm}}}
+      $k$ & C++-Implementierung & Matlab \textit{integral2}-Funktion & Relativer Fehler \\
+      5 & $-0.08447462 + 0.20608188i$ & $-0.0842793 + 0.20698190i$ & $4.1\times10^{-3}$ \\
+      10 & $ 0.00682469 - 0.09068582i$ & $ 0.0066867 - 0.09105933i$ & $4.3\times10^{-3}$ \\
+      20 & $ 0.02207955 - 0.02298169i$ & $ 0.0220181 - 0.02314369i$ & $5.4\times10^{-3}$ \\
+  \end{tblr}
+  \caption{Auswertung des Integrals $I_\Lambda(k)$ im Vergleich zu Matlab}\label{accu_2d}
+\end{table}
 
-%Das einfach mal auf einem Lauf rennen lassen
-
+%Im Vergleich zu der Auswertung in Tabelle 4 in \cite{gasperini:hal-03209144} fällt auf, dass die berechneten Integrale nicht übereinstimmen.
