@@ -25,6 +25,49 @@ TEST_CASE("calculate spec and sing points", "[math_lib]") {
 		REQUIRE(std::real(sing_point) == Approx(0.5));
 		REQUIRE(std::imag(sing_point) == Approx(1.524));
 	}
+
+}
+
+TEST_CASE("splitpoints", "[math_lib]") {
+	arma::mat  A{ {0, 0}, {2, 0}, {0, 2} };
+
+	arma::vec b{ 0,-1,0 };
+
+	arma::vec r{ -0.198422940262896, -0.150399880277165, 0 };
+
+	arma::vec theta{ 1,0, 0 };
+
+	auto [c, c_0] = math_utils::get_complex_roots(0, A, b, r);
+	auto q = 0.;
+	auto s = 0.;
+	auto left_split = 0.;
+	auto right_split = 1.;
+	auto k = 1000;
+
+	SECTION("Check type of singulerity") {
+		auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
+		auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
+
+		if (std::abs(std::imag(sing_point)) < std::abs(std::imag(c))) {
+			sing_point = std::real(sing_point);
+		}
+
+		if (std::abs(std::imag(spec_point)) < std::abs(std::imag(c))) {
+			spec_point = std::real(spec_point);
+		}
+		auto is_spec = math_utils::is_singularity_in_layer(0.1, spec_point, left_split, right_split);
+
+		auto is_sing = math_utils::is_singularity_in_layer(0.1, sing_point, left_split, right_split);
+		REQUIRE(is_sing);
+		REQUIRE(!is_spec);
+	}
+	SECTION("Check accuracy of split points") {
+		auto [sp1, sp2] = math_utils::get_split_points_sing(q, k, s, {c, c_0}, left_split, right_split);
+
+		REQUIRE(std::real(sp1) == Approx(0.408565556448243));
+		REQUIRE(std::real(sp2) == Approx(0.441034563274592));
+
+	}
 }
 
 
