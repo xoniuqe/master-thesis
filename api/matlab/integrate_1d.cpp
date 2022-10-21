@@ -32,7 +32,7 @@ private:
         integrator::gsl_integrator gslintegrator;
         integral::integral_1d integral1d(config, &gslintegrator, nodes, weights);
 
-        return integral1d(A, b, r, theta,y, left_split, right_split);
+        return integral1d(A, b, r, theta, y, left_split, right_split);
     }
 
     auto integrate_1d(matlab::mex::ArgumentList& inputs) ->std::complex<double> {

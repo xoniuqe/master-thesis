@@ -17,7 +17,7 @@ namespace integral {
 		this->weights = w;
 		this->green_fun_generator = [](const double& k, const std::complex<double>& y, const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const double& q, const std::complex<double>& s) -> math_utils::green_fun
 		{
-			return [&](const double x) -> auto {
+			return [y = y, A = A, b = b, r = r, k = k, q = q, s = s](const double x) -> auto {
 				auto Px = math_utils::calculate_P_x(x, y, A, b, r);
 				auto sqrtPx = std::sqrt(Px);
 				auto res = std::exp(1.i * k * (sqrtPx + q * x + s)) * (1. / sqrtPx);
@@ -33,7 +33,7 @@ namespace integral {
 	{ 
 		this->green_fun_generator = [](const double& k, const std::complex<double>& y, const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const double& q, const std::complex<double>& s) -> math_utils::green_fun
 		{
-			return [&](const double x) -> auto {
+			return [y=y,A=A,b=b,r=r,k=k,q=q,s=s](const double x) -> auto {
 				auto Px = math_utils::calculate_P_x(x, y, A, b, r);
 				auto sqrtPx = std::sqrt(Px);
 				auto res = std::exp(1.i * k * (sqrtPx + q * x + s)) * (1. / sqrtPx);
@@ -57,6 +57,7 @@ namespace integral {
 	}
 
 	auto integral_1d::operator()(const arma::mat& A, const arma::vec3& b, const arma::vec3& r, const double q, const std::complex<double> s, const std::complex<double> y, const std::complex<double> c, const double c_0, const double left_split, const double right_split) const -> std::complex<double> {
+		
 		auto sing_point = math_utils::get_singularity_for_ODE(q, { c, c_0 });
 		auto spec_point = math_utils::get_spec_point(q, { c, c_0 });
 
@@ -71,12 +72,11 @@ namespace integral {
 #ifndef STEDEPY_USE_DIRECT_STEEPEST_DESC
 		steepest_descent::steepest_descend_2d steepest_desc(this->path_function_generator, nodes, weights, config.wavenumber_k, y, A, b, r, q, s, { c, c_0 }, sing_point);
 #endif
-
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
 		if (math_utils::is_singularity_in_layer(config.tolerance, spec_point, left_split, right_split)) {
 			split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		}
-		else if (math_utils::is_singularity_in_layer(config.tolerance, sing_point, left_split, right_split)) {
+		if (math_utils::is_singularity_in_layer(config.tolerance, sing_point, left_split, right_split)) {
 			split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
 		}
 		else
@@ -91,15 +91,19 @@ namespace integral {
 			return left - right;
 #else
 			//no singularity
-			return steepest_desc(left_split) - steepest_desc(right_split);
+			return  steepest_desc(left_split) - steepest_desc(right_split);
 #endif
 
 		}
-		auto& [sp1, sp2] = split_points;
+		auto sp1 = std::get<0>(split_points);
+		auto sp2 = std::get<1>(split_points);
+
 
 		auto fun = green_fun_generator(config.wavenumber_k, y, A, b, r, q, s);
 
 		auto x = integrator->operator()(fun, sp1, sp2);
+
+
 
 
 #ifdef STEDEPY_USE_DIRECT_STEEPEST_DESC
