@@ -20,9 +20,13 @@ namespace integrator {
 
 
 	struct gsl_integrator_2d {
-		gsl_integrator_2d(const size_t n=1000) {
-			workspace = gsl_integration_cquad_workspace_alloc(n);
-			inner_workspace = gsl_integration_cquad_workspace_alloc(n);
+		gsl_integrator_2d(const size_t n=4000) : n(n) {
+			//workspace = gsl_integration_cquad_workspace_alloc(n);
+			//inner_workspace = gsl_integration_cquad_workspace_alloc(n);
+			workspace = gsl_integration_workspace_alloc(n);
+
+			inner_workspace = gsl_integration_workspace_alloc(n);
+
 		}
 
 		gsl_integrator_2d(gsl_integrator_2d& other) = delete;
@@ -34,11 +38,16 @@ namespace integrator {
 			workspace = other.workspace;
 			other.inner_workspace = nullptr;
 			other.workspace = nullptr;
+			n = other.n;
 		}
 
 		~gsl_integrator_2d() {
-			gsl_integration_cquad_workspace_free(inner_workspace);
-			gsl_integration_cquad_workspace_free(workspace);
+			//gsl_integration_cquad_workspace_free(inner_workspace);
+			//gsl_integration_cquad_workspace_free(workspace);
+			gsl_integration_workspace_free(inner_workspace);
+
+			gsl_integration_workspace_free(workspace);
+
 		}
 
 		template<class integrand_fun>
@@ -47,16 +56,20 @@ namespace integrator {
 			std::lock_guard<std::mutex> guard(integration_mutex);
 
 			double result_real, result_imag;
+			double abs_error_real_inner, abs_error_real, abs_error_imag_inner, abs_error_imag;
 
 			auto f_real = make_gsl_function([&](double x) {
 				double inner_result;
 				auto inner = make_gsl_function([&](double y) {
 					return std::real(integrand(x, y));
 					});
-				gsl_integration_cquad(&inner, y_start, y_end, 1e-16, 1e-6, inner_workspace, &inner_result, NULL, NULL);
+				//gsl_integration_cquad(&inner, y_start, y_end, 1e-12, 1e-12, inner_workspace, &inner_result, NULL, NULL);
+				gsl_integration_qags(&inner, y_start, y_end, 1e-12 , 1e-12, n, inner_workspace, &inner_result, &abs_error_real_inner);
+
 				return inner_result;
 				});
-			gsl_integration_cquad(&f_real, std::real(x_start), std::real(x_end), 1e-16, 1e-6, workspace, &result_real, NULL, NULL);
+			//gsl_integration_cquad(&f_real, std::real(x_start), std::real(x_end), 1e-12, 1e-12, workspace, &result_real, NULL, NULL);
+			gsl_integration_qags(&f_real, std::real(x_start), std::real(x_end), 1e-12, 1e-12, n, workspace, &result_real, &abs_error_real);
 
 
 			auto f_imag = make_gsl_function([&](double x) {
@@ -64,15 +77,19 @@ namespace integrator {
 				auto inner = make_gsl_function([&](double y) {
 					return std::imag(integrand(x, y));
 					});
-				gsl_integration_cquad(&inner, y_start, y_end, 1e-16, 1e-6, inner_workspace, &inner_result, NULL, NULL);
+				gsl_integration_qags(&inner, y_start, y_end, 1e-12, 1e-12, n, inner_workspace, &inner_result, &abs_error_imag_inner);
+				//gsl_integration_cquad(&inner, y_start, y_end, 1e-12, 1e-12, inner_workspace, &inner_result, NULL, NULL);
 				return inner_result;
 				});
-
-			gsl_integration_cquad(&f_imag, std::real(x_start), std::real(x_end), 1e-16, 1e-6, workspace, &result_imag, NULL, NULL);
+			gsl_integration_qags(&f_imag, std::real(x_start), std::real(x_end), 1e-12, 1e-12, n, workspace, &result_imag, &abs_error_real);
+			//gsl_integration_cquad(&f_imag, std::real(x_start), std::real(x_end), 1e-12, 1e-12, workspace, &result_imag, NULL, NULL);
 			return std::complex<double>(result_real, result_imag);
 		}
 	private:
 		mutable std::mutex integration_mutex;
-		gsl_integration_cquad_workspace *workspace, *inner_workspace;
+		size_t n;
+	//	gsl_integration_cquad_workspace *workspace, *inner_workspace;
+		gsl_integration_workspace* workspace, * inner_workspace;
+
 	};
 }

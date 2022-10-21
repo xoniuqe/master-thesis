@@ -65,13 +65,13 @@ namespace integral {
 		auto c2_0 = std::get<1>(croots2);
 
 		auto local_k = config.wavenumber_k;
-		auto green_fun_2d = [k = local_k, &A, &b, &r, qx, qy, prod](const double x, const double y) -> auto {
+		auto green_fun_2d = [k = local_k, A=A, b=b, r=r, qx=qx, qy=qy, prod=prod](const double x, const double y) -> auto {
 			auto Px = math_utils::calculate_P_x(x, y, A, b, r);
 			auto sqrtPx = std::sqrt(Px);
 			auto res = std::exp(1.i * k * (sqrtPx + qx * x + qy * y + prod)) * (1. / sqrtPx);
 			return res;
 		};
-		//std::mutex write_mutex;j
+
 		auto integration_result = 0. + 0.i;
 		int number_of_steps = (int)1. / config.y_resolution;
 #ifdef STEDEPY_1D_INSTEAD_OF_PARTIAL
@@ -113,7 +113,7 @@ namespace integral {
 				auto integration_y = integrate_lambda(A1, b, r, 0., q1, sx1, c1, c1_0, y, y + config.y_resolution);
 				auto integration_1_minus_y = integrate_lambda(A2, b, r, 1., q2, sx2, c2, c2_0, y, y + config.y_resolution);
 #endif
-		
+
 #ifndef STEDEPY_USE_DIRECT_STEEPEST_DESC
 				steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_2d, nodes, weights, config.wavenumber_k, u, A, b, r, q, s, { c, c_0 }, sing_point);
 #endif
@@ -126,7 +126,7 @@ namespace integral {
 				auto path2 = path_utils::get_weighted_path_2d(1 - u, u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
 				auto Ifin = gauss_laguerre::calculate_integral_cauchy_tbb(path2, nodes, weights);
 #else
-				auto Iin =  steepest_desc(0);
+				auto Iin = steepest_desc(0);
 				auto Ifin = steepest_desc(1 - u);
 #endif
 				//Rausgezogen, da es sp�ter sowieso berechnet wird (4.10)
@@ -136,15 +136,15 @@ namespace integral {
 					// no singularity
 					continue;
 				}
-				else if (is_spec) {
+				if (is_spec) {
 					split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
 				}
-				else if (is_sing) {
+				if (is_sing) {
 					split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, 0, 1 - u);
 				}
 				auto& [split_point1, split_point2] = split_points;
-	
-			
+
+
 				//singularity
 #ifdef STEDEPY_USE_DIRECT_STEEPEST_DESC
 				auto path3 = path_utils::get_weighted_path_2d(split_point1, u, A, b, r, q, config.wavenumber_k, s, { c, c_0 }, sing_point);
@@ -166,21 +166,24 @@ namespace integral {
 				//Vertical layer at splitPt2.
 				auto sx_intern_2 = arma::dot(A1.col(1), theta) * split_point2 + prod;
 				auto [cIntern2, c_0Intern2] = math_utils::get_complex_roots(split_point2, A1, b, r);
-				
-				
+
+
 
 				// Integration over these two segments.
 #ifdef STEDEPY_1D_INSTEAD_OF_PARTIAL				
-				auto intYintern1 = partial_integral( A1, b, r, q1, sx_intern_1, split_point1, cIntern1, c_0Intern1, y, y + config.y_resolution);
-				auto intYintern2 = partial_integral( A1, b, r, q1, sx_intern_2, split_point2, cIntern2, c_0Intern2, y, y + config.y_resolution);
+				auto intYintern1 = partial_integral(A1, b, r, q1, sx_intern_1, split_point1, cIntern1, c_0Intern1, y, y + config.y_resolution);
+				auto intYintern2 = partial_integral(A1, b, r, q1, sx_intern_2, split_point2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 #else
 				auto intYintern1 = integrate_lambda(A1, b, r, split_point1, q1, sx_intern_1, cIntern1, c_0Intern1, y, y + config.y_resolution);
 				auto intYintern2 = integrate_lambda(A1, b, r, split_point2, q1, sx_intern_2, cIntern2, c_0Intern2, y, y + config.y_resolution);
 #endif
 
 				auto integral2_res = integrator.operator()(green_fun_2d, split_point1, split_point2, y, y + config.y_resolution);
+				//auto integral2_res = integrator.operator()(green_fun_2d, 0., 1., 0.01, 0.02);// +config.y_resolution);
 
-				auto integration_result = integral2_res + Iin2 * intYintern2  - Ifin1 * intYintern1;
+				auto integration_result = integral2_res + Iin2 * intYintern2 - Ifin1 * intYintern1;
+		
+				//auto integration_result = integral2_res;
 				integral += integration_result;
 			}
 			return integral;
@@ -203,21 +206,25 @@ namespace integral {
 
 		steepest_descent::steepest_descend_2d steepest_desc(path_utils::get_weighted_path_y, nodes, weights, config.wavenumber_k, sPx, A, b, r, q, s, { c, c_0 }, sing_point);
 
+
+		auto is_spec = math_utils::is_singularity_in_layer(config.tolerance, spec_point, left_split, right_split);
+		auto is_sing = math_utils::is_singularity_in_layer(config.tolerance, sing_point, left_split, right_split);
+
 		std::tuple<std::complex<double>, std::complex<double>> split_points;
-		if (math_utils::is_singularity_in_layer(config.tolerance, spec_point, left_split, right_split)) {
-			split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
-		}
-		else if (math_utils::is_singularity_in_layer(config.tolerance, sing_point, left_split, right_split)) {
-			split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
-		}
-		else
-		{	
+		if (!is_sing && !is_spec)
+		{
 			auto left = steepest_desc(left_split);
 			auto right = steepest_desc(right_split);
 			//no singularity
 			return left - right;
-
-		}       
+		}
+		if (is_spec) {
+			split_points = math_utils::get_split_points_spec(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
+		}
+		if (is_sing) {
+			split_points = math_utils::get_split_points_sing(q, config.wavenumber_k, s, { c, c_0 }, left_split, right_split);
+		}
+    
 
 		auto& [sp1, sp2] = split_points;
 
