@@ -1,6 +1,7 @@
 \chapter{Entwurf}\label{desgin}
 In diesem Kapitel wird auf verschiedene Aspekte der Entwurfsphase eingegangen.
-Zum einen wird dargelegt, mit welcher Herangehensweise der Algorithmus umgesetzt wird und zum anderen werden die Entscheidungen über die verwendeten Technologien begründet.
+Zum einen wird dargelegt, welche Anforderungen an den entwickelten Algorithmus gestellt werden und zum anderen wird ein Überblick über die Architektur gegeben.
+%Zum einen wird dargelegt, mit welcher Herangehensweise der Algorithmus umgesetzt wird und zum anderen werden die Entscheidungen über die verwendeten Technologien begründet.
 
 \section{Anforderungen}
 
@@ -91,9 +92,9 @@ Die dargestellten Klassen sind verkürzt und die Funktionsparameter wurden ausge
 
 Anhand der Klasse \texttt{integral\_2d} wird das Zusammenspiel der Komponenten verdeutlicht:
 Per Konstruktor werden Instanzen der Konfiguration, der GSL-Integratoren und die Gauss-Laguerre Knoten \textit{nodes} und Gewichte \textit{weights} übergeben.
-Der Aufrufoperator implementiert die Berechnung des Integrals. Dort werden die partiellen Integrale für die Berechnung der $\Lambda$-Terme mithilfe der Klasse
-\texttt{integral\_1d} berechnet\footnote{Bei anders gewählten Einstellungen zur Kompilierung kann dies auch ein Aufruf der Funktion \textit{partial\_integral} sein.}, welche ähnlich initialisiert wird. Die GSL-Integratoren werden dann zum Berechnen der Singularitäten aufgerufen und die zulässigen Pfade werden mit 
-dem \textit{Steepest-descent}-Verfahren berechnet. 
+Der Aufrufoperator implementiert die Berechnung des Integrals. Dort werden die $\Lambda$-Terme mithilfe der Klasse
+\texttt{integral\_1d} berechnet\footnote{Bei anders gewählten Einstellungen zur Kompilierung, kann dies auch ein Aufruf der Funktion \textit{partial\_integral} sein.}, welche ähnlich initialisiert wird. Die GSL-Integratoren werden dann zum Berechnen der Singularitäten aufgerufen und die zulässigen Pfade werden mit 
+dem \textit{Steepest-descent}-Verfahren\footnote{Abhängig der Einstellungen zur Kompilierung, kann dies mit der Klasse \texttt{steepest\_descent\_2d} oder direkt berechnet werden.} berechnet. 
 
 \pagebreak
 

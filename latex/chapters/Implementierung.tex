@@ -23,7 +23,7 @@ Die Genauigkeit ist über die Ungleichung
 \begin{equation*}
     |RESULT - I| \leq \max{(epsabs, epsrel |I|)}
 \end{equation*}
-definiert, wobei $RESULT$ die Approximation des Algorithmus darstellt. Die Algorithmen liefern das erste Ergebnis, dessen absoluter Fehler kleiner als $epsabs$ bzw. dessen relativer Fehler kleiner als $epsrel$ ist.
+definiert, wobei $RESULT$ die Approximation des Algorithmus darstellt. Die Algorithmen liefern das erste Ergebnis, dessen absoluter Fehler kleiner als $epsabs$ bzw. dessen relativer Fehler kleiner als $epsrel$ ist. (Vgl. GSL-Handbuch Kapitel 17.1 \cite{gsl})
 
 
 %The algorithms in QUADPACK use a naming convention based on the following letters:
@@ -32,7 +32,7 @@ definiert, wobei $RESULT$ die Approximation des Algorithmus darstellt. Die Algor
 
 In dieser Arbeit wird das sogenannte \textit{QUAGS}-Integrationsverfahren verwendet. %Das Kürzel \textit{QUAGS} steht für \textbf{Q}uadrature routine
 Dieses adaptive Verfahren kann Integrale mit Singularitäten berechnen. Bei adaptiven Verfahren wird das zu integrierende Intervall in kleinere Teilintervalle aufgeteilt, die entsprechend ihres Fehlerterms ausgewählt werden.
-Bei dem \textit{QUAGS}-Verfahren werden diese Teilintervalle auf die Singularität konzentriert. (siehe GSL-Handbuch Kapitel 17.11 \cite{gsl})
+Bei dem \textit{QUAGS}-Verfahren werden diese Teilintervalle auf die Singularität konzentriert. (siehe GSL-Handbuch Kapitel 17.4 \cite{gsl})
 Hierbei wird die Gauss-Kronrod 21-Punkt Integrationsregel verwendet.\\
 
 Das Verfahren kann nicht direkt genutzt werden, um die benötigten Integrationen aus \cite*{gasperini:hal-03209144} zu berechnen, da 
