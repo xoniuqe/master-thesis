@@ -161,12 +161,14 @@ namespace integral {
 				//Vertical layer at splitPt1.
 
 				auto sx_intern_1 = arma::dot(A1.col(1), theta) * split_point1 + prod;
-				auto [cIntern1, c_0Intern1] = math_utils::get_complex_roots(split_point1, A1, b, r);
-
+				auto internRoots1 = math_utils::get_complex_roots(split_point1, A1, b, r);
+				auto cIntern1 = std::get<0>(internRoots1);
+				auto c_0Intern1 = std::get<1>(internRoots1);
 				//Vertical layer at splitPt2.
 				auto sx_intern_2 = arma::dot(A1.col(1), theta) * split_point2 + prod;
-				auto [cIntern2, c_0Intern2] = math_utils::get_complex_roots(split_point2, A1, b, r);
-
+				auto internRoots2 = math_utils::get_complex_roots(split_point2, A1, b, r);
+				auto cIntern2 = std::get<0>(internRoots2);
+				auto c_0Intern2 = std::get<1>(internRoots2);
 
 
 				// Integration over these two segments.
